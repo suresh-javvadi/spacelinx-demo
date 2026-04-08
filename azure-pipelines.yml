@@ -1,7 +1,7 @@
 # ============================================================
 # SpaceLinx MES - Azure DevOps CI/CD Pipeline
 # Mono-repo: .NET 10 API + React 18 Frontend
-# Flow: main → Dev | release/v* → UAT | v* tag → Prod (approval)
+# Flow: main → Dev | release/v* → UAT | v* tag → Prod + Demo
 # ============================================================
 
 trigger:
@@ -82,18 +82,16 @@ stages:
     displayName: 'Deploy to Dev'
     dependsOn: BuildAPI
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-    variables:
-      apiBaseUrl: 'https://spacelinxapidev.azurewebsites.net/api/'
     jobs:
       - job: BuildFrontendDev
         displayName: 'Build Frontend (Dev)'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-          - task: NodeTool@0
+          - task: UseNode@1
             displayName: 'Install Node.js'
             inputs:
-              versionSpec: '$(nodeVersion)'
+              version: '$(nodeVersion)'
 
           - task: Cache@2
             displayName: 'Cache npm'
@@ -106,14 +104,9 @@ stages:
             displayName: 'Install dependencies'
             workingDirectory: '$(frontendDir)'
 
-          - script: npm run build
-            displayName: 'Build frontend'
+          - script: npm run build:dev
+            displayName: 'Build frontend (dev mode)'
             workingDirectory: '$(frontendDir)'
-            env:
-              VITE_API_BASE_URL: $(apiBaseUrl)
-              VITE_MSAL_CLIENT_ID: $(msalClientId)
-              VITE_MSAL_TENANT_ID: '9a2ef642-7a2d-4c40-9e00-b8b132aef5b8'
-              VITE_APP_NAME: 'SPACELINX'
 
           - task: ArchiveFiles@2
             displayName: 'Archive build'
@@ -127,6 +120,7 @@ stages:
             artifact: frontend-dev
             displayName: 'Upload frontend artifact'
 
+      # Deploy API to Dev (Linux App Service)
       - deployment: DeployApiDev
         displayName: 'Deploy API'
         dependsOn: []
@@ -150,6 +144,7 @@ stages:
                     package: '$(Pipeline.Workspace)/api/*.zip'
                     runtimeStack: 'DOTNETCORE|10.0'
 
+      # Deploy Frontend to Dev (Windows App Service)
       - deployment: DeployWebDev
         displayName: 'Deploy Frontend'
         dependsOn: BuildFrontendDev
@@ -167,12 +162,10 @@ stages:
                   displayName: 'Deploy to spacelinxmesdev'
                   inputs:
                     azureSubscription: '$(azureSubscription)'
-                    appType: 'webAppLinux'
+                    appType: 'webApp'
                     appName: 'spacelinxmesdev'
                     resourceGroupName: 'SpaceLinxDev'
                     package: '$(Pipeline.Workspace)/frontend-dev/frontend.zip'
-                    runtimeStack: 'NODE|22-lts'
-                    startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
 
   # ──────────────────────────────────────────────────────────
   # DEPLOY UAT (auto on release/v* branches)
@@ -181,18 +174,16 @@ stages:
     displayName: 'Deploy to UAT'
     dependsOn: BuildAPI
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/v'))
-    variables:
-      apiBaseUrl: 'https://spacelinxapiuat.azurewebsites.net/api/'
     jobs:
       - job: BuildFrontendUAT
         displayName: 'Build Frontend (UAT)'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-          - task: NodeTool@0
+          - task: UseNode@1
             displayName: 'Install Node.js'
             inputs:
-              versionSpec: '$(nodeVersion)'
+              version: '$(nodeVersion)'
 
           - task: Cache@2
             displayName: 'Cache npm'
@@ -205,14 +196,9 @@ stages:
             displayName: 'Install dependencies'
             workingDirectory: '$(frontendDir)'
 
-          - script: npm run build
-            displayName: 'Build frontend'
+          - script: npm run build:uat
+            displayName: 'Build frontend (UAT mode)'
             workingDirectory: '$(frontendDir)'
-            env:
-              VITE_API_BASE_URL: $(apiBaseUrl)
-              VITE_MSAL_CLIENT_ID: $(msalClientId)
-              VITE_MSAL_TENANT_ID: '9a2ef642-7a2d-4c40-9e00-b8b132aef5b8'
-              VITE_APP_NAME: 'SPACELINX'
 
           - task: ArchiveFiles@2
             displayName: 'Archive build'
@@ -266,32 +252,29 @@ stages:
                   displayName: 'Deploy to spacelinxmesuat'
                   inputs:
                     azureSubscription: '$(azureSubscription)'
-                    appType: 'webAppLinux'
+                    appType: 'webApp'
                     appName: 'spacelinxmesuat'
                     resourceGroupName: 'SpaceLinxUat'
                     package: '$(Pipeline.Workspace)/frontend-uat/frontend.zip'
-                    runtimeStack: 'NODE|22-lts'
-                    startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
 
   # ──────────────────────────────────────────────────────────
-  # DEPLOY PROD (on v* tags, with approval gate)
+  # DEPLOY PROD + DEMO (on v* tags, with approval gate)
   # ──────────────────────────────────────────────────────────
   - stage: DeployProd
-    displayName: 'Deploy to Production'
+    displayName: 'Deploy to Production + Demo'
     dependsOn: BuildAPI
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-    variables:
-      apiBaseUrl: 'https://spacelinxapiprod.azurewebsites.net/api/'
     jobs:
+      # Build frontend for Prod
       - job: BuildFrontendProd
         displayName: 'Build Frontend (Prod)'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-          - task: NodeTool@0
+          - task: UseNode@1
             displayName: 'Install Node.js'
             inputs:
-              versionSpec: '$(nodeVersion)'
+              version: '$(nodeVersion)'
 
           - task: Cache@2
             displayName: 'Cache npm'
@@ -305,13 +288,8 @@ stages:
             workingDirectory: '$(frontendDir)'
 
           - script: npm run build
-            displayName: 'Build frontend'
+            displayName: 'Build frontend (production mode)'
             workingDirectory: '$(frontendDir)'
-            env:
-              VITE_API_BASE_URL: $(apiBaseUrl)
-              VITE_MSAL_CLIENT_ID: $(msalClientId)
-              VITE_MSAL_TENANT_ID: '9a2ef642-7a2d-4c40-9e00-b8b132aef5b8'
-              VITE_APP_NAME: 'SPACELINX'
 
           - task: ArchiveFiles@2
             displayName: 'Archive build'
@@ -325,8 +303,47 @@ stages:
             artifact: frontend-prod
             displayName: 'Upload frontend artifact'
 
+      # Build frontend for Demo
+      - job: BuildFrontendDemo
+        displayName: 'Build Frontend (Demo)'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: UseNode@1
+            displayName: 'Install Node.js'
+            inputs:
+              version: '$(nodeVersion)'
+
+          - task: Cache@2
+            displayName: 'Cache npm (demo)'
+            inputs:
+              key: 'npm | "$(Agent.OS)" | $(frontendDir)/package-lock.json'
+              restoreKeys: 'npm | "$(Agent.OS)"'
+              path: $(frontendDir)/node_modules
+
+          - script: npm ci
+            displayName: 'Install dependencies'
+            workingDirectory: '$(frontendDir)'
+
+          - script: npm run build:demo
+            displayName: 'Build frontend (demo mode)'
+            workingDirectory: '$(frontendDir)'
+
+          - task: ArchiveFiles@2
+            displayName: 'Archive build'
+            inputs:
+              rootFolderOrFile: '$(frontendDir)/dist'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/frontend.zip'
+
+          - publish: $(Build.ArtifactStagingDirectory)/frontend.zip
+            artifact: frontend-demo
+            displayName: 'Upload frontend artifact'
+
+      # Deploy API to Prod
       - deployment: DeployApiProd
-        displayName: 'Deploy API'
+        displayName: 'Deploy API (Prod)'
         dependsOn: []
         pool:
           vmImage: 'ubuntu-latest'
@@ -349,15 +366,40 @@ stages:
                     runtimeStack: 'DOTNETCORE|10.0'
 
                 - task: AzureAppServiceManage@0
-                  displayName: 'Restart API'
+                  displayName: 'Restart API (Prod)'
                   inputs:
                     azureSubscription: '$(azureSubscription)'
                     action: 'Restart Azure App Service'
                     webAppName: 'spacelinxapiprod'
                     resourceGroupName: 'SpaceLinxProd'
 
+      # Deploy API to Demo
+      - deployment: DeployApiDemo
+        displayName: 'Deploy API (Demo)'
+        dependsOn: []
+        pool:
+          vmImage: 'ubuntu-latest'
+        environment: 'spacelinx-mes-demo'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: api
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy to spacelinxapidemo'
+                  inputs:
+                    azureSubscription: '$(azureSubscription)'
+                    appType: 'webAppLinux'
+                    appName: 'spacelinxapidemo'
+                    resourceGroupName: 'SpaceLinxProd'
+                    package: '$(Pipeline.Workspace)/api/*.zip'
+                    runtimeStack: 'DOTNETCORE|10.0'
+
+      # Deploy Frontend to Prod
       - deployment: DeployWebProd
-        displayName: 'Deploy Frontend'
+        displayName: 'Deploy Frontend (Prod)'
         dependsOn: BuildFrontendProd
         pool:
           vmImage: 'ubuntu-latest'
@@ -373,17 +415,38 @@ stages:
                   displayName: 'Deploy to spacelinxmesprod'
                   inputs:
                     azureSubscription: '$(azureSubscription)'
-                    appType: 'webAppLinux'
+                    appType: 'webApp'
                     appName: 'spacelinxmesprod'
                     resourceGroupName: 'SpaceLinxProd'
                     package: '$(Pipeline.Workspace)/frontend-prod/frontend.zip'
-                    runtimeStack: 'NODE|22-lts'
-                    startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
 
                 - task: AzureAppServiceManage@0
-                  displayName: 'Restart Frontend'
+                  displayName: 'Restart Frontend (Prod)'
                   inputs:
                     azureSubscription: '$(azureSubscription)'
                     action: 'Restart Azure App Service'
                     webAppName: 'spacelinxmesprod'
                     resourceGroupName: 'SpaceLinxProd'
+
+      # Deploy Frontend to Demo
+      - deployment: DeployWebDemo
+        displayName: 'Deploy Frontend (Demo)'
+        dependsOn: BuildFrontendDemo
+        pool:
+          vmImage: 'ubuntu-latest'
+        environment: 'spacelinx-mes-demo'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: frontend-demo
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy to spacelinxmesdemo'
+                  inputs:
+                    azureSubscription: '$(azureSubscription)'
+                    appType: 'webApp'
+                    appName: 'spacelinxmesdemo'
+                    resourceGroupName: 'SpaceLinxProd'
+                    package: '$(Pipeline.Workspace)/frontend-demo/frontend.zip'
