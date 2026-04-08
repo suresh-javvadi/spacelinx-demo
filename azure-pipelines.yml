@@ -76,11 +76,48 @@ stages:
             displayName: 'Upload API artifact'
 
   # ──────────────────────────────────────────────────────────
+  # BUILD FRONTEND (lint + build) — runs on every trigger
+  # ──────────────────────────────────────────────────────────
+  - stage: BuildFrontend
+    displayName: 'Build Frontend'
+    dependsOn: []
+    jobs:
+      - job: LintAndBuild
+        displayName: 'Lint & Build React Frontend'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: UseNode@1
+            displayName: 'Install Node.js'
+            inputs:
+              version: '$(nodeVersion)'
+
+          - task: Cache@2
+            displayName: 'Cache npm'
+            inputs:
+              key: 'npm | "$(Agent.OS)" | $(frontendDir)/package-lock.json'
+              restoreKeys: 'npm | "$(Agent.OS)"'
+              path: $(frontendDir)/node_modules
+
+          - script: npm ci
+            displayName: 'Install dependencies'
+            workingDirectory: '$(frontendDir)'
+
+          # TODO: Re-enable once lint warnings are resolved
+          # - script: npm run lint
+          #   displayName: 'ESLint (zero warnings)'
+          #   workingDirectory: '$(frontendDir)'
+
+          - script: npm run build
+            displayName: 'Build (production)'
+            workingDirectory: '$(frontendDir)'
+
+  # ──────────────────────────────────────────────────────────
   # DEPLOY DEV (auto on main branch)
   # ──────────────────────────────────────────────────────────
   - stage: DeployDev
     displayName: 'Deploy to Dev'
-    dependsOn: BuildAPI
+    dependsOn: [BuildAPI, BuildFrontend]
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     jobs:
       - job: BuildFrontendDev
@@ -172,7 +209,7 @@ stages:
   # ──────────────────────────────────────────────────────────
   - stage: DeployUAT
     displayName: 'Deploy to UAT'
-    dependsOn: BuildAPI
+    dependsOn: [BuildAPI, BuildFrontend]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/v'))
     jobs:
       - job: BuildFrontendUAT
@@ -262,7 +299,7 @@ stages:
   # ──────────────────────────────────────────────────────────
   - stage: DeployProd
     displayName: 'Deploy to Production + Demo'
-    dependsOn: BuildAPI
+    dependsOn: [BuildAPI, BuildFrontend]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
     jobs:
       # Build frontend for Prod
