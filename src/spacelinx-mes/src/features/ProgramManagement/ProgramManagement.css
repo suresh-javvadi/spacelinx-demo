@@ -1,0 +1,9 @@
+.EditFlyoutContentWithProgram {
+  position: relative;
+  padding: 10px;
+  width: 100%;
+  height: calc(100vh - 160px);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  gap: 5%;
+}

@@ -1,0 +1,873 @@
+.BuildFlyout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  margin-top: -60px;
+  width: 100%;
+  margin-left: -20px;
+  justify-content: space-between;
+}
+.MOrderDetailsMain {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.MOrderDetailsLoader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.SubWODetails {
+  display: flex;
+  width: 100%;
+  height: 80%;
+  overflow-y: scroll;
+}
+.SubWorkOrderDetailsInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 75%;
+  height: 80vh;
+}
+.SubWorkOrderDetailsHeader {
+  display: flex;
+  align-items: center;
+  width: 97.7%;
+  justify-content: space-between;
+}
+.PartDetails {
+  display: flex;
+  gap: 5px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.SubWorkOrderStepDetails {
+  position: fixed;
+  left: 70%;
+  width: 40%;
+  height: 100%;
+}
+.MOrderStepDetails {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  top: 100px;
+  gap: 10px;
+  left: 76%;
+  height: 100%;
+  width: 100%;
+  transition: 0.3s;
+  overflow: hidden;
+}
+.draweropen {
+  position: fixed;
+  width: 75%;
+  left: 80%;
+  transition: 0.3s;
+  overflow: hidden;
+}
+.LinearProgressBar {
+  width: 23%;
+  height: 30px;
+}
+.LinearProgressBar p {
+  font-size: 12px;
+  padding-top: 5px;
+}
+.LinearProgress {
+  padding-top: 20px;
+  border-radius: 3px;
+  width: 100%;
+}
+.StepDetailsInner {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 10px;
+  max-height: 400px;
+  overflow: hidden;
+  max-width: 300px;
+  border: 1px;
+}
+.StepDetailsInner::-webkit-scrollbar {
+  width: 5px;
+}
+.StepDetailsInner::-webkit-scrollbar-thumb {
+  border-radius: 30px;
+}
+.StepDetailsInner h2 {
+  font-size: 16px;
+}
+.StepDetailsInner h3 {
+  font-size: 14px;
+}
+.StepDetailsInner p {
+  display: flex;
+  font-size: 12px;
+  width: 100%;
+}
+.StepDetailsInner.Completed p {
+  display: flex;
+  width: 100%;
+  color: green;
+  border-radius: 5px;
+}
+
+.StepDetailsInner.InProgress p {
+  display: flex;
+  color: orange;
+  width: 100%;
+  border-radius: 5px;
+}
+.MOrderStepDetails h2,
+.SubWorkOrderStepDetails h3 {
+  font-size: 24px;
+  font-weight: 600;
+}
+.MOrderStepDetails h2 {
+  font-size: 18px;
+}
+.WorkOrderDetails {
+  display: flex;
+  width: 100%;
+}
+.WorkOrderStepInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  width: 100%;
+  margin-top: 35px;
+  margin-left: 10px;
+}
+.WorkOrderStepInfo .WorkOrderStepsLoader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  min-height: 60vh;
+  height: 100%;
+}
+.WorkOrderStepDetailsLoader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.WorkOrderStepInfo .WorkOrderSteps {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  max-height: calc(100vh - 20%);
+  overflow-y: auto;
+  padding-left: 1.5%;
+  padding-right: 5px;
+}
+.WorkOrderSteps::-webkit-scrollbar {
+  width: 0.3em;
+}
+.WorkOrderSteps::-webkit-scrollbar-thumb {
+  border-radius: 30px;
+}
+.WorkOrderSteps:hover {
+  cursor: pointer;
+}
+.StepsPaper {
+  height: 100%;
+}
+.StepPaperDivMain:hover {
+  cursor: pointer;
+}
+.StepsPaper:hover {
+  cursor: pointer;
+}
+.StepsPaperHighlight {
+  height: 100%;
+  border-radius: 10px !important;
+  border: 3px solid rgb(87, 226, 87);
+  margin-bottom: 10px;
+}
+.NoKitAvailable a {
+  color: var(--link-color);
+}
+.WOTasksList {
+  position: fixed;
+  display: flex;
+  margin-top: 40px;
+  gap: 10px;
+  width: 30%;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 52%;
+}
+.WorkOrderStepDetails {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+.MOrderDetailsDataGrid {
+  width: 98%;
+  height: 100%;
+}
+.WOBreadCrumb {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  margin: -5px 0 20px 10px;
+  font-weight: 600;
+  height: 5%;
+}
+.WOBreadCrumb ion-icon {
+  color: #808080;
+}
+.WOBreadCrumb p {
+  font-weight: 400;
+}
+.WODetailsBreadCrumb button {
+  margin-left: auto;
+  margin-right: 10px;
+}
+.WODetailsBreadCrumb {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-top: -30px;
+  gap: 10px;
+  color: #1e1e1e;
+  font-weight: 600;
+  width: 100%;
+}
+.WODetailsBreadCrumb ion-icon {
+  color: var(--light-secondary-color);
+}
+.stepDetailBreadCrumb {
+  font-weight: 400;
+  color: var(--light-secondary-color);
+  font-family: var (--header-font-family);
+}
+.WoStepInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 600;
+}
+.WoStepInfoInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 20px;
+  width: 100%;
+}
+
+.WoStepsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+}
+.WoStepsHeader h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.WOLinearProgressBar {
+  display: flex;
+  align-items: center;
+  width: 20%;
+  margin-right: 2%;
+  cursor: pointer;
+}
+.WOLinearProgress {
+  flex-grow: 1;
+  cursor: pointer;
+}
+.WOStepResetButton {
+  display: flex;
+}
+.WOStepResetButton ion-icon {
+  font-size: 25px;
+  color: var(--link-color);
+  cursor: pointer;
+}
+.WoTasksBody {
+  padding-top: 20px;
+  width: 98%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.WOTaskType {
+  width: auto;
+  height: auto;
+}
+.WOTasksListMain {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+  border: 1px solid rgb(91, 91, 91);
+  border-radius: 5px;
+  height: auto;
+  width: 100%;
+}
+
+.WoTaskTypeInList {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  font-size: 15px;
+  color: rgba(143, 143, 143, 1);
+  flex-direction: column;
+  align-items: center;
+}
+.WotaskDescription {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  height: auto;
+}
+.DescriptionCompleted {
+  font-size: 12px;
+  font-weight: 400;
+}
+.WotaskDescription .Description {
+  font-size: 12px;
+  font-weight: 400;
+}
+.taskControls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+}
+.taskControls ion-icon:hover {
+  cursor: pointer;
+}
+.WOTaskApprove {
+  padding: 0;
+  font-size: 18px;
+  color: a 1a 1a 1px;
+}
+
+.WOTaskApproved {
+  padding: 0;
+  font-size: 18px;
+  color: var(--primary-color);
+}
+.WOStepDetailsFooter {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  height: 5%;
+  justify-content: flex-end;
+  gap: 20px;
+  background-color: transparent;
+  padding-bottom: 8px;
+}
+
+.DataTypeOptions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: auto;
+}
+.WoTaskOptions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+  font-size: 10px;
+}
+.WorkOrderBreadCrumb {
+  text-decoration: none;
+  color: var(--link-color);
+  font-weight: 400;
+  font-family: var (--header-font-family);
+}
+.WorkOrderBreadCrumb:hover {
+  text-decoration: underline;
+}
+
+.ChildKitTableBody {
+  height: 100%;
+  overflow-y: auto;
+}
+.image-flyout {
+  position: fixed;
+  top: 10px;
+  left: 50px;
+  width: 90%;
+  height: 90%;
+  margin-left: 20px;
+  background-color: var(--image-preview-flyout-bg-color);
+  padding: 20px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-flyout img {
+  max-width: 100%;
+  max-height: 100%;
+  margin-right: 150px;
+}
+
+.image-flyout .close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+.STepCompletedNote {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  color: var(--primary-color);
+  font-size: 14px;
+  font-weight: 700;
+}
+.TaskTypePicture {
+  object-fit: contain;
+  width: 100%;
+  height: 200px;
+  cursor: pointer;
+}
+.pictureTaskModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000cc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.pictureTaskModalImage {
+  width: 75vw;
+  height: 95vh;
+  border-radius: 10px;
+}
+.WOStepsSection {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 180px;
+}
+.WOStepsInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background-color: #f2f2f2;
+}
+.WOStepsInfoSideButtons {
+  background-color: transparent;
+  color: black;
+  font-size: 25px;
+  width: 2%;
+  border: none;
+  cursor: pointer;
+}
+.WOStepsScrollContainer {
+  position: relative;
+  white-space: nowrap;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.5) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0);
+}
+.WOStepsScrollContainer::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.WOStepsScrollingBox {
+  display: flex;
+  align-items: center;
+  width: 165px !important;
+  height: 135px;
+  margin-left: 20px;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 0 2px grey;
+}
+
+.WOStepsScrollingBoxHighlight {
+  cursor: pointer;
+  display: flex;
+  width: 165px !important;
+  height: 135px;
+  box-shadow: 1px 2px 10px #009cbb65;
+  margin-left: 20px;
+  border-radius: 10px;
+  border: 2px solid #009cbb;
+  position: relative;
+}
+.WOStepsScrollingBox:hover {
+  cursor: pointer;
+  box-shadow: 1px 1px 15px #009cbb65;
+}
+.WOStepsScrollingBox .WOStepsScrollingBoxInner img,
+.WOStepsScrollingBoxHighlight img {
+  object-fit: contain;
+  border-radius: 10px;
+  width: 160px !important;
+  height: 120px;
+}
+.WOCardStepNumber {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--secondary-color);
+  color: #fff;
+}
+.WOCardStepNumberCompleted {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+}
+.WOStepsScrollingBoxInner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.WOStepsScrollingBoxInner p {
+  width: 80%;
+  font-size: 10px;
+  padding-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 10%;
+  max-width: 100%;
+}
+.WODetailsHeader {
+  height: 50px;
+  border-radius: 10px;
+  width: 100%;
+  height: 5%;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: 1fr 10px 1fr 10px 1fr 10px 1fr 10px 1fr 10px 1fr 10px 1fr;
+  align-items: center;
+}
+.WODetailsHeader div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 12px;
+  width: 100%;
+}
+.WODetailsHeader div h2 {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 100%;
+  margin: 0;
+  white-space: nowrap;
+  max-width: 80%;
+}
+.WODetailsHeader div p {
+  font-size: 12px;
+  margin: 0;
+  overflow: hidden;
+  height: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80%;
+}
+.WOStepDetails {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  height: calc(100vh - 70px);
+}
+.WoTimerDiv {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
+  gap: 10px;
+  height: 100%;
+  width: 100%;
+  background-color: rgb(219, 218, 218);
+}
+.WoTimerDiv ion-icon {
+  font-size: 28px;
+  color: rgba(0, 156, 187, 1);
+}
+.WoTimerDiv ion-icon:hover {
+  cursor: pointer;
+}
+.WoTimerDiv .workorder-content {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(0, 156, 187, 1);
+}
+
+.WOStepDetails .WOStepDetailsInfo {
+  display: flex;
+  flex-direction: column;
+  object-fit: contain;
+  align-items: center;
+  width: 50%;
+  height: 100%;
+}
+.WOStepDetailsInfo img {
+  object-fit: contain;
+  width: 95%;
+}
+.WOStepTitleField {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  padding: 10px;
+  font-size: 13px;
+}
+.WOStepTitleField p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  width: 100%;
+}
+.WOStepTitleField p h2 {
+  font-size: 16px;
+  margin: 0;
+}
+.WOStepTitleField input {
+  padding-left: 10px;
+  padding-bottom: 0;
+  height: 100%;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.WOStepTitleField ion-icon {
+  font-size: 20px;
+  padding: 0;
+  margin: 0;
+  color: blue;
+}
+.WorkOrderStepImage {
+  width: 100%;
+  height: 100%;
+}
+.WOStepTaskInfo {
+  height: 100%;
+  width: 50%;
+}
+.WOMbomDiv {
+  width: 49%;
+  height: 90%;
+}
+.SearchBar {
+  height: 30px;
+}
+.WOEquipmentTabDivMain {
+  width: 100%;
+  height: 80%;
+}
+.WOEquipmentTabDiv {
+  width: 100%;
+  height: 80%;
+}
+.WOEquipmentTabDiv .AddItemsDataGrid {
+  width: 100%;
+  height: 100%;
+}
+.WOEquipmentTabDiv .WOMbomDiv {
+  width: 100%;
+  height: 100%;
+}
+.WOStepsList {
+  width: 24%;
+  height: 70%;
+  overflow-y: scroll;
+}
+.GenealogyResponse {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.GenealogyResponse p {
+  display: flex;
+  font-size: 12px;
+  color: #007bff;
+}
+.GenealogyResponse p:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.GuideDetailsControls {
+  width: auto !important;
+}
+
+.WOkitLinkTag {
+  text-decoration: none;
+  color: var(--link-color);
+}
+.WOkitLinkTag:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.WorkOrderFlyoutDetails {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.WorkOrderFlyoutDetails div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.WorkOrderFlyoutDetails h2 {
+  font-size: 15px;
+  padding: 0;
+  margin: 0;
+}
+.WorkOrderFlyoutDetails p {
+  font-size: 14px;
+}
+.WoTasksBodycomments {
+  padding-top: 10px;
+  width: 100%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.CommentSection {
+  font-size: 13px;
+  overflow-y: scroll;
+  padding-top: 3px;
+  width: 100%;
+  height: 20%;
+}
+.CommentSectionheader {
+  font-weight: bold;
+  font-size: 13px;
+  padding-bottom: 5px;
+}
+.CommentsDescription {
+  font-size: 12px;
+  flex-wrap: wrap;
+  height: 100%;
+}
+.PictureTaskControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.PictureTaskControls ion-icon {
+  font-size: 20px;
+}
+.PictureTaskControls ion-icon[title="Delete Image"] {
+  color: var(--error-color);
+}
+.CreateWOGuideInfo {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+.CreateWOGuideInfoChild1 {
+  display: flex;
+  justify-content: space-between;
+}
+#dark .WoTimerDiv {
+  background-color: #242424;
+}
+#dark .WOCardStepNumber {
+  background-color: #10768f;
+  color: var(--light-primary-color);
+}
+.WOMenuDisabled {
+  pointer-events: none !important;
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+.NewWODatesDiv {
+  display: flex;
+  gap: 20px;
+}
+.WOCompleteBtn {
+  background-color: #009cbb !important;
+  color: #ffffff !important;
+}
+.WOCompleteBtnContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+.CreateFlyoutWoBody {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 96%;
+  font-size: 14px;
+  gap: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+  height: calc(100vh - 170px);
+  padding-top: 10px;
+}

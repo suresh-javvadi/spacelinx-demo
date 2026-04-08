@@ -1,0 +1,35 @@
+﻿-- Table: mes.work_order
+-- DROP TABLE IF EXISTS mes.work_order;
+
+CREATE TABLE mes.work_order (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    number VARCHAR(255) UNIQUE NOT NULL,     
+    status VARCHAR(255) NOT NULL DEFAULT 'Pending',    
+    work_package_id UUID,
+    kit_id UUID UNIQUE,
+    technician_id UUID,
+    manager_id UUID,
+    guide_id UUID,
+    part_id UUID NOT NULL,
+    product_id UUID,
+    execution_time INTERVAL,
+    start_date TIMESTAMPTZ,
+    end_date TIMESTAMPTZ,
+    actual_start_date TIMESTAMPTZ,
+    actual_end_date TIMESTAMPTZ,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMPTZ,
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMPTZ,
+    deleted_by VARCHAR(255),
+    FOREIGN KEY (kit_id) REFERENCES mes.kit(id) ON DELETE SET NULL,
+    FOREIGN KEY (guide_id) REFERENCES mes.guide(id) ON DELETE SET NULL,
+    FOREIGN KEY (part_id) REFERENCES mes.part(id),
+    FOREIGN KEY (product_id) REFERENCES mes.product(id) ON DELETE SET NULL,
+    FOREIGN KEY (technician_id) REFERENCES application.user(id) ON DELETE SET NULL,
+    FOREIGN KEY (manager_id) REFERENCES application.user(id) ON DELETE SET NULL,
+    FOREIGN KEY (work_package_id) REFERENCES mes.work_package(id) ON DELETE SET NULL
+);

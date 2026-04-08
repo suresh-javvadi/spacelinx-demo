@@ -1,0 +1,994 @@
+.ViewToggleButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 5px;
+  height: 37px !important;
+  width: 80px;
+}
+.ViewToggleButtons button {
+  cursor: pointer;
+}
+
+.Quotation-button {
+  color: #b3b3b3 !important;
+  text-transform: none !important;
+  font-size: 0.8rem !important;
+  font-weight: normal !important;
+  width: 100%;
+  top: 5px;
+  border: 1px white solid var(--border-color-dark);
+}
+
+.quotation-input-field {
+  justify-content: center;
+  display: flex;
+  text-align: start;
+  cursor: pointer;
+}
+
+.quotation-button:hover {
+  background-color: transparent !important;
+}
+
+.cost-summary-container {
+  padding: 0px 5px;
+  width: 99%;
+  margin-top: 20px;
+}
+.cost-summary-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+}
+.cost-summary-icon {
+  margin-right: 8px;
+  color: #03a9f4;
+}
+.cost-summary-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.text-secondary {
+  color: #b3b3b3;
+}
+
+.grand-total-row {
+  margin-top: 16px;
+}
+.grand-total-label,
+.grand-total-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.SwitchBtn {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  height: 37px !important;
+  width: 38px !important;
+}
+.AdminChildrenHeaderControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.VendorGridContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+  align-items: stretch;
+  width: 100%;
+}
+
+.VendorGridItem {
+  flex: 0 0 calc(33.333% - 20px);
+  max-width: calc(33.333% - 20px);
+  display: flex;
+}
+
+.VendorSearchInput {
+  flex: 1;
+  min-width: 300px;
+}
+
+.VendorCard {
+  margin-left: 15px !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.VendorCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.VendorLogo {
+  width: 22%;
+  position: relative;
+  padding: 10%;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #5d5d5d;
+}
+
+.VendorLogo.light {
+  background-color: #5f5f5f;
+}
+.VendorLogoImage {
+  position: absolute;
+
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.VendorName {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #009cbb;
+}
+.VendorCode {
+  font-size: 0.9rem !important;
+}
+.VendorContact {
+  font-size: 0.7rem !important;
+  color: grey;
+}
+.VendorContactKeyMetrics {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.VendorContactInfo {
+  width: 60%;
+}
+.VendorKeyMetrics {
+  width: 40%;
+}
+.VendorContactInfoHeader,
+.VendorKeyMetricsHeader,
+.VendorPerformanceHeader {
+  font-weight: bold !important;
+  font-size: 0.9rem !important;
+}
+.VendorPerformanceHeader {
+  margin-top: -6% !important;
+}
+.VendorItem {
+  display: flex;
+  align-items: center;
+}
+.VendorIcon {
+  margin-right: 1px;
+  font-size: small !important;
+  font-weight: bold !important;
+}
+.VendorIconText {
+  font-size: 0.7rem !important;
+  color: grey !important;
+}
+.VendorPerformanceProgress {
+  border-radius: 5px;
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+.VendorCardActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px !important;
+  padding-left: 15px !important;
+}
+.VendorViewButton {
+  padding: 4px 4px !important;
+  font-size: 0.6rem !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+  margin-right: 15px !important;
+}
+.VendorArrowIcon {
+  font-size: 0.8rem !important;
+  margin-left: 5px !important;
+}
+.VendorDividerWrapper {
+  padding: 0 !important;
+  padding: 0px 15px !important;
+  margin: 10px 0px !important;
+}
+
+.VendorDivider {
+  background-color: #676767;
+}
+
+.vendor-details {
+  display: grid;
+  /* grid-template-columns: 1fr 1fr; */
+  gap: 16px;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+  /* position: relative; */
+}
+/* .vendor-details::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding-top: 47.9%;
+  left: 50%;
+  width: 1px;
+  } */
+
+.vendor-details p {
+  margin: 0;
+  font-size: 1rem;
+}
+.vendor-details strong {
+  margin: 0;
+  font-size: 1rem;
+  color: #009cbb;
+}
+
+.vendor-details .full-width {
+  grid-column: span 1;
+}
+.PoCreateFlyoutBody {
+  position: absolute;
+  right: 0;
+  width: 96%;
+  top: 110px;
+  bottom: 60px;
+  font-size: 14px;
+  gap: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 130px);
+}
+.cancel-icon {
+  font-size: 99% !important;
+  color: #c74b4b !important;
+}
+.VendorSelectHint {
+  width: 100%;
+  border: 2px dotted #757575;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  text-align: center;
+  color: #757575;
+  font-size: 14px;
+}
+.RightColumnStack {
+  grid-column: 2 / 3; /* force right column */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.FullWidthField {
+  grid-column: 1 / -1; /* spans both columns */
+}
+.VendorDetails {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center !important;
+  gap: 10px;
+  overflow: auto;
+  color: rgb(197, 197, 197) !important;
+  min-height: 150px !important;
+  max-height: 500px;
+  border-radius: 5px;
+  height: 100%;
+}
+.VendorDetailsReadOnly {
+  color: grey !important;
+}
+.VendorDetailsInner {
+  padding: 5px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  font-size: 13px;
+  height: 100%;
+}
+.VendorDetailsCard {
+  width: 100%;
+  border: 1px solid rgb(56, 56, 56);
+  border-style: dashed;
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  overflow-y: auto;
+  color: rgb(197, 197, 197) !important;
+}
+.VendorDetailsCardReadOnly {
+  width: 100%;
+  border: 1px solid grey;
+  border-style: dashed;
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: auto;
+  overflow-y: auto;
+  color: grey;
+}
+.VendorDetailsCard strong {
+  font-size: 16px;
+}
+.VendorDetailsCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  font-size: 12px !important;
+  padding-bottom: 8px;
+  border: 0px;
+  border-bottom: 1px solid rgb(34, 34, 34);
+  border-style: dashed;
+}
+.VendorDetailsCardHeader strong {
+  font-size: 15px !important;
+}
+.VendorAddressesEditBtn {
+  color: #009cbb !important;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 12px !important;
+}
+.VendorDetailsCardDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  margin-left: 24px;
+}
+.VendorDetailsCardDetails h3 {
+  font-weight: 800;
+}
+.VendorAddressesEditBtn:hover {
+  text-decoration: underline;
+}
+
+.GrnDataGrid {
+  height: 320px;
+  margin-top: 20px;
+  width: 100%;
+  overflow-y: auto;
+}
+.grnDetailsCard {
+  background: var(--grnDetailsCard-bg-color);
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cardTitle-color-light);
+  margin-bottom: 12px;
+}
+
+.grnDetailsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.editSMDetailsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  background-color: var(--hierarchy-shadow-color);
+  padding: 18px;
+  border-radius: 8px;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.detailLabel {
+  font-size: 12px;
+  color: var(--detailLabel-color-light);
+  margin: 0;
+}
+
+.detailValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: #b0b0b0;
+  margin: 4px 0 0;
+}
+
+.refDescGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.refDescCard {
+  background: var(--grnDetailsCard-bg-color);
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.PO_Link {
+  cursor: pointer;
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.details-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  border-radius: 8px;
+  padding: 16px;
+  box-sizing: border-box;
+  box-shadow: 0 0 2px #a1a1a1;
+}
+.details-table .PO_Link {
+  color: #009cbb !important;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.details-table .PO_Link:hover {
+  text-decoration: none;
+}
+.row {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr;
+  align-items: center;
+}
+
+.label {
+  flex: 2.5;
+  font-weight: bold;
+  min-width: 150px;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.separator {
+  flex: 0.5;
+  text-align: center;
+  margin-right: 8px;
+}
+
+.input-wrapper {
+  flex: 3;
+}
+
+.value {
+  word-break: break-word;
+}
+.GrnDataGridWrapper {
+  height: calc(100vh - 180px);
+  width: 100%;
+  overflow: hidden;
+}
+.PurchaseOrderEditFlyoutFooter {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid rgb(81, 81, 81);
+}
+.GrnEditFlyoutFooter {
+  position: fixed;
+  width: 50%;
+  left: 50%;
+  background-color: var(--flyout-footer);
+}
+.FooterLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.FooterRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.GrnNewFlyout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto; /* 👈 add this */
+}
+
+.GrnNewFlyoutTabPanel {
+  display: flex;
+  flex-direction: column;
+  padding: 15px !important;
+}
+
+.GrnNewFlyoutContent {
+  position: relative;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: calc(100vh - 190px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.GrnNewFlyoutContentTop {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.GrnNewFlyoutContentTopgap {
+  margin-top: 12px;
+}
+.StockMovementContainer {
+  margin-top: 80px;
+}
+
+.GrnDataGridDiv {
+  height: calc(100vh - 400px) !important;
+  width: 100% !important;
+  min-height: 300px;
+  flex-grow: 1;
+}
+.GrnEditDataGridDiv {
+  height: calc(100vh - 525px) !important;
+  width: 100% !important;
+  min-height: 300px;
+  flex-grow: 1;
+}
+
+.GrnCreateFlyoutFooter {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px;
+  height: 50px;
+  width: 100%;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.GrnNewFlyoutTabPanelDocuments {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 110px);
+  padding: 0 !important;
+}
+.grey-date-text input {
+  color: #999; /* light grey when empty */
+}
+
+.grey-date-text input:focus {
+  color: #000; /* black when user focuses */
+}
+.LineItemsAccordion {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+.LineItemsPartOption {
+  color: white;
+  padding: 10px;
+  font-size: 12px !important;
+  display: flex;
+  flex-direction: column;
+}
+.LineItemsPartOption div {
+  display: grid;
+  grid-template-columns: 1fr 10px 2fr;
+}
+.AddOption {
+  color: #009cbb;
+}
+/* Hover for line item options */
+.LineItemsPartOption:hover {
+  background-color: #444444 !important;
+  cursor: pointer;
+}
+
+/* Selected style */
+.LineItemsPartOption.selected {
+  background-color: #444444 !important;
+  font-weight: bold;
+}
+
+.LineItemControlsDiv {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  height: 100%;
+}
+.LineItemControlsDivInner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  width: auto;
+}
+.pogrnd-container {
+  padding: 0px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.pogrns-datagrid {
+  height: 300px;
+  width: 100%;
+}
+.pogrns-header h2 {
+  font-family: var(--body-font-family);
+  margin-bottom: 10px;
+}
+.pogrns-accordion-header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.pogrns-accordion-field {
+  display: flex;
+  gap: 20px;
+  max-width: 45%;
+}
+.pogrns-accordion-span {
+  color: #a1a1a1;
+}
+.pogrns-truncate-line {
+  display: flex;
+  align-items: center;
+  max-width: 45%;
+}
+.pogrns-truncate-fixed {
+  display: inline-block;
+  max-width: 120px;
+  width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-left: 3px;
+}
+.pogrns-empty-message {
+  font-size: 13px;
+  color: var(--error-color);
+}
+
+.PODetailsMainDiv {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 110px);
+  width: 100%;
+  padding: 5px 10px;
+  overflow: hidden;
+  gap: 5px;
+  font-size: 13px !important;
+}
+.PODetailsPageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: auto;
+  /* border: 1px solid rgb(69, 69, 69); */
+  padding: 5px;
+  /* border-radius: 5px;
+  border-style: dashed; */
+}
+.PODetailsPageHeaderDetails {
+  display: flex;
+  align-items: center;
+  width: auto;
+  gap: 10px;
+}
+.PageTabs {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  border-bottom: 1px solid rgb(50, 50, 50);
+}
+.PageTabs .TabButton {
+  width: 10%;
+  cursor: pointer;
+  padding: 8px 0px;
+  font-size: 11px;
+  background-color: transparent;
+  color: var(--PageTabButton-color);
+}
+.TabButton.Selected {
+  background-color: rgb(69, 69, 69);
+}
+#light .TabButton.Selected {
+  background-color: rgb(173, 170, 170);
+}
+.TabButton:hover {
+  background-color: rgb(96, 96, 96);
+}
+.PODetailsContent {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  height: calc(150% - 20px);
+  overflow-y: auto;
+  gap: 30px;
+  width: 100%;
+  padding-right: 10px;
+}
+.PODetailsContentInner {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: 100%;
+  gap: 5px;
+  font-size: 13px !important;
+}
+.PODetailsContentInner h3 {
+  font-size: 16px;
+}
+.DataGridActionsDiv {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.DimButton {
+  padding: 5px;
+  border: none;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  font-size: 12px !important;
+  gap: 5px;
+  color: rgb(255, 255, 255) !important;
+  border: 1px solid rgb(70, 70, 70) !important;
+  background-color: var(--DimButton-color) !important;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.LineItemsDiv {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  gap: 5px;
+}
+.LineItemControlsDiv {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.AddOrUpdateButton {
+  width: auto !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 5px 8px;
+  border: none;
+  background-color: transparent;
+  font-size: 12px !important;
+  color: rgb(255, 255, 255) !important;
+  border: 1px solid rgb(109, 109, 109) !important;
+  border-radius: 3px;
+  background-color: #009cbb !important;
+}
+.disabledButton {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.TaxGroupAddButton {
+  width: 100% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: none;
+  font-size: 12px !important;
+  color: #009cbb !important;
+  border: 1px solid rgb(109, 109, 109) !important;
+  border-radius: 3px;
+  background-color: transparent !important;
+}
+.RejectBtn {
+  color: white !important;
+  font-size: 12px !important;
+  width: auto !important;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: none;
+  background-color: rgb(250, 31, 31) !important;
+  border: 1px solid red !important;
+  border-radius: 3px;
+}
+.DataGridActionsDiv ion-icon {
+  font-size: 16px !important;
+}
+.TaxGroupsOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+.TaxGroupsOptions .Heading {
+  font-size: 13px;
+}
+.TaxGroupsOptions .Description {
+  font-size: 9px;
+}
+.GrnFlyoutFooterApprover {
+  display: flex;
+  justify-content: space-between;
+}
+.HighlightBtn {
+  background-color: #009cbb !important;
+  color: white !important;
+}
+.VendorDetailsDiv {
+  display: grid;
+  grid-template-columns: 1fr 5px 1fr;
+  gap: 10px;
+}
+.PoAddDetailsDrawerHeaderDiv {
+  display: flex;
+  align-items: center;
+  width: 100% !important;
+  padding-right: 10px;
+  justify-content: space-between;
+  border-bottom: 1px solid grey;
+}
+.PoAddDetailsDrawerHeader {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: transparent;
+  gap: 10px;
+}
+.PoAddDetailsDrawerHeaderDiv ion-icon {
+  font-size: 22px !important;
+}
+.po-approvals {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.po-approvals__stage {
+  padding: 4px 0;
+}
+
+.po-approvals__row {
+  display: flex;
+  align-items: center;
+}
+
+.po-approvals__stage-label {
+  width: 100px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.po-approvals__approver-select {
+  flex: 1;
+}
+
+.po-approvals__loader {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+.po-tracker-container {
+  width: 100%;
+  padding: 0;
+  display: flex;
+  justify-content: flex-start;
+}
+.po-stage-section {
+  border: 1px dashed rgb(66, 66, 66);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.po-stage-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgb(70, 70, 70);
+}
+
+.po-stage-title {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0 12px;
+  margin-bottom: 6px;
+}
+
+.po-stage-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.po-stage-horizontal-line {
+  width: 60px;
+  height: 2px;
+  background-color: #d0d5dd;
+}
+.po-stage-connector {
+  display: flex;
+  align-items: center;
+  /* gap: 6px; */
+  /* margin: 0 12px; */
+}
+
+.po-stage-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #98a2b3;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.po-stage-line {
+  width: 48px;
+  height: 2px;
+  background-color: #d0d5dd;
+}
+.po-tracker-acc-header {
+  margin-bottom: 5px;
+}
+.PoHeaderButtons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

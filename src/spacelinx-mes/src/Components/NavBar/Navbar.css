@@ -1,0 +1,190 @@
+.navListItem {
+  transition: margin-bottom 0.3s ease;
+}
+.drawerOpen.navListItem {
+  margin-bottom: 5px;
+}
+.drawerClosed.navListItem {
+  margin-bottom: 12px;
+}
+.NavBarItems {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+.text-truncate {
+  margin-left: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.text-truncate .MuiListItemText-primary {
+  font-size: 14px;
+}
+.navbar-icons-container {
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: calc(100vh - 40px);
+}
+.selected-icon svg {
+  color: var(--link-color) !important;
+}
+.selected-text .MuiListItemText-primary {
+  color: var(--link-color) !important;
+}
+.submenu-list-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 40px;
+  color: var(--submenu-list-item-text);
+}
+.submenu-list-item-text .MuiListItemText-primary {
+  font-size: 14px;
+}
+.custom-popper {
+  z-index: 1200;
+  margin-left: 8px;
+  transition: opacity 0.2s ease;
+}
+.subMenuPaper {
+  background-size: cover;
+  min-width: 80px;
+  margin-left: 8px;
+}
+.navbar-text .MuiListItemText-primary {
+  font-size: 14px !important;
+}
+.navbar-text :hover {
+  color: var(--link-color) !important;
+}
+.MuiBox-root.drawer-open .sub-buttons .MuiListItem-root:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.navbar-icons svg {
+  font-size: 24px;
+}
+.navbar-icons svg:hover {
+  color: var(--link-color) !important;
+}
+.xdlinxLogoContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 75px;
+}
+
+.xdlinxLogo {
+  max-width: 150px;
+}
+.custom-popper .MuiListItem-root:hover .MuiListItemText-primary,
+.custom-popper .MuiListItem-root:hover {
+  color: #00ccff !important;
+  background-color: var(--navbar-custom-popper) !important;
+}
+.navListItem:hover .MuiListItemText-primary {
+  color: #00ccff !important;
+}
+
+.navListItem:hover .navbar-icons svg {
+  color: #00ccff !important;
+}
+
+.navListItem {
+  position: relative;
+}
+
+.navListItem:hover::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  border-radius: 4px 0 0 4px;
+}
+.MuiListItem-root {
+  position: relative;
+}
+
+.MuiListItem-root:hover::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  border-radius: 4px 0 0 4px;
+}
+.right-rail {
+  position: relative;
+  background-color: #353e40;
+}
+.right-rail.active-menu::after,
+.right-rail.active-submenu::after,
+.right-rail.active-child::after,
+.right-rail.active-popper::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  background-color: #00ccff;
+  border-radius: 4px 0 0 4px;
+  transition: transform 150ms ease;
+}
+.custom-popper .MuiListItem-root.right-rail {
+  position: relative;
+}
+
+#dark .navListItem:hover,
+#dark .MuiListItem-root:hover,
+#dark .submenu-list-item-text:hover,
+#dark .custom-popper .MuiListItem-root:hover {
+  background-color: #353e40 !important;
+}
+#light .navListItem:hover,
+#light .MuiListItem-root:hover,
+#light .submenu-list-item-text:hover,
+#light .custom-popper .MuiListItem-root:hover {
+  background-color: #e1faff !important;
+}
+
+/* Keep text and icons highlighted on selected item */
+.selected-menu-item .MuiListItemText-primary,
+.selected-menu-item svg {
+  color: var(--link-color) !important;
+}
+/* === Permanent selected background for ALL levels === */
+
+/* === Only submenu & child get background === */
+#dark .active-submenu,
+#dark .active-child {
+  background-color: #353e40 !important;
+}
+
+#light .active-submenu,
+#light .active-child {
+  background-color: #e1faff !important;
+}
+
+/* === Parent menu (active-menu) should NOT get background === */
+.active-menu {
+  background-color: transparent !important;
+}
+
+/* Parent menu text + icon should stay highlighted */
+.active-menu .MuiListItemText-primary,
+.active-menu svg {
+  color: var(--link-color) !important;
+}
+
+/* === Selected text & icons always stay highlighted === */
+.active-menu .MuiListItemText-primary,
+.active-submenu .MuiListItemText-primary,
+.active-child .MuiListItemText-primary,
+.active-menu svg,
+.active-submenu svg,
+.active-child svg {
+  color: var(--link-color) !important;
+}

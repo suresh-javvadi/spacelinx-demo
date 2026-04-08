@@ -1,0 +1,47 @@
+.HeaderMain {
+  display: flex;
+  height: 60px;
+  background-color: #1e1e1e;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.Header1 {
+  margin-left: 20px;
+}
+
+.Header2 {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.Header2 a {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 620;
+  color: black;
+  font-family: Akkurat LL, Lato, -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
+}
+
+.Header2 button {
+  background-color: rgb(83, 83, 250);
+  font-size: 14px;
+  font-weight: 620;
+  padding-left: 15px;
+  padding-right: 15px;
+  font-family: Akkurat LL, Lato, -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
+}
+
+.Header2 button:hover {
+  cursor: pointer;
+
+  background-color: rgb(75, 75, 173);
+}
+
+.CompanyLogoMain {
+  width: 150px;
+  height: 100%;
+}

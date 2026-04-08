@@ -1,0 +1,473 @@
+.DocContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.DocUploadContainer,
+.DocExistingContainer {
+  width: 100%;
+  background-color: var(--part-doc-container);
+  flex: 1;
+  padding: 15px;
+  border-radius: 5px;
+}
+.DocUpload {
+  display: flex;
+  justify-content: space-between;
+}
+.DocUpload h3 {
+  font-family: var(--header-font-family);
+}
+.DocExistingContainer h3 {
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: var(--link-color);
+}
+.DocContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-left: 10px;
+}
+.testing {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+.DocUploadContainer,
+.UploadedDocs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.UploadedDocs {
+  width: 100%;
+}
+.TableRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.SelectedFilesContainer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.UploadedDocsList {
+  display: flex;
+  justify-content: end;
+}
+.ExistingDocsList {
+  height: calc(100vh - 320px);
+  overflow-y: auto;
+}
+
+.ExistingDocsList ul {
+  padding: 0;
+}
+
+.ExistingDocsList li {
+  margin: 5px 0;
+}
+
+.ExistingDocsList ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.ExistingDocsList li {
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+}
+
+.ExistingDocsList a {
+  color: #4fc3f7;
+  text-decoration: none;
+}
+
+.ExistingDocsList a:hover {
+  text-decoration: underline;
+}
+
+.PartDocPreviewContainer {
+  padding: 15px;
+  border: 1px solid #a1a1a1;
+  border-radius: 5px;
+}
+
+.PreviewContent {
+  margin-top: 10px;
+}
+
+.DocumentDialogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.DocumentPreview {
+  width: 100%;
+  height: 100%;
+}
+.ImagePreview {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: 0px auto;
+}
+.DocumentVisibleIconOptions {
+  color: var(--doc-icon-color) !important;
+  background-color: var(--image-preview-control-bg-color) !important;
+  padding: 8px !important;
+  border-radius: 8px;
+  margin-right: 8px !important;
+  border: 1px solid var(--doc-icon-border-color) !important;
+}
+.DocumentDeleteIcon {
+  color: var(--error-color) !important;
+  margin-right: 20px;
+}
+.DocumentDownloadIcon {
+  color: #00ccff;
+  margin-right: 20px;
+}
+.DocumentDelete {
+  color: var(--error-color) !important;
+}
+.ExistingDocsContainer {
+  display: flex;
+  justify-content: space-between;
+}
+.DocCsvLoader {
+  text-align: center;
+  padding: 10px;
+}
+
+.SelectedDocsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.SelectedDocsTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.SelectedDocsCount {
+  font-size: 14px;
+  margin: 0;
+}
+
+.UploadedDocsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-left: 20px;
+}
+.UploadButtonWrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.ExistingDocsTable {
+  width: 100%;
+  border-collapse: collapse;
+  display: flex;
+}
+.DocumentContainer {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ExistingDocsRow {
+  width: 48%;
+  background-color: var(--document-bg-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: start;
+}
+
+.DocType {
+  background-color: var(--doctype-bg-color);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.DocNameCell {
+  padding: 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.DocSnoCell {
+  padding: 8px;
+  font-weight: bold;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--doc-icon-border-color);
+}
+
+.DocActionCell {
+  text-align: right;
+  white-space: nowrap;
+  margin-top: 10px;
+}
+.LoaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px !important;
+  width: 100% !important;
+}
+.PreviewLoaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-size: 14px;
+  gap: 10px;
+}
+.csv-table-container {
+  height: calc(100vh - 160px);
+  overflow: auto;
+}
+
+.csv-header-cell {
+  position: sticky;
+  top: 0;
+  font-weight: bold;
+  z-index: 2;
+  height: 50px;
+}
+
+.csv-loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--primary-color);
+}
+
+.csv-loading p {
+  margin-top: 20px;
+}
+
+.DocCsvLoader {
+  text-align: center;
+  padding: 10px;
+}
+
+.PreviewContentContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.NoPreviewContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+#light .NoPreviewContainer {
+  background: linear-gradient(145deg, #f5f9fc, #ffffff);
+}
+
+#dark .NoPreviewContainer {
+  background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
+}
+
+.NoPreviewCard {
+  border-radius: 20px !important;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  transform: translateY(0);
+  transition: all 0.35s ease;
+  backdrop-filter: blur(8px);
+}
+
+.NoPreviewCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 28px !important;
+  background-color: transparent !important;
+}
+
+.NoPreviewIconWrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: transform 0.4s ease;
+}
+
+.NoPreviewCard:hover .NoPreviewIconWrapper {
+  transform: scale(1.08);
+}
+
+#light .NoPreviewIconWrapper {
+  background-color: rgba(0, 156, 187, 0.1);
+}
+
+#dark .NoPreviewIconWrapper {
+  background-color: rgba(76, 195, 217, 0.15);
+}
+
+.NoPreviewIcon {
+  font-size: 58px !important;
+  transition: color 0.3s ease;
+}
+
+#light .NoPreviewIcon {
+  color: #009cbb;
+}
+
+#dark .NoPreviewIcon {
+  color: #4cc3d9;
+}
+
+.NoPreviewTitle {
+  font-weight: 700 !important;
+  margin-bottom: 12px !important;
+  letter-spacing: 0.5px;
+}
+
+.NoPreviewText {
+  color: inherit;
+  opacity: 0.85;
+  margin-bottom: 28px !important;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.DownloadButton {
+  background: linear-gradient(135deg, #009cbb, #007e9d) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  text-transform: none !important;
+  padding: 10px 28px !important;
+  box-shadow: 0 4px 14px rgba(0, 156, 187, 0.3);
+  transition: all 0.35s ease;
+}
+
+.DownloadButton:hover {
+  background: linear-gradient(135deg, #00b3d1, #0093a8) !important;
+  box-shadow: 0 6px 20px rgba(0, 156, 187, 0.4);
+}
+.UploadDialogMainContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 10px;
+  position: relative;
+}
+
+.LoadingUploadDialogContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  border-radius: 8px;
+}
+.ExternalURL {
+  display: inline-block;
+  white-space: nowrap;
+  color: var(--link-color);
+  text-decoration: underline;
+  overflow: hidden;
+  max-width: 300px;
+  text-overflow: ellipsis;
+}
+.URLContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.DocLabel2 {
+  font-size: 12px;
+  display: flex;
+  gap: 5px;
+}
+.ChooseFilesButton {
+  padding: 12px;
+  text-transform: none;
+  font-size: 15px;
+  border-style: dashed;
+  border-width: 2px;
+}
+.OrText {
+  text-align: center;
+  font-weight: 500;
+  color: #666;
+}
+.DocumentDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.EntityDocs {
+  margin-top: 20px;
+}
+.EntityDocumentsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.EntityDocsTittle {
+  font-weight: bold;
+  margin: 0;
+  color: var(--link-color);
+}
+.DocActionCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.EntityDocsAction {
+  padding: 6px !important;
+  border-radius: 6px;
+  color: #00ccff !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.EntityDocsAction:hover {
+  color: #009cbb !important;
+}
+.EntityDocsHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.EntityDocsActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 10px;
+}

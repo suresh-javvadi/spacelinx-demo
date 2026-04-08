@@ -1,0 +1,319 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>ScutoidCommon</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{eba10b20-fade-4a6d-a9a4-497fc48e18aa}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath />
+    <RootNamespace>ScutoidCommon</RootNamespace>
+    <AssemblyName>ScutoidCommon</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Application" />
+    <Folder Include="Application\Tables" />
+    <Folder Include="Application\Views" />
+    <Folder Include="Application\Functions" />
+    <Folder Include="Application\StoredProcedures" />
+    <Folder Include="Application\Scripts" />
+    <Folder Include="MES" />
+    <Folder Include="MES\Functions" />
+    <Folder Include="MES\Stored Procedures" />
+    <Folder Include="MES\Tables" />
+    <Folder Include="MES\Views" />
+    <Folder Include="DAP" />
+    <Folder Include="DAP\Tables" />
+    <Folder Include="DAP\Functions" />
+    <Folder Include="DAP\Stored Procedures" />
+    <Folder Include="DAP\Views" />
+    <Folder Include="Imagery" />
+    <Folder Include="Imagery\Functions" />
+    <Folder Include="Imagery\Stored Procedures" />
+    <Folder Include="Imagery\Tables" />
+    <Folder Include="Imagery\Views" />
+    <Folder Include="VM" />
+    <Folder Include="VM\Functions" />
+    <Folder Include="VM\Stored Procedures" />
+    <Folder Include="VM\Tables" />
+    <Folder Include="VM\Views" />
+    <Folder Include="MES\Triggers" />
+    <Folder Include="PostgreSQL Helper" />
+    <Folder Include="SC" />
+    <Folder Include="Common" />
+    <Folder Include="Common\Tables" />
+    <Folder Include="SC\Tables" />
+    <Folder Include="Application\Triggers" />
+    <Folder Include="SC\Functions" />
+    <Folder Include="PM" />
+    <Folder Include="PM\Functions" />
+    <Folder Include="PM\Tables" />
+    <Folder Include="PM\Views" />
+    <Folder Include="SC\Views" />
+    <Folder Include="Common\Views" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Application\Tables\application.role.sql" />
+    <Build Include="Application\Tables\application.user.sql" />
+    <Build Include="Application\Tables\application.user_role.sql" />
+    <Build Include="MES\Tables\mes.ebom.sql" />
+    <Build Include="MES\Tables\mes.guide.sql" />
+    <Build Include="MES\Tables\mes.guide_step.sql" />
+    <Build Include="MES\Tables\mes.guide_step_equipment.sql" />
+    <Build Include="MES\Tables\mes.guide_step_task.sql" />
+    <Build Include="MES\Tables\mes.guide_type.sql" />
+    <Build Include="MES\Tables\mes.kit.sql" />
+    <Build Include="MES\Tables\mes.kit_serial.sql" />
+    <Build Include="MES\Tables\mes.location.sql" />
+    <Build Include="MES\Tables\mes.machine.sql" />
+    <Build Include="MES\Tables\mes.machine_type.sql" />
+    <Build Include="MES\Tables\mes.material_kit.sql" />
+    <Build Include="MES\Tables\mes.news.sql" />
+    <Build Include="MES\Tables\mes.news_type.sql" />
+    <Build Include="MES\Tables\mes.part.sql" />
+    <Build Include="MES\Tables\mes.part_type.sql" />
+    <Build Include="MES\Tables\mes.platform.sql" />
+    <Build Include="MES\Tables\mes.product.sql" />
+    <Build Include="MES\Tables\mes.tool.sql" />
+    <Build Include="MES\Tables\mes.tool_type.sql" />
+    <Build Include="MES\Tables\mes.unit_of_measure.sql" />
+    <Build Include="MES\Tables\mes.work_order.sql" />
+    <Build Include="MES\Tables\mes.work_order_step.sql" />
+    <Build Include="MES\Tables\mes.work_order_task.sql" />
+    <Build Include="Application\Functions\application.generate_alphanumeric_sequence.sql" />
+    <Build Include="MES\Stored Procedures\copy_guide_step.sql" />
+    <Build Include="MES\Stored Procedures\create_draft_guide.sql" />
+    <Build Include="MES\Stored Procedures\clone_guide.sql" />
+    <Build Include="MES\Stored Procedures\reorder_guide_steps.sql" />
+    <Build Include="MES\Stored Procedures\reorder_guide_steps_after_deletion.sql" />
+    <Build Include="MES\Stored Procedures\create_material_kit_and_kits.sql" />
+    <Build Include="MES\Views\guide_mbom_vw.sql" />
+    <None Include="Imagery\Tables\imagery.country.sql" />
+    <None Include="Imagery\Tables\imagery.satellite.sql" />
+    <None Include="Imagery\Tables\imagery.sensor_type.sql" />
+    <None Include="Imagery\Tables\imagery.sensor.sql" />
+    <None Include="Imagery\Tables\imagery.technology_type.sql" />
+    <None Include="Imagery\Tables\imagery.manufacturer.sql" />
+    <None Include="Imagery\Tables\imagery.station.sql" />
+    <None Include="Imagery\Tables\imagery.band_type.sql" />
+    <None Include="Imagery\Tables\imagery.band_type_category.sql" />
+    <None Include="Imagery\Tables\imagery.band.sql" />
+    <None Include="Imagery\Tables\imagery.pass_information.sql" />
+    <None Include="Imagery\Tables\imagery.strip_information.sql" />
+    <Build Include="MES\Tables\mes.kit_bom_comment.sql" />
+    <None Include="Imagery\Tables\imagery.request.sql" />
+    <None Include="Imagery\Tables\imagery.request_audit.sql" />
+    <None Include="Imagery\Tables\imagery.request_comment.sql" />
+    <None Include="Imagery\Tables\imagery.satellite_sensor.sql" />
+    <Build Include="Application\Tables\application.option_set.sql" />
+    <Build Include="MES\Stored Procedures\reorder_guide_step_tasks.sql" />
+    <Build Include="MES\Tables\mes.work_package.sql" />
+    <Build Include="MES\Stored Procedures\import_parts.sql" />
+    <Build Include="MES\Stored Procedures\import_tools.sql" />
+    <Build Include="Imagery\Views\strip_information_view.sql" />
+    <None Include="MES\Stored Procedures\mes.release_eco.sql" />
+    <Build Include="MES\Views\mes.eco_with_users_vw.sql" />
+    <None Include="Application\Tables\application.role_permission.sql" />
+    <None Include="Application\Tables\application.role_filter.sql" />
+    <Build Include="Common\Tables\common.address.sql" />
+    <Build Include="Common\Tables\common.bank_account.sql" />
+    <Build Include="Common\Tables\common.contact.sql" />
+    <Build Include="Common\Tables\common.country.sql" />
+    <Build Include="Common\Tables\common.currency.sql" />
+    <Build Include="SC\Tables\sc.payment_term.sql" />
+    <Build Include="SC\Tables\sc.company.sql" />
+    <Build Include="SC\Tables\sc.company_address.sql" />
+    <Build Include="SC\Tables\sc.company_bank_account.sql" />
+    <Build Include="SC\Tables\sc.company_contact.sql" />
+    <Build Include="MES\Stored Procedures\clone_ebom.sql" />
+    <Build Include="PM\Functions\pm.generate_program_code.sql" />
+    <Build Include="PM\Functions\pm.generate_project_code.sql" />
+    <Build Include="PM\Functions\pm.generate_task_code.sql" />
+    <Build Include="PM\Tables\pm.milestone.sql" />
+    <Build Include="PM\Tables\pm.program.sql" />
+    <Build Include="PM\Tables\pm.project.sql" />
+    <Build Include="PM\Tables\pm.task.sql" />
+    <Build Include="PM\Tables\pm.task_alter.sql" />
+    <Build Include="PM\Tables\pm.task_dependency.sql" />
+    <Build Include="PM\Tables\pm.task_assignee.sql" />
+    <Build Include="PM\Tables\pm.task_comment.sql" />
+    <Build Include="PM\Tables\pm.task_activity.sql" />
+    <Build Include="PM\Tables\pm.board_column.sql" />
+    <Build Include="PM\Tables\pm.time_entry.sql" />
+    <Build Include="PM\Views\pm.task_gantt_vw.sql" />
+    <Build Include="PM\Tables\pm.dashboard_widget.sql" />
+    <Build Include="PM\Tables\pm.resource_allocation.sql" />
+    <Build Include="PM\Views\pm.resource_workload_vw.sql" />
+    <Build Include="MES\Stored Procedures\is_eco_valid_for_submit.sql" />
+    <Build Include="SC\Views\sc.grn_with_user_vw.sql" />
+    <Build Include="SC\Views\sc.company_with_organization_vw.sql" />
+    <Build Include="MES\Stored Procedures\revert_inventory_for_kit.sql" />
+    <Build Include="MES\Stored Procedures\reserve_inventory_for_kit.sql" />
+    <Build Include="MES\Stored Procedures\consume_inventory_for_kit.sql" />
+    <Build Include="Application\StoredProcedures\application.get_user_roles.sql" />
+    <Build Include="Application\StoredProcedures\application.set_default_role.sql" />
+    <Build Include="Common\Views\common.document_with_users_vw.sql" />
+    <None Include="Common\Tables\common.approval.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DAP\Tables\dap.band.sql" />
+    <None Include="DAP\Tables\dap.sensor.sql" />
+    <None Include="DAP\Tables\dap.country.sql" />
+    <None Include="DAP\Tables\dap.satellite.sql" />
+    <None Include="DAP\Tables\dap.pass_information.sql" />
+    <None Include="DAP\Tables\dap.strip_information.sql" />
+    <None Include="Imagery\Tables\imagery.consolidated.sql" />
+    <None Include="Application\Tables\appication.consolidated.sql" />
+    <None Include="MES\Tables\mes.consolidated.sql" />
+    <None Include="MES\Views\parts_not_associated_with_guides.sql" />
+    <None Include="MES\Tables\mes.guide_check_out_history.sql" />
+    <None Include="Imagery\Tables\imagery.satellite_tle.sql" />
+    <None Include="MES\Views\Workorderguidestepsview.sql" />
+    <None Include="MES\Stored Procedures\create_work_package_and_work_orders.sql" />
+    <None Include="MES\Stored Procedures\reset_work_order.sql" />
+    <None Include="MES\Stored Procedures\reset_work_order_step.sql" />
+    <None Include="Application\Tables\application.feature_bit.sql" />
+    <None Include="Application\Tables\application.bulk_upload.sql" />
+    <None Include="Application\Scripts\Consolidated.PostDeployment.sql" />
+    <None Include="MES\Stored Procedures\import_ebom.sql" />
+    <None Include="MES\Stored Procedures\import_locations.sql" />
+    <None Include="MES\Stored Procedures\import_machines.sql" />
+    <None Include="MES\Stored Procedures\import_news.sql" />
+    <None Include="MES\Stored Procedures\validate_record.sql" />
+    <None Include="MES\Tables\mes.guide_mbom.sql" />
+    <None Include="MES\Stored Procedures\create_guide_mbom.sql" />
+    <None Include="MES\Stored Procedures\guide_mbom_refresh.sql" />
+    <None Include="MES\Views\mes.guide_mbom_details.sql" />
+    <None Include="Application\Tables\application.app.sql" />
+    <None Include="MES\Stored Procedures\get_part_sequence.sql" />
+    <None Include="MES\Tables\mes.guide_ebom.sql" />
+    <None Include="MES\Stored Procedures\mes.create_guide_ebom.sql" />
+    <None Include="Application\StoredProcedures\delete_user_role.sql" />
+    <None Include="Application\Tables\application.issue.sql" />
+    <None Include="VM\Tables\vm.visitor.sql" />
+    <None Include="VM\Tables\vm.visitor_document.sql" />
+    <None Include="VM\Tables\vm.visitor_request.sql" />
+    <None Include="VM\Tables\vm.visitor_request_document.sql" />
+    <None Include="VM\Tables\vm.visitor_request_visitor.sql" />
+    <None Include="VM\Stored Procedures\auto_cancel_visitor_requests.sql" />
+    <None Include="VM\Stored Procedures\vm.clone_visitor_request.sql" />
+    <None Include="Imagery\Tables\imagery.video.sql" />
+    <None Include="Imagery\Tables\imagery.document.sql" />
+    <None Include="Imagery\Tables\imagery.image.sql" />
+    <None Include="MES\Functions\mes.generate_part_number.sql" />
+    <None Include="MES\Triggers\part_number_trigger.sql" />
+    <None Include="MES\Tables\mes.eco.sql" />
+    <None Include="MES\Tables\mes.eco_part.sql" />
+    <None Include="MES\Functions\mes.generate_eco_number.sql" />
+    <None Include="MES\Stored Procedures\discard_eco.sql" />
+    <None Include="Imagery\Views\strip_information_vw.sql" />
+    <None Include="PostgreSQL Helper\PostgreSql Queries.sql" />
+    <None Include="Application\Tables\application.permission.sql" />
+    <None Include="Application\Tables\application.customer.sql" />
+    <None Include="SC\Functions\sc.generate_vendor_code.sql" />
+    <None Include="Application\Tables\application.organization.sql" />
+    <None Include="Application\Tables\application.staff.sql" />
+    <None Include="SC\Tables\sc.purchase_order.sql" />
+    <None Include="SC\Tables\sc.requisition.sql" />
+    <None Include="SC\Tables\sc.requisition_line_item.sql" />
+    <None Include="SC\Tables\sc.goods_receipt_note.sql" />
+    <None Include="SC\Tables\sc.po_line_item.sql" />
+    <None Include="SC\Functions\sc.generate_grn_number.sql" />
+    <None Include="SC\Functions\sc.generate_purchase_order_number.sql" />
+    <None Include="SC\Functions\sc.generate_req_number.sql" />
+    <None Include="SC\Tables\sc.grn_line_item.sql" />
+    <None Include="Common\Tables\common.document.sql" />
+    <None Include="Common\Tables\common.image.sql" />
+    <None Include="Common\Tables\common.video.sql" />
+    <None Include="Common\Tables\common.fcm_token.sql" />
+    <None Include="MES\Tables\mes.eco_log.sql" />
+    <None Include="SC\Tables\sc.inventory_part.sql" />
+    <None Include="SC\Tables\sc.bin_management.sql" />
+    <None Include="SC\Tables\sc.inventory_stock.sql" />
+    <None Include="SC\Tables\sc.inventory_transaction.sql" />
+    <None Include="Application\Tables\application.organization_address.sql" />
+    <None Include="SC\Tables\sc.company_part.sql" />
+    <None Include="SC\Views\sc.requisitions_with_user_vw.sql" />
+    <None Include="SC\Views\sc.grns_by_purchase_order_vw.sql" />
+    <None Include="SC\Views\sc.inventory_part_vw.sql" />
+    <None Include="SC\Views\sc.inventory_goods_vw.sql" />
+    <None Include="SC\Views\sc.inventory_services_vw.sql" />
+    <None Include="SC\Views\sc.inventory_transaction_vw.sql" />
+    <None Include="SC\Functions\sc.generate_company_code.sql" />
+    <None Include="SC\Functions\sc.generate_customer_code.sql" />
+    <None Include="SC\Functions\sc.generate_partner_code.sql" />
+    <None Include="MES\Stored Procedures\mes.validate_part_deletion.sql" />
+    <None Include="MES\Functions\mes.update_has_bom_flag.sql" />
+    <None Include="MES\Tables\mes.assembly_location.sql" />
+    <None Include="MES\Tables\mes.part_type_category.sql" />
+    <None Include="SC\Tables\sc.scrap_line_item.sql" />
+    <None Include="SC\Tables\sc.scrap_request.sql" />
+    <None Include="SC\Tables\sc.vendor_return_line_item.sql" />
+    <None Include="SC\Tables\sc.vendor_return_request.sql" />
+    <None Include="MES\Tables\mes.email_log.sql" />
+    <None Include="MES\Tables\mes.email_template.sql" />
+    <None Include="MES\Tables\mes.part_level.sql" />
+    <None Include="MES\Tables\mes.subsystem.sql" />
+    <None Include="Common\Tables\common.approval_configuration.sql" />
+    <None Include="Common\Tables\common.approval_notification_recipient.sql" />
+    <None Include="Common\Tables\common.approval_log.sql" />
+    <None Include="SC\Tables\sc.tender.sql" />
+    <None Include="SC\Tables\sc.tender_line_item.sql" />
+    <None Include="SC\Tables\sc.tender_vendor.sql" />
+    <None Include="SC\Tables\sc.tender_quotation.sql" />
+    <None Include="SC\Tables\sc.tender_quotation_line_item.sql" />
+    <None Include="SC\Functions\sc.generate_tender_number__.sql" />
+    <None Include="SC\Functions\sc.generate_stock_movement_number__.sql" />
+    <None Include="SC\Tables\sc.stock_movement.sql" />
+    <None Include="SC\Tables\sc.stock_movement_line_item.sql" />
+    <None Include="Common\Tables\common.additional_recipient_configuration.sql" />
+    <None Include="SC\Views\sc.stock_movement_with_user_vw.sql" />
+    <None Include="Common\Tables\common.department.sql" />
+    <None Include="SC\Views\scrap_request_with_user_vw.sql" />
+    <None Include="SC\Views\vendor_return_request_with_user_vw.sql" />
+    <None Include="SC\Views\sc.inventory_part_price_vw.sql" />
+  </ItemGroup>
+</Project>

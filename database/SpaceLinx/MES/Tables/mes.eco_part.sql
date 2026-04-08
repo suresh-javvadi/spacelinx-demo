@@ -1,0 +1,21 @@
+﻿CREATE TABLE mes.eco_part (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    eco_id UUID NOT NULL,
+    part_id UUID NOT NULL,
+    status VARCHAR(255) NOT NULL CHECK (Status IN ('Obsolete', 'Release')),
+    previous_status VARCHAR(255) NOT NULL,
+    description TEXT,
+	old_version VARCHAR(255) NOT NULL,
+	new_version VARCHAR(255),
+	effective_date TIMESTAMPTZ,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMPTZ,
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMPTZ,
+    deleted_by VARCHAR(255),
+	FOREIGN KEY (eco_id) REFERENCES mes.eco(id),
+	FOREIGN KEY (part_id) REFERENCES mes.part(id),
+	UNIQUE(eco_id, part_id, deleted_at)
+);

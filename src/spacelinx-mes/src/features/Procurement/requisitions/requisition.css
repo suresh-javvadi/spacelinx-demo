@@ -1,0 +1,199 @@
+.ActionsContainer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.LineItemsContainer {
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reqNewFlyoutTabPanel {
+  padding: 10px !important;
+  min-height: 0; /* REQUIRED */
+  display: flex;
+  flex-direction: column;
+}
+
+.LineItemAccordion {
+  border: 1px solid #414141;
+  background-color: #2b2b2b;
+}
+
+.AccordionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.AccordionTitle {
+  font-weight: 500;
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.LineItemsGrid {
+  height: 300px;
+  margin-top: 16px;
+}
+.TabPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.AddLineItemButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  gap: 10px;
+}
+.RequisitionGrid {
+  height: calc(100vh - 200px);
+}
+.reqEditLineItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.reqEditLineItemsGrid {
+  width: 100%;
+  height: calc(100vh - 200px);
+}
+.RequisitonApprovals {
+  margin-top: 50px;
+  margin-bottom: -40px;
+}
+
+.FlyoutScrollableContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* IMPORTANT */
+  min-height: 0; /* CRITICAL for flex children */
+  overflow-y: auto; /* Enables scrolling */
+}
+
+/* Footer stays visible but does not overlap */
+.RequisitionEditFlyoutFooter {
+  position: sticky;
+  bottom: 0;
+  background: var(--document-bg-color);
+  padding: 12px 16px;
+
+  z-index: 10;
+}
+.MultiStageApprovers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  /* background-color: var(--grnDetailsCard-bg-color); */
+  background-color: var(--tab-list-color);
+  padding: 12px;
+  /* align-items: center; */
+}
+.ApproversContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px; /* ADD THIS */
+  padding: 12px;
+}
+
+.ApprovalStageRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tracker-accordion {
+  background: #1f1f1f;
+  border-radius: 10px;
+}
+.tracker-accordion1 {
+  background-color: var(--tab-list-color);
+}
+
+.tracker-title {
+  color: var(--detailLabel-color-light);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.tracker-cards-wrapper {
+  display: flex;
+  margin-top: -23px;
+  gap: 16px;
+  flex-wrap: wrap;
+  /* background-color: var(--grnDetailsCard-bg-color); */
+  background-color: var(--tab-list-color);
+  padding: 25px;
+  align-items: center;
+}
+
+.tracker-card {
+  /* background-color: var(--grnDetailsCard-bg-color); */
+  background-color: var(--tab-list-color);
+  border-radius: 10px;
+  padding: 14px 16px;
+  width: 280px;
+  color: #e5e7eb;
+  box-shadow: 0 0 2px #a1a1a1;
+}
+
+.tracker-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tracker-stage {
+  font-size: 12px;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+.tracker-status {
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.tracker-status.approved {
+  background: #14532d;
+  color: #22c55e;
+}
+
+.tracker-status.rejected {
+  background: #450a0a;
+  color: #ef4444;
+}
+
+.tracker-status.pending {
+  background: #d3920526;
+  color: #facc15;
+}
+
+.tracker-date {
+  font-size: 12px;
+  /* color: ; */
+  color: var(--detailLabel-color-light);
+  margin: 6px 0;
+}
+
+.tracker-user {
+  margin-top: 8px;
+}
+
+.tracker-name {
+  font-size: 14px;
+  font-weight: 500;
+  /* color: #9ca3af; */
+  color: var(--detailLabel-color-light);
+}
+
+.tracker-email {
+  font-size: 12px;
+  /* color: #9ca3af; */
+  color: var(--detailLabel-color-light);
+}

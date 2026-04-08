@@ -1,0 +1,174 @@
+.TabButton.Selected {
+  background-color: rgb(69, 69, 69);
+}
+#light .TabButton.Selected {
+  background-color: rgb(173, 170, 170);
+}
+.stock-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 20px;
+}
+.stock-form-field {
+  width: 100%;
+}
+.stock-form-field.full-width {
+  grid-column: span 3;
+}
+.stock-form-grid-span-2 {
+  grid-column: span 2;
+}
+.stock-grid-des-pop-over {
+  padding: 10px;
+  width: 300px;
+}
+.stock-grid-des-pop-over button {
+  margin-top: 10px;
+}
+.stock-or-required-group {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stock-or-required-label {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: #b3b3b3;
+}
+.stock-or-required-label.error {
+  color: #d32f2f;
+}
+.stock-or-required-label .required {
+  margin-left: 1px;
+  font-size: 0.875rem;
+}
+
+.stock-or-required-error {
+  margin-left: 14px;
+  font-size: 0.75rem;
+  color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .stock-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stock-form-field.full-width {
+    grid-column: span 1;
+  }
+}
+
+.StockMovementContentDivHeaderResponsive {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 98%;
+  padding: 8px 0;
+}
+
+.StockMovementTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+@media (max-width: 600px) {
+  .StockMovementContentDivHeaderResponsive {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .StockMovementTabs {
+    width: 100%;
+  }
+
+  .StockMovementContentDivHeaderResponsive > .MuiButtonBase-root {
+    align-self: flex-end;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .StockMovementTabs {
+    flex: 1;
+    min-width: 0;
+  }
+}
+.PageHeaderRight {
+  display: flex;
+  gap: 16px;
+}
+.available-qty-cell.low-stock {
+  padding: 6px 12px;
+  line-height: normal;
+  height: auto;
+  background-color: #fb2c361a;
+  color: #ff6467;
+  border: 1px solid #fb2c3633;
+  border-radius: 10px;
+}
+.low-stock-row::before {
+  background-color: #fb2c36;
+}
+.TransHistoryContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+.TransHistoryInContainer {
+  background: #2a2a2a;
+  padding: 20px;
+}
+.TransHistoryHead {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+.HistoryDataGridContainer {
+  height: calc(50vh - 170px);
+}
+.StockMovementContentDivHeaderResponsive {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 98%;
+  padding: 8px 0;
+}
+.StockMovementTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+@media (max-width: 600px) {
+  .StockMovementContentDivHeaderResponsive {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .StockMovementTabs {
+    width: 100%;
+  }
+  .StockMovementContentDivHeaderResponsive > .MuiButtonBase-root {
+    align-self: flex-end;
+  }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .StockMovementTabs {
+    flex: 1;
+    min-width: 0;
+  }
+}
+.LineItemsContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--hierarchy-shadow-color);
+  padding: 12px;
+  gap: 8px;
+  border-radius: 8px;
+}

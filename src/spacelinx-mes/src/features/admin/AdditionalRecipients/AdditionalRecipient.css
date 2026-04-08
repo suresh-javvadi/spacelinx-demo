@@ -1,0 +1,26 @@
+.AddNewRecipientButton {
+  display: flex;
+  justify-content: flex-end;
+}
+.CancelUpdateCreateButton {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.EditFlyoutHeaderNew h3 {
+  margin-left: 15px;
+}
+.EditFlyoutBody {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 96%;
+  top: 40px;
+  font-size: 14px;
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 70px);
+}

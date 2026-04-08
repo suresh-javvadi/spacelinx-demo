@@ -1,0 +1,358 @@
+.PlatformMain {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.GlobeDiv {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.globeImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+}
+
+/* .globeImageDark {
+  filter: brightness(0.9);
+} */
+
+.globeImageLight {
+  filter: brightness(1.1);
+}
+
+/* Arc-shaped satellites at the top */
+.platformNamesDiv {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  max-width: 1200px;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.3s ease;
+}
+
+/* Arc shape for satellites */
+.platformNamesDiv .circle:nth-child(1) {
+  transform: translateY(20px) translateX(-40px);
+}
+
+.platformNamesDiv .circle:nth-child(2) {
+  transform: translateY(0);
+}
+
+.platformNamesDiv .circle:nth-child(3) {
+  transform: translateY(-20px);
+}
+
+.platformNamesDiv .circle:nth-child(4) {
+  transform: translateY(0);
+}
+
+.platformNamesDiv .circle:nth-child(5) {
+  transform: translateY(20px) translateX(40px);
+}
+
+/* Bottom center info div */
+.platformNamesDiv2 {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+  gap: 40px;
+}
+.Heading-Container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+.Heading-Child1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.satellites-open {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  max-width: 1200px;
+  top: 50px;
+  left: calc(50% + 120px);
+  transform: translateX(-50%);
+  transition: all 0.3s ease;
+}
+
+/* Arc shape for satellites when drawer open */
+.satellites-open .circle:nth-child(1) {
+  transform: translateY(100px) translateX(-250px);
+}
+
+.satellites-open .circle:nth-child(2) {
+  transform: translateY(40px) translateX(-200px);
+}
+
+.satellites-open .circle:nth-child(3) {
+  transform: translateY(10px) translateX(-100px);
+}
+
+.satellites-open .circle:nth-child(4) {
+  transform: translateY(20px) translateX(30px);
+}
+
+.satellites-open .circle:nth-child(5) {
+  transform: translateY(110px) translateX(80px);
+}
+.platformNamesDiv .circle:nth-child(1) {
+  transform: translateY(100px) translateX(-140px);
+}
+
+.platformNamesDiv .circle:nth-child(2) {
+  transform: translateY(40px) translateX(-80px);
+}
+
+.platformNamesDiv .circle:nth-child(3) {
+  transform: translateY(10px) translateX(0px);
+}
+
+.platformNamesDiv .circle:nth-child(4) {
+  transform: translateY(20px) translateX(80px);
+}
+
+.platformNamesDiv .circle:nth-child(5) {
+  transform: translateY(110px) translateX(120px);
+}
+
+.circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  margin: 0 10px;
+}
+
+.circle img {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.circle span {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.circle p {
+  font-size: 14px;
+  margin: 5px 0 0 0;
+}
+
+.xdlinxspacelabs {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.xdlinxspacelabs img {
+  height: 40px;
+}
+
+.platformNamesDiv2 h2 {
+  font-size: 24px;
+  margin: 0;
+  font-family: var(--header-font-family) !important;
+}
+
+.platformNamesDiv2 h3 {
+  font-size: 16px;
+  margin: 5px 0;
+  font-family: var(--header-font-family) !important;
+}
+
+.platformNamesDiv2 h6 {
+  font-size: 8px;
+  margin: 5px 0;
+}
+
+.PlatformDrawerStyles {
+  width: 400px;
+  max-width: 90%;
+  background-color: #f5f5f5;
+}
+@media (max-width: 768px) {
+  .circle img {
+    width: 70px; /* Reduced from 110px */
+    height: 70px; /* Reduced from 110px */
+  }
+
+  .platformNamesDiv {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    max-width: 1200px;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: all 0.3s ease;
+  }
+
+  /* Maintain arc shape */
+  .platformNamesDiv .circle:nth-child(1) {
+    transform: translateY(90px) translateX(-100px);
+  }
+
+  .platformNamesDiv .circle:nth-child(2) {
+    transform: translateY(-5px) translateX(-60px);
+  }
+
+  .platformNamesDiv .circle:nth-child(3) {
+    transform: translateY(-15px);
+  }
+
+  .platformNamesDiv .circle:nth-child(4) {
+    transform: translateY(-5px) translateX(60px);
+  }
+
+  .platformNamesDiv .circle:nth-child(5) {
+    transform: translateY(60px) translateX(90px);
+  }
+  .satellites-open .circle:nth-child(1) {
+    transform: translateY(90px) translateX(-100px);
+  }
+
+  .satellites-open .circle:nth-child(2) {
+    transform: translateY(-5px) translateX(-60px);
+  }
+
+  .satellites-open .circle:nth-child(3) {
+    transform: translateY(-15px);
+  }
+
+  .satellites-open .circle:nth-child(4) {
+    transform: translateY(-5px) translateX(60px);
+  }
+
+  .satellites-open .circle:nth-child(5) {
+    transform: translateY(60px) translateX(90px);
+  }
+
+  .platformNamesDiv2 {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+  }
+}
+@media only screen and (min-width: 1351px) {
+  .circle img {
+    width: 200px;
+    height: 200px;
+  }
+  .xdlinxspacelabs img {
+    height: 50px;
+  }
+  .platformNamesDiv2 {
+    width: 1000px;
+  }
+  .platformNamesDiv2 h2 {
+    font-size: 40px;
+  }
+}
+.DataGridLinkCell {
+  color: var(--link-color);
+}
+.ProductsScrollingBox2 {
+  height: 180px;
+}
+.productDetail {
+  display: flex;
+  justify-content: center;
+  margin-left: 5px;
+}
+.productDetail h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.productDetail p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.Guides-Container {
+  margin-top: 40px;
+}
+.ProductsPlatformSection {
+  display: flex;
+  flex-direction: column;
+  width: 97%;
+  height: 200px;
+  margin-top: 80px;
+  margin-left: 20px;
+}
+.Guides {
+  margin-top: -10px;
+  margin-left: 20px;
+  font-size: 10px;
+}
+.Products {
+  margin-top: -15px;
+  font-size: 10px;
+  margin-bottom: 10px;
+}
+.divider {
+  margin: 20px;
+}
+.NotAvailableMessage {
+  font-size: 1.5rem;
+  text-align: center;
+  margin: 20px auto;
+  padding: 10px;
+  width: fit-content;
+}
+.PlatformDrawerStyles {
+  width: 70%;
+}
+.xdlinxspacelabs {
+  margin-right: 10px;
+}
+.xdlinxspacelabs img {
+  width: 200px;
+  height: 50px;
+}

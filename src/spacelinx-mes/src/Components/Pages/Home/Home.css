@@ -1,0 +1,253 @@
+.DashBoardPageMainDiv {
+  display: flex;
+  flex-direction: column;
+  width: 99%;
+  gap: 20px;
+  height: 100%;
+}
+.DashBoardHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2%;
+  width: 100%;
+  height: 10%;
+}
+.DashBoardHeaderInnerDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  height: 60px;
+  background-color: rgba(232, 232, 232, 1);
+  flex: 1;
+}
+.DashBoardHeaderInnerDiv:hover {
+  cursor: pointer;
+}
+.DashBoardHeaderInnerDivP1 {
+  width: 100%;
+  padding-left: 15px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 17.07px;
+  letter-spacing: 0.02em;
+  text-align: left;
+  color: rgba(143, 143, 143, 1);
+}
+.DashBoardHeaderInnerDivP2 {
+  padding-right: 15px;
+  font-size: 35px;
+  font-weight: 600;
+  line-height: 58.51px;
+  text-align: center;
+}
+.DashBoardBody {
+  display: flex;
+  width: 100%;
+  gap: 5px;
+  height: 90%;
+  margin-bottom: 30px;
+}
+.DashBoardBody1 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 50%;
+  height: 100%;
+}
+.DashBoardBody1Inner1 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  height: 25%;
+}
+.DashBoardBody1Inner1P1,
+.DashBoardBody1Inner2P1 {
+  font-size: 18px;
+  color: rgba(143, 143, 143, 1);
+  font-weight: 600;
+  text-align: left;
+  width: auto;
+  height: 10%;
+}
+.DashBoardBody1InnerInner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 3%;
+}
+
+.DashBoardBody1InnerInnerP1 {
+  width: 20%;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 19.5px;
+  text-align: left;
+}
+.GuideProgressBar {
+  width: 65%;
+  padding-top: 10px;
+}
+.DashBoardBody1InnerInnerP2 {
+  width: 15%;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 17.07px;
+  text-align: left;
+}
+.DashBoardBody1Inner2 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 75%;
+}
+.DashBoardBody1Inner2Inner {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 90%;
+}
+.DashBoardBody1Inner2Inner1 {
+  display: flex;
+  width: 50%;
+  height: 100%;
+}
+.DashBoardBody1Inner2Inner2 {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+}
+.DashBoardBody1Inner2Inner2RadioDiv {
+  display: flex;
+  width: 100%;
+  font-size: 13px;
+  gap: 50px;
+  justify-content: center;
+}
+.DashBoardBody1Inner2Inner2RadioDiv div {
+  display: flex;
+  gap: 5px;
+}
+.DashBoardBody1Inner2InnerP2 th {
+  color: rgba(143, 143, 143, 1);
+  padding-bottom: 5px;
+}
+.DashBoardBody1Inner2InnerP2TableBody {
+  position: absolute;
+  height: calc(100vh - 470px);
+  width: 20%;
+  overflow-y: scroll;
+}
+.DashBoardBody1Inner2InnerP2TableBodyInner {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.DashBoardBody1Inner2InnerP2TableBody td {
+  font-size: 12px;
+  margin-bottom: 10px;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.DashBoardBody2 {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 90%;
+}
+.DashBoardBody2P1 {
+  padding-left: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  height: 10%;
+  color: rgba(143, 143, 143, 1);
+  text-align: left;
+}
+.DashBoardBody2Inner {
+  position: absolute;
+  margin-top: 50px;
+  width: 46%;
+  height: calc(100vh - 270px);
+  overflow-y: scroll;
+}
+.DashBoardBody2Inner1 {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  margin-left: 10px;
+}
+.DashBoardBody2Inner p {
+  font-size: 12px;
+}
+
+/* Temporary Styles */
+.DashBoardProducts {
+  width: 100%;
+  height: auto;
+  background-color: whitesmoke;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  box-shadow: 5px 5px 8px rgba(7, 7, 7, 0.1); /* Adjust the values as needed */
+}
+.WorkOrderData {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.WorkOrderTimeline {
+  width: 68%;
+  height: 350px;
+}
+.WorkOrderTimelineHeader {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  justify-content: space-between;
+  font-size: 18px;
+}
+.TimeGranularitySelector {
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+.TimeGranularitySelector select {
+  padding: 5px;
+}
+.WorkOrderBarGraph {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 30%;
+  height: 400px;
+}
+.WorkOrderBarGraphHeader {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  font-weight: 700;
+  justify-content: space-between;
+  font-size: 18px;
+}
+.WorkOrderBarGraphHeader p {
+  width: 60%;
+}
+.TechnicianSelector select {
+  width: 100px;
+  padding: 5px;
+}

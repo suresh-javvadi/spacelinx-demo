@@ -1,0 +1,344 @@
+@font-face {
+  font-family: "Square721 BdEx BT Bold";
+  src:
+    url("/fonts/square/square721bdexbtcyr_bold.woff2") format("woff2"),
+    url("/fonts/square/square721bdexbtcyr_bold.woff") format("woff"),
+    url("/public/fonts//square/Square_721_Bold_Extended_BT.ttf")
+      format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Poppins";
+  src:
+    url("/fonts/poppins/Poppins-Regular.woff2") format("woff2"),
+    url("/fonts/poppins/Poppins-Regular.woff") format("woff"),
+    url("/fonts/poppins/Poppins-Regular.ttf") format("truetype");
+}
+body {
+  margin: 0;
+  font-family: var(--body-font-family);
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+}
+
+#dark {
+  background-color: var(--dark-background-color);
+  color: var(--dark-text-color);
+}
+#light {
+  background-color: var(--light-background-color);
+  color: var(--light-text-color);
+}
+
+:root {
+  --primary-color: #00ccff;
+  --secondary-color: #009cbb;
+  --light-primary-color: #fff;
+  --light-secondary-color: #a1a1a1;
+  --dark-primary-color: #000;
+  --dark-secondary-color: #202020;
+  --error-color: #c74b4b;
+  --TabButton-color: #000;
+  --PageTabButton-color: #000;
+  --DimButton-color: #999999;
+  --light-background-color: #f2f2f2;
+  --dark-background-color: #000000;
+
+  --light-text-color: #121212;
+  --dark-text-color: #ffffff;
+
+  --link-color: #00ccff;
+
+  --header-font-family: "Square721 BdEx BT Bold";
+  --body-font-family: "Poppins", sans-serif;
+
+  --button-background-color-light: #009cbb;
+  --button-background-color-dark: transparent;
+  --button-color-light: #ffffff;
+  --button-color-dark: #00ccff;
+
+  --border-color-light: #009cbb;
+  --border-color-dark: #00ccff;
+
+  --cancel-button-border-light: #606060;
+  --cancel-button-border-dark: #a1a1a1;
+  --cancel-button-color-light: #ffffff;
+  --cancel-button-color-dark: #a1a1a1;
+  --cancel-button-bg-light: #606060;
+  --cancel-button-bg-dark: transparent;
+
+  --accordion-summary-bg-light: #fff;
+  --accordion-details-bg-light: #fff;
+  --accordion-details-padding-light: 16px;
+
+  --accordion-summary-bg-dark: #202020;
+  --accordion-details-bg-dark: #202020;
+
+  --drawer-bg-color-dark: #202020;
+  --drawer-bg-color-light: #f5f5f5;
+
+  --ion-icon-close-color: #606060;
+  --image-preview-flyout-bg-color: var(--light-background-color);
+  --image-preview-control-bg-color: #0000001a;
+  --part-doc-container: var(--light-primary-color);
+  --tab-list-color: var(--light-background-color);
+  --option-set-border-color: none;
+  --option-set-bg-color: #009cbb;
+  --option-set-text-color: #fff;
+  --tab-bg-color: #e6e6e6;
+  --drawer-resize-handle-bg: #0000001a;
+  --clone-box-bg-color: #f2f2f2;
+  --hierarchy-bg-primary: #f2f2f2;
+  --hierarchy-bg-secondary: #ffffff;
+  --hierarchy-border-color: #009cbb;
+  --hierarchy-text-primary: #121212;
+  --hierarchy-text-secondary: #666666;
+  --hierarchy-text-tertiary: #999999;
+  --hierarchy-node-bg: #ffffff;
+  --hierarchy-accent-color: #009cbb;
+  --hierarchy-shadow-color: rgba(0, 0, 0, 0.1);
+  --hierarchy-hover-brightness: 0.95;
+  --hierarchy-toggle-expand: #009cbb;
+  --hierarchy-toggle-collapse: #444;
+  --hierarchy-toggle-recursive: #ff9800;
+  --hierarchy-toggle-text: #ffffff;
+  --hierarchy-link-color: #9e9e9e;
+  --clone-bom-button: #009cbb;
+  --bom-buttons-bgcolor: #009cbb;
+  --ant-design-search: #fff;
+  --whereused-buttons-text: #fff;
+  --submenu-list-item-text: black;
+  --navbar-custom-popper: #e1faff;
+  --document-bg-color: #f2f2f2;
+  --doctype-bg-color: rgba(161, 161, 161, 0.54);
+  --doc-icon-color: rgba(96, 96, 96, 1);
+  --doc-icon-border-color: rgba(170, 184, 187, 1);
+  --grnDetailsCard-bg-color: #e8e8e8;
+  --cardTitle-color-light: #121212;
+  --detailLabel-color-light: #121212;
+  --detailValue-color-light: #b0b0b0;
+  --imagebackground-light: #fff;
+  --taskdashboard-bg-color: #dfdbdb8a;
+
+  /* Gantt Chart Colors */
+  --gantt-bg: #ffffff;
+  --gantt-alt-bg: #fafafa;
+  --gantt-text: #333333;
+  --gantt-border: #e0e0e0;
+  --gantt-grid-stroke: #e0e0e0;
+}
+
+[AppTheme="dark"] {
+  --ion-icon-close-color: #a1a1a1;
+  --image-preview-flyout-bg-color: var(--dark-background-color);
+  --image-preview-control-bg-color: #ffffff1a;
+  --part-doc-container: #303030;
+  --tab-list-color: #303030;
+  --option-set-border-color: 1px solid #00ccff;
+  --option-set-bg-color: none;
+  --option-set-text-color: #00ccff;
+  --tab-bg-color: #303030;
+  --drawer-resize-handle-bg: #ffffff1a;
+  --clone-box-bg-color: #191919;
+  --hierarchy-bg-primary: #000000;
+  --hierarchy-bg-secondary: #202020;
+  --hierarchy-border-color: #00ccff;
+  --hierarchy-text-primary: #ffffff;
+  --hierarchy-text-secondary: #a1a1a1;
+  --hierarchy-text-tertiary: #747474;
+  --hierarchy-node-bg: #202020;
+  --hierarchy-accent-color: #00ccff;
+  --hierarchy-shadow-color: rgba(0, 0, 0, 0.5);
+  --hierarchy-hover-brightness: 1.2;
+  --hierarchy-toggle-expand: #00ccff;
+  --hierarchy-toggle-collapse: #444;
+  --hierarchy-toggle-recursive: #ff9800;
+  --hierarchy-toggle-text: #ffffff;
+  --hierarchy-link-color: #9e9e9e;
+  --clone-bom-button: transparent;
+  --bom-buttons-bgcolor: rgb(57, 57, 57);
+  --ant-design-search: #1e1e1e;
+  --whereused-buttons-text: #00ccff;
+  --submenu-list-item-text: #ffffff;
+  --navbar-custom-popper: #353e40;
+  --TabButton-color: #ffffff;
+  --PageTabButton-color: #ffffff;
+  --DimButton-color: #666666;
+  --document-bg-color: #242424;
+  --doctype-bg-color: #585858;
+  --doc-icon-color: rgba(161, 161, 161, 1);
+  --doc-icon-border-color: rgba(0, 204, 255, 0.25);
+  --grnDetailsCard-bg-color: #191919;
+  --cardTitle-color-light: #ffffff;
+  --detailLabel-color-light: #ffffff;
+  --detailValue-color-light: #b0b0b0;
+  --dashboard-bg-color: #191919;
+  --imagebackground-light: #333333;
+  --taskdashboard-bg-color: #252525;
+
+  /* Gantt Chart Colors */
+  --gantt-bg: #1a1a1a;
+  --gantt-alt-bg: #242424;
+  --gantt-text: #ffffff;
+  --gantt-border: #666666;
+  --gantt-grid-stroke: #666666;
+}
+
+/* ============================================
+   GANTT CHART - DARK MODE STYLES
+   ============================================ */
+
+[AppTheme="dark"] .GanttChartWrapper {
+  background-color: var(--gantt-bg) !important;
+  color: var(--gantt-text) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Universal Text & Fill Colors */
+[AppTheme="dark"] .GanttChartWrapper *,
+[AppTheme="dark"] .GanttChartWrapper text,
+[AppTheme="dark"] .GanttChartWrapper ._2B2zv {
+  color: var(--gantt-text) !important;
+  fill: var(--gantt-text) !important;
+  border-color: var(--gantt-border) !important;
+}
+
+/* All Container Backgrounds */
+[AppTheme="dark"] .GanttChartWrapper > div,
+[AppTheme="dark"] .GanttChartWrapper > div > div,
+[AppTheme="dark"] .GanttChartWrapper div[class*="_"],
+[AppTheme="dark"] .GanttChartWrapper svg,
+[AppTheme="dark"] .GanttChartWrapper .gantt {
+  background-color: var(--gantt-bg) !important;
+}
+
+/* SVG Strokes & Lines */
+[AppTheme="dark"] .GanttChartWrapper svg rect,
+[AppTheme="dark"] .GanttChartWrapper line,
+[AppTheme="dark"] .GanttChartWrapper svg line,
+[AppTheme="dark"] .GanttChartWrapper svg polyline {
+  stroke: var(--gantt-grid-stroke) !important;
+}
+
+/* Grid Rows */
+[AppTheme="dark"] .GanttChartWrapper .gridRow,
+[AppTheme="dark"] .GanttChartWrapper svg > g rect {
+  fill: var(--gantt-bg) !important;
+  stroke: var(--gantt-grid-stroke) !important;
+  stroke-width: 1 !important;
+}
+
+[AppTheme="dark"] .GanttChartWrapper .gridRow:nth-child(even) {
+  fill: var(--gantt-alt-bg) !important;
+}
+
+/* Task List Rows */
+[AppTheme="dark"] .GanttChartWrapper div[role="row"] {
+  background-color: var(--gantt-bg) !important;
+  border-bottom: 1px solid var(--gantt-border) !important;
+  border-right: 1px solid var(--gantt-border) !important;
+}
+
+[AppTheme="dark"] .GanttChartWrapper div[role="row"]:nth-of-type(even) {
+  background-color: var(--gantt-alt-bg) !important;
+}
+
+[AppTheme="dark"] .GanttChartWrapper div[role="row"]:first-child {
+  font-weight: 600;
+  border-bottom: 2px solid var(--gantt-border) !important;
+}
+
+/* Task Bar Colors - Brightened for Dark Mode */
+[AppTheme="dark"] .GanttChartWrapper rect[fill="#4caf50"] {
+  fill: #66bb6a !important;
+  stroke: #4caf50 !important;
+}
+
+[AppTheme="dark"] .GanttChartWrapper rect[fill="#f44336"] {
+  fill: #ef5350 !important;
+  stroke: #f44336 !important;
+}
+
+[AppTheme="dark"] .GanttChartWrapper rect[fill="#9e9e9e"] {
+  fill: #bdbdbd !important;
+  stroke: #9e9e9e !important;
+}
+
+[AppTheme="dark"] .GanttChartWrapper rect[fill="#2196f3"] {
+  fill: #42a5f5 !important;
+  stroke: #2196f3 !important;
+}
+
+/* Progress Bars */
+[AppTheme="dark"] .GanttChartWrapper rect[fill="#2e7d32"] {
+  fill: #4caf50 !important;
+}
+
+[AppTheme="dark"] .GanttChartWrapper rect[fill="#1976d2"] {
+  fill: #2196f3 !important;
+}
+
+[AppTheme="dark"] .GanttChartWrapper rect[fill="#ed6c02"] {
+  fill: #ff9800 !important;
+}
+
+/* Today Line */
+[AppTheme="dark"] .GanttChartWrapper ._2qL9F {
+  stroke: #ff5252 !important;
+  stroke-width: 2 !important;
+}
+
+/* Dependency Arrows */
+[AppTheme="dark"] .GanttChartWrapper path[stroke] {
+  stroke: #90caf9 !important;
+  stroke-width: 2;
+}
+
+/* Tooltip */
+[AppTheme="dark"] .GanttTooltip {
+  background-color: var(--gantt-bg) !important;
+  border: 1px solid var(--gantt-border) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Toolbar */
+[AppTheme="dark"] .GanttToolbar {
+  border-bottom-color: var(--gantt-border);
+}
+
+/* Scrollbar */
+[AppTheme="dark"] .GanttChartWrapper ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[AppTheme="dark"] .GanttChartWrapper ::-webkit-scrollbar-track {
+  background: var(--gantt-bg);
+  border-radius: 5px;
+}
+
+[AppTheme="dark"] .GanttChartWrapper ::-webkit-scrollbar-thumb {
+  background: var(--gantt-border);
+  border-radius: 5px;
+}
+
+[AppTheme="dark"] .GanttChartWrapper ::-webkit-scrollbar-thumb:hover {
+  background: #808080;
+}
+
+/* Hover States */
+[AppTheme="dark"] .GanttChartWrapper rect:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}

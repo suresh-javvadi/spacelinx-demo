@@ -1,0 +1,23 @@
+﻿CREATE TABLE mes.eco (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    number VARCHAR(50) NOT NULL DEFAULT mes.generate_eco_number(),
+    name VARCHAR(255) NOT NULL,
+    reason_for_change TEXT NOT NULL,
+    description TEXT,
+    change_type VARCHAR(255) NOT NULL,
+    impact_analysis TEXT NOT NULL DEFAULT 'Design Changes',
+    priority VARCHAR(255) NOT NULL DEFAULT 'Low',
+    requestor VARCHAR(255) NOT NULL,
+    approver VARCHAR(255),
+    planned_implementation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    approved_by VARCHAR(255),
+    approved_date TIMESTAMPTZ,
+	status VARCHAR(255) NOT NULL CHECK (status IN ('Draft', 'Submitted', 'Approved', 'Discarded', 'Rejected', 'Released')) DEFAULT 'Draft',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMPTZ,
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMPTZ,
+    deleted_by VARCHAR(255)
+);

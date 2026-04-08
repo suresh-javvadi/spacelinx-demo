@@ -1,0 +1,20 @@
+﻿CREATE TABLE sc.vendor_return_line_item (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    return_request_id UUID NOT NULL,
+    part_id UUID NOT NULL,
+    grn_line_item_id UUID,        
+    tracking_type VARCHAR(50) CHECK (tracking_type IN ('None','Batch','Serial')),
+    tracking_id VARCHAR(255),           
+    return_quantity INT,
+    reason TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255),
+    updated_at TIMESTAMPTZ,
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMPTZ,
+    deleted_by VARCHAR(255),
+    FOREIGN KEY (return_request_id) REFERENCES sc.vendor_return_request(id) ON DELETE CASCADE,
+    FOREIGN KEY (part_id) REFERENCES mes.part(id) ON DELETE SET NULL,
+    FOREIGN KEY (grn_line_item_id) REFERENCES sc.grn_line_item(id) ON DELETE SET NULL
+);

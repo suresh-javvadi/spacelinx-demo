@@ -1,0 +1,252 @@
+/* Time Tracking Container */
+.TimeTrackingContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+}
+
+/* Summary Cards */
+.TimeTrackingSummary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.TimeTrackingSummary .SummaryCard,
+.ReportSummary .SummaryCard {
+  flex: 1;
+  min-width: 150px;
+  padding: 16px;
+  text-align: center;
+  border-radius: 8px;
+}
+
+/* Filters */
+.TimeTrackingFilters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Time Entry Form */
+.TimeEntryFormContainer {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.TimeEntryFormContainer .DrawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.TimeEntryFormContainer .FormContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.TimeEntryFormContainer .FormActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 16px;
+}
+
+/* Time Report */
+.TimeReportContainer {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.TimeReportContainer .DrawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ReportFilters {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.ReportSummary {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* Data Grid Styling */
+.TimeTrackingContainer .MasterDataDataGridDiv {
+  flex: 1;
+  min-height: 400px;
+}
+
+.TimeTrackingContainer .DataGrid {
+  border-radius: 8px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .TimeTrackingSummary,
+  .ReportSummary {
+    flex-direction: column;
+  }
+
+  .TimeTrackingSummary .SummaryCard,
+  .ReportSummary .SummaryCard {
+    min-width: 100%;
+  }
+
+  .TimeTrackingFilters {
+    flex-direction: column;
+  }
+
+  .TimeTrackingFilters > * {
+    width: 100% !important;
+  }
+}
+
+/* Quick Time Entry Widget (for future use) */
+.QuickTimeEntry {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--paper-bg, #fff);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
+.QuickTimeEntry .MuiTextField-root,
+.QuickTimeEntry .MuiFormControl-root {
+  flex: 1;
+}
+
+/* Hours Display */
+.HoursDisplay {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.HoursDisplay.billable {
+  color: var(--success-color, #2e7d32);
+}
+
+.HoursDisplay.non-billable {
+  color: var(--text-secondary, #666);
+}
+
+/* Work Type Chips */
+.WorkTypeChip {
+  font-size: 12px;
+}
+
+.WorkTypeChip.development {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.WorkTypeChip.design {
+  background-color: #fce4ec;
+  color: #c2185b;
+}
+
+.WorkTypeChip.testing {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.WorkTypeChip.meeting {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.WorkTypeChip.documentation {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+/* Entry Row Hover */
+.TimeEntryRow {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.TimeEntryRow:hover {
+  background-color: var(--hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+/* Calendar View (for future use) */
+.TimeCalendarView {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 16px;
+}
+
+.CalendarDay {
+  min-height: 100px;
+  padding: 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+}
+
+.CalendarDay.today {
+  border-color: var(--primary-color, #1976d2);
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+.CalendarDay.has-entries {
+  background-color: rgba(25, 118, 210, 0.08);
+}
+
+/* Timer Widget (for future use) */
+.TimerWidget {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.TimerWidget .TimerDisplay {
+  font-size: 32px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+.TimerWidget .TimerControls {
+  display: flex;
+  gap: 8px;
+}
+
+/* Print Styles */
+@media print {
+  .TimeTrackingFilters,
+  .AdminChildrenHeaderButtons,
+  .FormActions {
+    display: none;
+  }
+
+  .TimeTrackingSummary .SummaryCard,
+  .ReportSummary .SummaryCard {
+    border: 1px solid #ccc;
+  }
+}

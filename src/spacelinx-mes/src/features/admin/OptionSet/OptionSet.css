@@ -1,0 +1,88 @@
+.NewOptionSetInputContainer {
+  display: flex;
+  justify-content: space-between;
+}
+.NewOptionSetlabelContainer {
+  display: flex;
+  flex-direction: column;
+}
+.NewOptionSetlabelInput {
+  display: flex;
+  gap: 10px;
+}
+.NewOptionSetLabelList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+.NewOptionSetObjectInput {
+  display: flex;
+  gap: 10px;
+}
+.NewOptionSetObjectContainer,
+.NewLocationObjectContainer {
+  display: flex;
+  align-items: center;
+}
+.NewOptionSetObjectLabel,
+.NewLocationObjectLabel {
+  min-width: 150px;
+}
+.NewOptionsetDeleteIcon {
+  color: var(--error-color);
+}
+.NewOptionSetContainer,
+.NewLocationContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.NewOptionSetHeader,
+.NewLocationHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.NewOptionSetRemoveIcon,
+.NewLocationRemoveIcon {
+  color: var(--error-color);
+}
+.NewOptionSetAddButton,
+.NewLocationAddButton {
+  color: var(--link-color);
+  cursor: pointer;
+  font-style: italic;
+}
+
+.label-chip {
+  display: flex;
+  align-items: center;
+  border: var(--option-set-border-color);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  color: var(--option-set-text-color);
+  background-color: var(--option-set-bg-color);
+  gap: 4px;
+}
+
+.delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.x-icon {
+  height: 12px;
+  width: 12px;
+  color: var(--option-set-text-color);
+}

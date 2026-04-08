@@ -1,0 +1,228 @@
+@media print {
+  @page {
+    margin: 10mm;
+  }
+  .printContainer {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    color: #000;
+  }
+
+  .printWatermark {
+    display: block;
+    top: 50%;
+    left: 50%;
+    width: 90%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
+
+  .printPage {
+    page-break-after: always;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .printPageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .printHeaderlabel {
+    font-weight: bold;
+    margin-right: 5px;
+    color: #333;
+  }
+
+  .printHeaderValue {
+    color: #000;
+  }
+
+  .printStepContainer {
+    flex-grow: 1;
+    padding: 10px 0 0 0;
+  }
+
+  .printStep {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .printImageSection {
+    width: 60%;
+    padding-right: 20px;
+  }
+
+  .printStepTitle h2 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    color: #333;
+  }
+
+  .printStepImageContainer {
+    position: fixed;
+    width: 55%;
+    height: 90%;
+  }
+
+  .printStepImage {
+    max-width: 100%;
+    height: 90%;
+  }
+
+  .printTasksSection {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .printTaskContainer {
+    margin-bottom: 5px;
+  }
+
+  .printStepTask {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+  }
+
+  .taskContent {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    gap: 2px;
+  }
+
+  .printTaskType {
+    margin-right: 10px;
+    color: #666;
+  }
+
+  .printTaskDescription {
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  .printTaskBehaviour {
+    margin-left: 10px;
+    color: #ff9800;
+  }
+
+  .printTaskStatusCompleted {
+    color: #4caf50;
+  }
+
+  .printNotAvailableMsg {
+    color: #ff0000;
+    font-style: italic;
+  }
+
+  .printEquipmentTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .printEquipmentTable th,
+  .printEquipmentTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .printEquipmentTable th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+
+  .printPageFooter {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    padding: 5px 0px;
+    font-size: 12px;
+  }
+  .printPageFooter div {
+    color: #666;
+  }
+  .printCoverPage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+    padding: 2rem;
+  }
+
+  .coverPageContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+
+  .coverPageTitle {
+    margin-top: 2rem;
+  }
+
+  .coverPageTitle h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+
+  .coverPageTitle h2 {
+    font-size: 1.5rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  .coverPageDetails {
+    margin-top: 1.5rem;
+    font-size: 1.5rem;
+    color: #666;
+  }
+
+  .coverPageDetails p {
+    margin: 0.5rem 0;
+  }
+
+  .coverPageFooter {
+    margin-bottom: 2rem;
+    color: #777;
+  }
+
+  .printPageFooter {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.8rem;
+    font-size: 0.8rem;
+    color: #666;
+  }
+}
+
+@media screen {
+  .printContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+}

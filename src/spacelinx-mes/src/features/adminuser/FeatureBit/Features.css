@@ -1,0 +1,24 @@
+.AddFeatureContainer {
+  display: flex;
+  width: 98%;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.AddFeatureContainer .FeatureName {
+  width: 75%;
+}
+
+.AddFeatureContainer .AddFeatureButton {
+  width: 15%;
+  height: 50px;
+}
+.FeaturesDataGridDiv {
+  height: calc(100vh - 270px);
+  width: 100%;
+  overflow: hidden;
+}
+.CancelFeatureButton {
+  height: 50px;
+}

@@ -1,0 +1,21 @@
+﻿CREATE TABLE pm.task (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    project_id UUID,
+    assigned_to_id UUID,
+    milestone_id UUID,
+    status VARCHAR(255) NOT NULL CHECK (status IN ('Completed', 'In Progress', 'To Do', 'Logged')),
+    due_date TIMESTAMPTZ,
+    priority VARCHAR(255) NOT NULL CHECK (priority IN ('High', 'Medium', 'Low')),
+	is_active BOOLEAN NOT NULL DEFAULT TRUE,	
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMPTZ,
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMPTZ,
+    deleted_by VARCHAR(255),
+    FOREIGN KEY (project_id) REFERENCES pm.project(id) ON DELETE SET NULL,
+    FOREIGN KEY (assigned_to_id) REFERENCES application.user(id) ON DELETE SET NULL,
+    FOREIGN KEY (milestone_id) REFERENCES pm.milestone(id) ON DELETE SET NULL
+);

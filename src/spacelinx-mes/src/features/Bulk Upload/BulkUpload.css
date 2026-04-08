@@ -1,0 +1,153 @@
+.BulkUploadHeader {
+  margin-right: auto;
+  font-size: 20px;
+  font-family: "Square721 BdEx BT Bold";
+  font-weight: 600;
+  margin-left: 20px;
+}
+
+.BulkUploadDetails {
+  margin: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.TemplateSection {
+  flex: 1;
+  width: 75%;
+}
+
+.TemplateDetails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.Cards {
+  /* width: 200px;
+  height: 100px; */
+  width: 25%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.Cards:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.CardContentCentered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.CardContentCentered .bulkupload-content {
+  font-family: "Square721 BdEx BT Bold";
+}
+
+.DownloadUpload {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.icon-download,
+.icon-upload {
+  color: #009cbb;
+  margin-left: 8px;
+  font-size: 11px;
+  border: 2px solid #009cbb;
+  padding: 3px;
+  border-radius: 50%;
+}
+.icon-download:hover {
+  transform: scale(1.2);
+  transition: 0.5s;
+}
+.icon-upload:hover {
+  transform: scale(1.2);
+  transition: 0.5s;
+}
+
+.VisuallyHiddenInput {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  white-space: nowrap;
+  width: 1;
+}
+
+.availableCountText {
+  text-decoration: underline;
+  color: #009cbb;
+}
+
+.css-46bh2p-MuiCardContent-root {
+  background-color: white;
+}
+
+.AlertMessages {
+  position: fixed;
+  top: 70px;
+  right: 10px;
+}
+
+.FlyoutBody {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 98%;
+  top: 60px;
+  padding-top: 20px;
+  font-size: 14px;
+  font-family: "Roboto" !important;
+  gap: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 10px;
+  max-height: calc(100vh - 70px);
+}
+.details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: center;
+  margin-left: 5px;
+}
+
+.label {
+  font-weight: bold;
+  margin-right: 5px;
+  font-family: "roboto";
+}
+.fileName {
+  color: #009cbb;
+  margin-right: -15px !important;
+}
+.downloadButton {
+  background-color: transparent !important;
+  color: #009cbb !important;
+  border: none;
+  padding: 0;
+  min-width: auto;
+  min-height: auto;
+  font-size: small;
+}
+.details button {
+  margin-left: 20px;
+}

@@ -1,0 +1,20 @@
+﻿CREATE TABLE sc.tender_line_item (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tender_id UUID NOT NULL,
+    part_id UUID,
+    quantity INTEGER NOT NULL,
+    unit_of_measure_id UUID,
+    description TEXT,
+    specifications TEXT,
+    line_number INTEGER,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255),
+    updated_at TIMESTAMPTZ,
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMPTZ,
+    deleted_by VARCHAR(255),
+    FOREIGN KEY (tender_id) REFERENCES sc.tender(id) ON DELETE CASCADE,
+    FOREIGN KEY (part_id) REFERENCES mes.part(id) ON DELETE SET NULL,
+    FOREIGN KEY (unit_of_measure_id) REFERENCES common.unit_of_measure(id) ON DELETE SET NULL
+);

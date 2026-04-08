@@ -1,0 +1,298 @@
+.PartHierarchyMainDiv {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  padding-left: 10px;
+  height: 100% !important;
+  background-color: var(--hierarchy-bg-primary);
+  overflow-x: hidden;
+  margin-top: 8px;
+  border-radius: 8px;
+}
+
+.PartHierarchyHeader {
+  position: absolute !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  top: 0;
+  width: 450px;
+  height: auto !important;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: var(--hierarchy-bg-secondary);
+  border: 1px solid var(--hierarchy-border-color);
+  box-shadow: -2px 0 5px var(--hierarchy-shadow-color);
+  z-index: 10;
+  transition: right 0.5s ease-in-out;
+}
+
+.PartHierarchyHeader.drawer-visible {
+  right: 0;
+  opacity: 1;
+}
+
+.PartHierarchyHeader.drawer-hidden {
+  right: -470px;
+  opacity: 0.8;
+}
+
+.PartHierarchyHeader p {
+  color: var(--hierarchy-text-primary);
+  margin: 0;
+}
+
+.PartHierarchyPlaceArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: calc(100vh - 95px) !important;
+}
+
+.HierarchyControlsBtn {
+  right: 0;
+  top: 10px;
+  position: absolute;
+  padding: 15px 0px;
+  border: none;
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  display: flex;
+  align-items: center;
+  background-color: var(--hierarchy-bg-secondary);
+  border: 1px solid var(--hierarchy-border-color);
+  border-right: none;
+  color: var(--hierarchy-accent-color);
+  cursor: pointer;
+  z-index: 11;
+  font-size: 10px;
+  justify-content: center;
+  transition: transform 0.5s ease-in-out;
+}
+
+.PartHierarchyMainDiv.drawer-open .HierarchyControlsBtn {
+  transform: translateX(-450px);
+}
+
+.PartHierarchyMainDiv.drawer-closed .HierarchyControlsBtn {
+  transform: translateX(0);
+}
+
+.HierarchyControlsBtn ion-icon {
+  transition: transform 0.5s ease-in-out;
+  font-size: 24px;
+}
+
+.HierarchyControlsBtn .icon-open {
+  transform: rotate(0deg);
+}
+
+.HierarchyControlsBtn .icon-closed {
+  transform: rotate(90deg) !important;
+}
+
+.ControlsInfo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 100%;
+  width: auto;
+}
+
+.controls-text {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.controls-text svg {
+  width: 16px;
+  height: 16px;
+  color: var(--hierarchy-text-tertiary);
+}
+
+.tree-svg-root {
+  background-color: var(--hierarchy-bg-primary);
+}
+
+.node {
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+.node:hover {
+  opacity: 0.8;
+}
+
+.node-rect {
+  fill: var(--hierarchy-node-bg);
+  stroke-width: 1px;
+  transition: all 0.3s ease;
+}
+.node-rect:hover {
+  filter: brightness(var(--hierarchy-hover-brightness));
+}
+
+.link {
+  fill: none;
+  stroke-width: 2px;
+  transition: stroke 0.3s ease;
+}
+
+.node-content-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2px;
+  color: var(--hierarchy-text-primary);
+  box-sizing: border-box;
+  font-size: 11px;
+  font-family: "Inter", sans-serif;
+}
+.node-content-inner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.node-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--hierarchy-text-secondary);
+  max-height: 130px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--hierarchy-text-tertiary) transparent;
+}
+
+.node-details::-webkit-scrollbar {
+  width: 4px;
+}
+.node-details::-webkit-scrollbar-thumb {
+  background-color: var(--hierarchy-text-tertiary);
+  border-radius: 2px;
+}
+
+.node-row {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--hierarchy-text-secondary);
+}
+
+.node-label {
+  display: inline-block;
+  width: 120px;
+  text-align: left;
+  position: relative;
+  padding-right: 10px;
+  color: var(--hierarchy-text-secondary);
+}
+
+.node-label::after {
+  content: ":";
+  position: absolute;
+  right: 0;
+  color: var(--hierarchy-text-secondary);
+}
+
+.node-value {
+  flex: 1;
+  color: var(--hierarchy-text-primary);
+  padding-left: 8px;
+  word-break: break-word;
+}
+
+.node-value.part-link {
+  color: var(--hierarchy-accent-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.node-value.part-link:hover {
+  text-decoration: none;
+}
+
+.node-name {
+  color: var(--hierarchy-text-primary);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.node-name.part-link {
+  color: var(--hierarchy-accent-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.node-pno,
+.node-qty {
+  color: var(--hierarchy-text-tertiary);
+  font-size: 12px;
+}
+
+.toggle-circle {
+  transition: fill 0.3s;
+}
+.node:hover .toggle-circle {
+  stroke-width: 2px;
+}
+.toggle-text {
+  fill: var(--hierarchy-toggle-text);
+  font-size: 16px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.PartHierarchyHeaderInner1 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+  max-height: calc(100vh - 325px);
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.PartHierarchyHeaderInner2 {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.HierarchyTooltip {
+  position: absolute;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white !important;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.HierarchyLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.HierarchyLoading p {
+  color: var(--hierarchy-text-primary);
+}

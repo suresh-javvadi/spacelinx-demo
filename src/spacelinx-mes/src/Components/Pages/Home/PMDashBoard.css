@@ -1,0 +1,154 @@
+.PMDashBoardPageMainDiv {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 98%;
+  gap: 15px;
+  height: 100%;
+}
+.PMDashBoardPageMainDivInner {
+  font-weight: 600;
+  font-size: 20px;
+}
+.PMDashBoardHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+  width: 100%;
+  height: 20%;
+}
+.PMDashBoardHeaderInnerDiv {
+  display: flex;
+  flex-direction: row;
+  text-decoration: none;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  height: 60px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 156, 187, 1) 0%,
+    rgba(128, 205, 221, 1) 100%
+  );
+  flex: 1;
+}
+.PMDashBoardHeaderInnerDiv:hover {
+  cursor: pointer;
+}
+.PMDashBoardHeaderInnerDivP1 {
+  width: 100%;
+  padding-left: 15px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 17.07px;
+  letter-spacing: 0.02em;
+  text-align: left;
+  color: rgba(255, 255, 255, 1);
+}
+.PMDashBoardHeaderInnerDivP2 {
+  padding-right: 15px;
+  font-size: 35px;
+  font-weight: 600;
+  line-height: 58.51px;
+  text-align: center;
+  color: black;
+}
+.PMDashBoardBody1 {
+  display: flex;
+  padding-left: 20px;
+  width: 95%;
+  gap: 30px;
+  height: 50%;
+  margin-bottom: 10px;
+}
+.PMDashBoard1Inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+}
+.PMDashBoard1Inner div {
+  display: flex;
+  font-weight: 600;
+  text-align: left;
+  justify-content: space-between;
+}
+.PMDashBoard1Inner div p {
+  font-size: 16px;
+}
+.PMDashBoard1Inner div ion-icon {
+  font-size: 20px;
+  color: rgba(143, 143, 143, 1);
+}
+.PMDashBoard1Inner div ion-icon:hover {
+  cursor: pointer;
+}
+.PMDashBoardBody2 {
+  display: flex;
+  width: 100%;
+  gap: 15px;
+}
+.PMDashBoardBody2Inner1 {
+  width: 70%;
+}
+.PMDashBoardBody2Inner2 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 30%;
+}
+.PMDashBoardBody2Inner1 div,
+.PMDashBoardBody2Inner2 div {
+  display: flex;
+  font-weight: 600;
+  text-align: left;
+  justify-content: space-between;
+}
+.PMDashBoardBody2Inner1 div div {
+  display: flex;
+  gap: 20px;
+}
+.PMDashBoardBody2Inner1 div ion-icon,
+.PMDashBoardBody2Inner2 div ion-icon {
+  font-size: 20px;
+  color: rgba(143, 143, 143, 1);
+}
+.PMDashBoardBody1Inner2InnerP2 {
+  width: 100%;
+}
+.PMDashBoardBody1Inner2InnerP2 tr {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.PMDashBoardBody1Inner2InnerP2 th {
+  color: rgba(143, 143, 143, 1);
+  padding-bottom: 5px;
+}
+.PMDashBoardBody1Inner2InnerP2TableBody {
+  position: absolute;
+  height: calc(100vh - 480px);
+  width: 28%;
+  overflow-y: scroll;
+}
+.PMDashBoardBody1Inner2InnerP2TableBodyInner {
+  width: 95%;
+}
+.PMDashBoardBody1Inner2InnerP2TableBodyInner td {
+  font-size: 11.5px;
+  padding-top: 10px;
+  text-align: center;
+}
+.GanttBar {
+  width: 100px !important;
+}
+.PMDashBoardLoader-Container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  gap: 20px;
+  min-height: 100vh;
+  margin-left: 80px;
+}

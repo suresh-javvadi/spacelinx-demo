@@ -1,0 +1,545 @@
+.MaterialkitHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+.KitFooter {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  margin-left: 0;
+  bottom: 0;
+  gap: 10%;
+  padding: 10px 0;
+  justify-content: flex-end;
+}
+.KitFooter button {
+  position: relative;
+  right: 10px;
+}
+
+.Image-button {
+  display: flex;
+  gap: 10px;
+}
+.Kitbody {
+  margin-top: 18%;
+  margin-left: 15%;
+  width: 70%;
+}
+.MKtable tbody tr.active-row td ion-icon {
+  transition: ease-in 0.2s;
+  transform: rotate(90deg);
+}
+
+.MKtable tbody tr td button {
+  transition: ease-in 0.2s;
+  background-color: white;
+}
+
+.MKtable tbody tr td ion-icon {
+  transform: rotate(0deg);
+}
+.MKtable {
+  width: 100%;
+  font-family: var(--body-font-family);
+  border-collapse: collapse;
+  border-top: 2px solid rgb(193, 191, 191);
+  border-bottom: 2px solid rgb(193, 191, 191);
+}
+.MKtable thead {
+  height: 45px;
+}
+.MKtable thead th {
+  font-family: var(--body-font-family);
+  color: white;
+  text-align: center;
+  background-image: none;
+}
+.MKtable tbody tr td {
+  padding: 10px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.MKtable tbody tr {
+  font-family: var(--body-font-family);
+  border-top: 1px solid rgb(193, 191, 191);
+}
+
+.MKtable tbody td {
+  padding: 10px;
+  text-align: left;
+}
+
+.MKtable tbody tr.child-row {
+  border-top: 1px solid rgb(233, 231, 231);
+}
+
+.MKtable tbody tr.child-row td {
+  padding: 8px;
+}
+.MaterialKitsConfirmButton {
+  display: flex;
+  gap: 3px;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-left: 10px !important;
+  border: 1px solid var(--primary-color) !important;
+  background-color: transparent !important;
+  color: var(--primary-color) !important;
+  border-radius: 20px;
+}
+.MaterialKitsConfirmButton:hover {
+  cursor: pointer;
+}
+.MKtable tbody tr td .location {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.MKtable tbody tr td.quantity {
+  left: 28px;
+}
+
+.MKtable tbody tr td.status,
+.MKtable tbody tr.child-row td.status,
+.MKtable tbody tr td.assigned,
+.MKtable tbody tr.child-row td.assigned {
+  text-align: center;
+}
+
+.MKtable tbody tr.child-row td.status,
+.MKtable tbody tr.child-row td.assigned {
+  text-align: center;
+  right: 30px;
+}
+
+.MKtable tbody tr.child-row td.status {
+  padding: 10px;
+}
+.MKtable tbody tr.child-row td.status ion-icon {
+  color: #2baf50;
+}
+.MKtable tbody tr.child-row td.assigned {
+  padding: 10px;
+  bottom: 5px;
+}
+.MKAssignedWO ion-icon {
+  color: var(--link-color);
+}
+
+.CreateFlyoutHeaderChildKit {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 60px;
+  background-color: rgba(30, 30, 30, 1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.CreateFlyoutHeaderChildKit h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 10px;
+  color: white;
+}
+.CreateFlyoutHeaderChildKit ion-icon {
+  color: white;
+  font-size: 24px;
+  padding-right: 10px;
+}
+.CreateFlyoutHeaderChildKit ion-icon:hover {
+  cursor: pointer;
+}
+.ChildKitDataGrid {
+  height: calc(60vh - 120px) !important;
+  width: 100%;
+  flex: 1;
+}
+
+.ChildKitSerialNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 5px;
+}
+.ChildKitSerialNumber p {
+  font-size: 12px;
+}
+.ChildKitTableBody input {
+  border-radius: 10px;
+  border: 1px solid grey;
+  padding: 10px;
+  width: 100px;
+}
+.ChildMkTableTHead {
+  position: sticky;
+  top: 0px;
+  margin: 0 0 0 0;
+}
+.ChildMKtable {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid rgb(193, 191, 191);
+  border-bottom: 2px solid rgb(193, 191, 191);
+}
+.ChildMKtable thead {
+  height: 45px;
+}
+.ChildMKtable thead th {
+  color: white;
+  text-align: center;
+  background-image: none;
+}
+.ChildMKtable tbody tr td {
+  padding: 10px;
+  font-size: 16px;
+  text-align: center;
+}
+.ChildMKtable tbody tr {
+  font-family: var(--body-font-family);
+  border-top: 1px solid rgb(193, 191, 191);
+}
+.ChildMKtable tbody td {
+  padding: 10px;
+  text-align: left;
+}
+.MKAssignedWO {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.MKAssignedWO div {
+  display: flex;
+  gap: 10px;
+}
+.MKAssignedWO ion-icon {
+  cursor: pointer;
+}
+
+.image-flyout {
+  position: fixed;
+  top: 10px;
+  left: 50px;
+  background-color: var(--image-preview-flyout-bg-color);
+  width: 90%;
+  height: 90%;
+  padding: 20px;
+  overflow: auto;
+}
+
+.image-flyout img {
+  max-width: 70%;
+  margin-left: 150px;
+  height: auto;
+}
+
+.image-flyout .close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+.MaterialKitImageControlsDiv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.MaterialKitImageControlsDiv label {
+  cursor: pointer;
+}
+
+.CreateFlyoutBodyKit {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 96%;
+  top: 60px;
+  margin-top: 20px;
+  font-size: 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-right: 20px;
+  max-height: calc(100vh - 140px);
+}
+.CreateFlyoutHeader h2 {
+  margin-left: 20px !important;
+}
+
+.CameraButton button {
+  background-color: transparent;
+}
+.CameraButton button:hover {
+  cursor: pointer;
+}
+
+.ScrollableFields {
+  max-height: 70%;
+  overflow-y: auto;
+}
+
+.ChildKitSerialNumber {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.ChildKitSerialNumber p {
+  margin: 0 4px 0 0;
+}
+
+.Status {
+  margin-left: 10px;
+}
+
+.CommentsContainer {
+  position: fixed;
+  bottom: 150px;
+  width: 50% !important;
+  margin-left: 22px;
+  height: 20px;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.CommentsField {
+  width: 100% !important;
+}
+
+.CreateFlyoutFooterKit {
+  position: absolute;
+  display: flex;
+  gap: 20px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin-left: 0;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  padding: 6px 0 6px;
+  margin-top: 20px;
+  justify-content: space-between;
+}
+
+.SaveButton {
+  align-self: flex-end;
+  font-family: var(--body-font-family);
+  margin-right: 20px !important;
+  width: 130px !important;
+  margin-top: 30px !important;
+}
+
+.ChildKitDetailsBody {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  margin-top: 80px;
+  padding-left: 40px;
+  gap: 30px;
+}
+.ChildKitDetailsBody1 {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-left: -10px;
+}
+.ChildKitDatacontainer {
+  width: 99%;
+  padding: 20px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.ChildKitDetailsHeader {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-top: 70px;
+  font-family: var(--body-font-family) !important;
+  width: 100%;
+  text-decoration: none;
+}
+.ChildKitDetailsHeader .ChildKitDetailsHeaderInner {
+  display: flex;
+  gap: 5px;
+}
+.ChildKitDetailsHeader .ChildKitDetailsHeaderInner h2 {
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0;
+  width: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ChildKitDetailsHeader .ChildKitDetailsHeaderInner p {
+  width: 70%;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.divider {
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+
+.ChildKitDataFlyoutHeader {
+  background-color: var(--secondary-color);
+  margin-left: 99%;
+  margin-bottom: 10px;
+}
+.closebutton {
+  color: black;
+  background-color: white;
+  cursor: pointer;
+  font-size: 22px;
+}
+.ChildKitDataDetailsDivBodyRow {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-bottom-color: 1px solid black;
+  margin-bottom: 10px;
+  margin-top: 50px;
+}
+.ChildKitDataGrid {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  padding-right: 10px;
+  margin-left: 0;
+  margin-bottom: 20px;
+}
+
+.ChildKitDataDetailsImage {
+  display: flex;
+  flex-direction: column;
+  margin: 0px 2px;
+  box-shadow: 0 0 2px #a1a1a1;
+  padding: 8px;
+  border-radius: 8px;
+}
+.ChildKitDataDetailsImage img {
+  object-fit: contain;
+  width: 100%;
+  height: 200px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+.icons-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 14px;
+}
+.icons-child1 {
+  display: flex;
+  align-items: center;
+}
+.upload,
+.camera {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+.ChildKitDataDetailsBody1 {
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+.ChildKitDataDetailsDivBody {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.ChildKitDataGridHeader {
+  font-size: 25px;
+  margin-bottom: 10px;
+}
+
+.CreateFlyoutHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.CreateFlyoutBodyKit {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.CreateFlyoutFooterKit {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.AntTableDiv {
+  height: calc(100vh - 220px);
+  width: 100%;
+  overflow: hidden;
+}
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 30px;
+  background-color: transparent !important;
+}
+.AntTable {
+  width: 100%;
+  margin: 10px auto;
+}
+.AntTable .ant-table-body {
+  scrollbar-width: thin;
+  scrollbar-color: #5c5c5c #f1f1f1;
+  scroll-behavior: smooth;
+  background-color: transparent !important;
+}
+.AntTable .ant-table-row-expand-icon {
+  color: var(--primary-color) !important;
+  background-color: transparent !important;
+  border: 1px solid var(--primary-color) !important;
+}
+.ChildKitActionIcon {
+  color: #009cbb;
+  cursor: pointer;
+  font-size: 24px;
+}
+.ChildKitImageEditIcon {
+  font-size: 18px !important;
+}
+.KitNewNoPreview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: #999;
+}

@@ -1,0 +1,104 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.Main {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url("../../../../Assest/Images/loginpage/loginpagebackground.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.Main::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #00000066;
+  z-index: 1;
+}
+
+.ContentWrapper {
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2%;
+  background-color: transparent;
+}
+.Logos {
+  height: 70px;
+  object-fit: contain;
+}
+.xdlinxlogo {
+  height: 75px;
+  object-fit: contain;
+  opacity: 0.8;
+}
+.SignInOptions2 {
+  display: flex;
+  justify-content: center;
+  width: 60%;
+  margin-top: 30px; /* Remove unnecessary margins */
+}
+
+.SignInCard {
+  width: 100%;
+  max-width: 400px;
+  margin-top: -30px;
+}
+.SignInCard .MuiCardContent-root {
+  background-color: #e6e6e6cc; /* Login card background */
+  border-radius: 5px; /* Optional: Smooth corners */
+}
+
+.SignInHeader {
+  color: black;
+  text-align: center;
+  margin-bottom: 10px;
+  font-family: poppins;
+}
+
+.GoogleButton {
+  display: flex;
+  width: 100%;
+  max-width: 300px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: black;
+  /* border: solid 1px grey; */
+  padding: 10px;
+  border-radius: 5px;
+  transition: 0.1s;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.GoogleButton:hover {
+  background-color: rgb(185, 183, 183);
+}
+
+.SignInGoogle {
+  width: 40px;
+}
+
+@media only screen and (max-width: 767px) {
+  .GoogleButton {
+    width: 80%;
+    max-width: 300px;
+  }
+}

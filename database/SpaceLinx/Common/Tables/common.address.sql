@@ -1,0 +1,20 @@
+﻿CREATE TABLE common.address (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20),
+    country_id UUID NOT NULL,
+    phone_number VARCHAR(20),
+	latitude DECIMAL(9,6),
+    longitude DECIMAL(9,6),	
+	is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMPTZ,
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMPTZ,
+    deleted_by VARCHAR(255),
+	FOREIGN KEY (country_id) REFERENCES common.country(id) ON DELETE SET NULL
+);

@@ -1,0 +1,1049 @@
+:root {
+  --primary-color-blue: #141414;
+  --stars-image: url("https://cdn.pixabay.com/photo/2020/03/30/13/29/space-4984262_1280.jpg");
+}
+
+.stepTitle {
+  display: inline-block;
+  font-size: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.GuideDetailsHeaderLoader {
+  display: flex;
+  justify-content: center;
+  margin: 0px auto;
+}
+
+.GuidesListMain {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+.TaskLists {
+  position: relative;
+  width: 100%;
+  height: calc(80vh - 10%);
+  overflow-y: auto;
+  padding-right: 10px;
+  margin-top: -12px !important;
+}
+.EditAccordion {
+  width: 100%;
+
+  height: auto;
+  background-color: rgba(232, 232, 232, 1);
+}
+
+.GuideDetailsHeader div {
+  font-size: 14px;
+}
+
+.GuideNameNumber ion-icon {
+  cursor: pointer;
+  color: var(--secondary-color) !important;
+  font-family: 900 !important;
+}
+
+.GuidePartChangeDropDown {
+  width: 80% !important;
+  margin: 0 auto;
+}
+
+.GuideVersion {
+  max-width: 15%;
+}
+.GuideDetailsHeader div h2 {
+  font-size: 12px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70% !important;
+}
+.GuideDetailsHeader div p {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+  max-width: 90%;
+}
+
+.StepsSection {
+  display: flex;
+  flex-direction: row;
+  margin-left: auto;
+  width: 99%;
+  height: 190px;
+}
+.PublishedStepsInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 99%;
+  height: 100%;
+  border-radius: 10px;
+}
+.StepsInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: rgba(232, 232, 232, 1);
+  width: 95%;
+  height: 100%;
+  border-radius: 10px;
+}
+
+.StepsScrollContainer {
+  position: relative;
+  white-space: nowrap;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  padding-top: 20px;
+}
+.StepsScrollContainer::-webkit-scrollbar {
+  height: 1px;
+  border-radius: 10px;
+}
+
+.StepsScrollContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(182, 182, 182, 0.5) !important;
+  border-radius: 10px;
+}
+
+.StepsScrollContainer::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+.StepsScrollingBoxInner {
+  display: flex;
+  flex-direction: column;
+  width: 165px;
+  height: 155px;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 0 0 2px #009cbb;
+}
+.StepsScrollingBoxInner .guide-image {
+  width: 95%;
+  margin: auto;
+}
+
+.StepsScrollingBoxInner p {
+  width: 80%;
+
+  font-size: 10px;
+  padding-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.StepsInfoSideButtons {
+  background-color: transparent;
+  color: var(--dark-primary-color);
+  font-size: 25px;
+  width: 40px;
+  border: none;
+  cursor: pointer;
+}
+.GuideDetailsBreadCrumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.GuideDetailsBreadCrumb1 {
+  margin-top: -5px;
+  letter-spacing: 0.2px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+.GuideControlButtonContainer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.GuideControlButton {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  font-size: 13px;
+  border-radius: 5px;
+  padding: 5px;
+  color: var(--light-primary-color);
+  background-color: var(--error-color);
+  transition: 0.3s;
+}
+.GuideControlButton:hover {
+  background-color: var(--light-primary-color);
+  color: var(--secondary-color);
+  cursor: pointer;
+  border: 1px solid #009cbb;
+  transition: 0.3s;
+}
+.GuideDetailsBreadCrumb .GuideDetailsBreadCrumbLink {
+  color: var(--secondary-color);
+  text-decoration: none;
+  font-family: "Square721 BdEx BT Bold";
+}
+.GuideDetailsBreadCrumb .GuideDetailsBreadCrumbLink:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+.GuideDetailsBreadCrumb1 .guide-number {
+  font-family: "Square721 BdEx BT Bold";
+}
+.StepsScrollingBoxHighlight {
+  cursor: pointer;
+  display: flex;
+  width: 170px !important;
+  height: 160px;
+  margin-left: 20px;
+  border-radius: 10px;
+  border: 2px solid #009cbb;
+  position: relative;
+}
+.StepsScrollingBox {
+  display: flex;
+  width: 165px !important;
+  height: 135px;
+  margin-left: 20px;
+  border-radius: 10px;
+  position: relative;
+}
+.StepsScrollingBox:hover {
+  cursor: pointer;
+  box-shadow: 1px 1px 15px #009cbb65;
+}
+.StepsScrollingBox img,
+.StepsScrollingBoxHighlight img,
+.StepsScrollingBox video,
+.StepsScrollingBoxHighlight video {
+  object-fit: contain;
+  border-radius: 10px;
+  width: 160px;
+  height: 120px;
+}
+
+.CardStepNumber {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #10768f;
+  color: var(--light-primary-color);
+}
+
+.StepControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5%;
+  flex-direction: column;
+  height: 100%;
+  gap: 8px;
+}
+.StepControls button {
+  font-size: 22px;
+  border-radius: 10px;
+  display: flex;
+  height: 60px;
+  width: 70%;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(219, 218, 218);
+}
+.StepControls button:hover {
+  cursor: pointer;
+}
+.AddStep {
+  color: rgb(80, 80, 231);
+}
+.DeleteStep {
+  color: var(--error-color);
+}
+.StepDetails {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+}
+.StepDetails .StepDetailsInfo {
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60%;
+  height: 100%;
+}
+
+.StepDetailsInfo img {
+  object-fit: contain;
+  width: 95%;
+}
+.PasteContainer,
+.StepImageControls {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.StepImageControls button {
+  margin-right: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  padding: 5px;
+  border: 1px solid #00ccff40;
+  background-color: #00ccff26;
+}
+
+.PasteContainer ion-icon,
+.StepImageControls button:hover {
+  cursor: pointer;
+}
+.StepTitleField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.StepTitleField h2 {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  font-size: 14px;
+}
+.StepTitleField p {
+  font-weight: 400 !important;
+}
+.StepTitleField input {
+  height: 100%;
+  width: 100%;
+  border: none;
+  padding: 10px;
+  box-shadow: 0 0 3px #a1a1a1;
+}
+.StepTitleField ion-icon {
+  font-size: 25px;
+  padding: 2px;
+  margin: 0;
+  border-radius: 5px;
+}
+.StepTitleField ion-icon:hover {
+  cursor: pointer;
+}
+.StepTaskInfo {
+  height: 100%;
+  width: 40% !important;
+}
+
+.Steps {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  width: 59%;
+  height: calc(100% - 150px);
+  overflow-y: auto;
+  padding-right: 0.8%;
+}
+.Steps::-webkit-scrollbar {
+  width: 0.2em;
+  border-radius: 50%;
+}
+.Steps::-webkit-scrollbar-thumb {
+  border-radius: 30px;
+}
+.Steps:hover {
+  cursor: pointer;
+}
+
+.CreateAccordion {
+  padding: 30px !important;
+
+  height: 350px;
+  overflow-y: auto;
+  background-color: rgba(232, 232, 232, 1);
+}
+.Accordion {
+  padding: 30px !important;
+
+  height: auto;
+  background-color: rgba(232, 232, 232, 1);
+}
+.EditTaskAccordion {
+  padding: 20px !important;
+  background-color: rgba(0, 0, 0, 0.8);
+  height: auto;
+}
+.CreateTaskAccordion {
+  display: flex;
+  padding-top: 10px;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.CreateTask {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: 0.015cm;
+}
+.TaskRadiosDiv {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  width: 100%;
+  justify-content: space-between;
+}
+.CreateTaskButton {
+  display: flex;
+  justify-content: end;
+  gap: 20px;
+  width: 100%;
+}
+.TaskRadiosDiv1 {
+  display: flex;
+  flex-direction: column;
+}
+.TaskRadiosDiv1 p {
+  font-size: 12px;
+  font-weight: 500;
+}
+.TaskRadiosDiv1Inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.TaskRadiosDiv1Inner p {
+  font-size: 14px;
+  font-weight: 700;
+}
+.GenealogyEquipUnavailable {
+  display: flex;
+  align-items: center;
+  width: 90%;
+  padding: 20px;
+  font-size: 16px;
+  color: var(--error-color);
+}
+.TaskType {
+  min-width: 200px;
+  min-height: 30px;
+}
+.TasksListMain {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+  height: auto;
+}
+
+.TasksList {
+  display: flex;
+  align-items: center;
+  border: 1px solid grey;
+  width: 100%;
+  height: 100%;
+}
+.TasksList div {
+  display: flex;
+  flex: auto 2;
+  gap: 5px;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+.taskDescription {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+  padding: 10px 10px 10px;
+}
+.TasksList p {
+  margin-left: 5px;
+}
+.DeleteTaskIcon {
+  padding: 0;
+  margin: 0;
+  color: var(--error-color);
+  padding-left: 5px;
+}
+.DeleteTaskIcon:hover {
+  cursor: pointer;
+}
+.TaskType {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+}
+.TaskTypeInList {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  font-size: 15px;
+  color: var(--secondary-color);
+  flex-direction: column;
+  align-items: center;
+}
+.TaskTypeInList ion-icon {
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: 14px;
+}
+.TaskBehaviour {
+  color: orange;
+  padding-right: 5px;
+}
+.AddItemsDataGrid {
+  width: 100%;
+  margin-top: 11px;
+  height: 100% !important;
+  overflow-x: hidden !important;
+}
+.TaskEditPencil {
+  font-size: 20px;
+  padding-right: 3px;
+  color: var(--primary-color);
+}
+.TaskEditPencil:hover {
+  cursor: pointer;
+}
+.WOEquipmentTabDiv {
+  display: flex;
+  height: 100%;
+  gap: 10px;
+  width: 100%;
+}
+.EquipmentTabDiv {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 10px;
+  width: 100%;
+}
+.GuideItemsDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  overflow: auto;
+}
+.quantityMissMatch:hover,
+.quantityMissMatch {
+  background-color: rgb(255, 128, 128) !important;
+}
+
+.GuideItemsDiv .GuideTaskBodyAccordion,
+.ItemsDiv .GuideTaskBodyAccordion {
+  width: 100%;
+}
+.GuideItemsDiv h2,
+.ItemsDiv h2 {
+  font-weight: 700;
+  font-size: 24px;
+}
+.ItemsOptions {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.CreateStepButton Button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.CreateStepButton Button ion-icon {
+  font-size: 18px;
+}
+.CreateStepButton Button p {
+  font-size: 12px;
+}
+.dataTypeInput {
+  display: flex;
+  align-items: center;
+  max-width: 500px;
+}
+.dataTypeOptionBox {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.dataTypeOptionBoxInner {
+  display: flex;
+  width: auto;
+  gap: 5px;
+  align-items: center;
+  min-height: 10px;
+  padding: 5px 5px 5px;
+  border: 0.5px solid black;
+  border-radius: 5px;
+}
+.dataTypeOptionBoxInner ion-icon {
+  min-width: 15px;
+}
+
+.dataTypeOptionBoxInnerP {
+  width: 100%;
+}
+.dataTypeOptionBox .MuiTextField-root input {
+  font-size: 16px;
+  padding-left: 10px;
+}
+.GuideStepTasksLoader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.ManufacturingBomHeader {
+  font-size: 22px;
+  font-weight: 600;
+  color: rgba(94, 88, 91, 1);
+}
+.ManufacturingBomInner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 75%;
+  overflow-y: hidden;
+}
+
+.GuideEditFlyoutBody {
+  display: flex;
+  align-items: top;
+  gap: 15px;
+  width: 100%;
+  height: 100%;
+}
+.GuideTaskBody {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100%;
+}
+
+.GuideTaskBodyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 99%;
+  font-size: 16px;
+  padding: 10px;
+  overflow: hidden;
+}
+.GuideTaskBodyHeader ion-icon {
+  font-size: 26px;
+  color: rgba(96, 173, 212, 1);
+}
+.GuideTaskBodyHeader h2 {
+  font-size: 14px;
+}
+.GuideTaskBodyHeader ion-icon:hover {
+  cursor: pointer;
+}
+
+.EquipAccordion {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  padding: 30px !important;
+  height: auto;
+  box-shadow: 0 0 2px #a1a1a1;
+}
+.EquipAccordionInner {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.AddButtonInEquipTab {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.QuantityTextField {
+  width: 50%;
+}
+
+.SelectPartTextField {
+  width: 20%;
+}
+
+.SelectPartSelectField {
+  width: 40%;
+}
+.ErrorMessage {
+  color: var(--error-color);
+}
+.image-flyout {
+  position: fixed;
+  top: 10px;
+  left: 50px;
+  width: 90%;
+  height: 90%;
+  margin-left: 20px;
+  background-color: var(--image-preview-flyout-bg-color);
+  padding: 20px;
+  overflow: auto;
+}
+
+.image-flyout img {
+  max-width: 70%;
+  margin-left: 150px;
+  height: auto;
+}
+
+.image-flyout .close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.PublishedTag {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  font-weight: 700;
+  color: rgba(0, 156, 187, 1);
+}
+
+.image-editor-container.full-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1200;
+}
+.PreviewDiv {
+  width: 100%;
+  height: 80%;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.PreviewDiv img,
+.PreviewDiv video {
+  display: block;
+  object-fit: contain;
+  height: 100%;
+  width: 100%;
+  transition: transform 0.3s ease;
+}
+
+.GuideDetailsControls {
+  position: fixed;
+  bottom: 0;
+  left: 80px;
+  width: 100%;
+  background-color: transparent;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  z-index: 1000;
+}
+
+.GuideDetailsControls button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  color: var(--dark-text-color);
+  background-color: var(--secondary-color);
+  padding: 5px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  min-width: 70px;
+}
+.AddItemsBody {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 100px;
+  width: 100%;
+  height: 100%;
+}
+.NoDataMessage {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--error-color);
+  gap: 10px;
+}
+.NoDataMessage p {
+  text-decoration: underline;
+  color: var(--link-color);
+  cursor: pointer;
+}
+
+.divider {
+  display: inline-block;
+  vertical-align: middle;
+}
+.GuideDraftButtonsContainer {
+  display: flex;
+  gap: 5px;
+  cursor: pointer;
+}
+.GuideDraftButtonsContainer button {
+  background-color: var(--secondary-color);
+  padding: 5px;
+  color: var(--dark-text-color);
+  border-radius: 5px;
+  cursor: pointer;
+}
+.GuideDraftButtons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.GuideDraftButtons.disabled {
+  background-color: #009cbbc0;
+  color: var(--dark-text-color);
+  cursor: not-allowed;
+  border: 1px solid #a9a9a9;
+  position: relative;
+}
+.GuideDraftButtons.disabled::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  padding: 5px;
+  background-color: #333;
+  color: var(--dark-text-color);
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+}
+.GuideDraftButtons.disabled:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+#light .guides-button {
+  background-color: var(--secondary-color);
+  color: var(--light-primary-color);
+}
+#dark .guides-button {
+  background-color: #001f26;
+  color: var(--light-secondary-color);
+}
+#light .StepImageControls button [name="create-outline"] {
+  color: var(--light-primary-color) !important;
+}
+.GuideBOMCellWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.GuideBOMGuideLink {
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+}
+.GuideBOMGuideLink:hover {
+  text-decoration: underline;
+  color: #999;
+}
+/* Main container */
+.CreateStepButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.GuideDetailsHeader {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.GuideNameNumber {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 180px;
+  flex: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.GuideNameNumber h2,
+.GuideNameNumber p {
+  margin: 0;
+  font-weight: 500;
+  font-size: 16px;
+  color: #333;
+}
+
+.GuidePartName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 160px;
+  flex: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.GuidePartName p.AppHyperLink {
+  cursor: pointer;
+  color: #009cbb;
+  text-decoration: underline;
+  margin: 0;
+}
+
+.GuidePartNumber {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+  flex: 1;
+}
+
+.GuidePartNumber p,
+.GuidePartNumber button {
+  margin: 0;
+  font-size: 14px;
+}
+
+.GuideVersion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+  flex: 0.8;
+}
+
+.VersionName {
+  font-weight: 500;
+}
+
+.GuideVersion .MuiSelect-standard {
+  font-size: 14px;
+}
+
+.GuideWeight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+  flex: 1.2;
+}
+
+.GuideWeight .MuiSelect-standard {
+  font-size: 14px;
+}
+
+.MuiDivider-root {
+  margin: 0 10px;
+}
+
+.GuidePublish {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.GuidePublishButton {
+  color: var(--light-primary-color);
+  background-color: rgba(0, 156, 187, 1);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.PublishedTag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #d4edda;
+  color: #155724;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+@media (max-width: 1200px) {
+  .GuideDetailsHeader {
+    gap: 12px;
+  }
+}
+@media (min-width: 1600px) {
+  .GuidePublishButton {
+    padding: 10px 20px !important;
+  }
+  .CreateStepButton {
+    padding: 10px 16px !important;
+  }
+}
+@media (max-width: 900px) {
+  .GuideDetailsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .GuidePublish {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+}

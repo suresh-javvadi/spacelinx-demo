@@ -1,0 +1,735 @@
+.AdminTextFeilds.MuiTextField-root .MuiInputLabel-root.MuiInputLabel-shrink {
+  color: grey !important;
+  font-weight: bold;
+}
+.AdminTextFeilds .MuiTextField-root .MuiInputLabel-root.MuiInputLabel-shrink {
+  color: grey !important;
+  font-weight: bold;
+}
+.AdminTextFeilds.MuiAutocomplete-root .MuiInput-root .MuiInput-input {
+  font-family: var(--body-font-family);
+}
+.AdminTextFeilds.MuiInputLabel-root {
+  color: grey !important;
+  font-weight: bold !important;
+}
+.newimage-container {
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.image-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-header p {
+  font-size: 15px;
+  margin-top: 30px;
+  margin-left: 30px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.icon-button {
+  min-width: 30px;
+  margin-top: 30px !important;
+  padding: 5px;
+}
+.small-icon {
+  font-size: 15px !important;
+}
+
+.ImageUploadContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.UploadTextWrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.UploadTextWrapper > * {
+  margin-right: 5px;
+}
+.NewPartUploadedImageWrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 350px;
+  border: 2px solid grey;
+  border-radius: 8px;
+  padding: 8px;
+  width: 330px;
+}
+
+.NewPartUploadedImageWrapper ion-icon {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 18px;
+  color: #ff0000;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.NewPartUploadedImageWrapper ion-icon:hover {
+  background: #ff0000cc;
+  color: white;
+  transform: scale(1.1);
+}
+
+.NewPartCloseButton {
+  position: absolute;
+  top: 10px;
+  right: -140px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  padding: 5px;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.NewPartCloseButton:hover {
+  background: #ff0000cc;
+  color: white;
+  transform: scale(1.1);
+}
+
+.CloseIcon {
+  font-size: 18px;
+  cursor: pointer;
+}
+.NewPartImagePreview {
+  width: 100%;
+  margin-top: 20px;
+  max-width: 330px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.UploadedImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  min-height: 200px;
+  border-radius: 8px;
+}
+
+.FlyoutContentSectionInnerFlex {
+  display: flex;
+  gap: 20px;
+}
+
+.FlyoutContentSectionInnerLeft {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.FlyoutContentSectionInnerLeft .MuiTextField-root,
+.FlyoutContentSectionInnerLeft .MuiAutocomplete-root {
+  margin-bottom: 10px;
+}
+
+.FlyoutContentSectionInnerLeft .MuiTextField-root:last-child,
+.FlyoutContentSectionInnerLeft .MuiAutocomplete-root:last-child {
+  margin-bottom: 0;
+}
+
+.FlyoutContentSectionInnerRight {
+  width: 300px;
+  text-align: center;
+}
+.FlyoutContentWrapper {
+  display: flex;
+  gap: 15px;
+}
+
+.FlyoutContentLeft {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.FlyoutContentLeft h3 {
+  margin-bottom: 13px;
+}
+.FlyoutContentLeft .MuiTextField-root,
+.FlyoutContentLeft .MuiAutocomplete-root {
+  margin-bottom: 15px;
+}
+
+.FlyoutContentLeft .MuiTextField-root:last-child,
+.FlyoutContentLeft .MuiAutocomplete-root:last-child {
+  margin-bottom: 0;
+}
+
+.FlyoutContentRight {
+  width: 300px;
+  text-align: center;
+}
+.image-container {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  overflow: hidden;
+  background-color: lightgray;
+}
+
+.PartVersionsAutocomplete {
+  display: flex;
+  justify-content: flex-start;
+  width: 20%;
+}
+.PartVersionsAutocomplete .MuiInputBase-root {
+  min-height: 40px !important;
+  height: 40px !important;
+}
+.EditBOMContainer {
+  padding: 50px 20px;
+  margin-top: 20px;
+}
+.EditBOMFlyoutHeader h3 {
+  margin-left: 25px;
+  font-weight: 600;
+  font-size: 19px;
+}
+.EditFlyoutHeaderIcons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px !important;
+}
+.FlyoutContentSection {
+  margin-top: 10px;
+}
+.NewBOMContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.NewBOMAutocomplete {
+  width: 80%;
+}
+.EditPartHeaderMakeBuyStatusDiv {
+  display: flex;
+  gap: 20px;
+}
+
+.EditPartHeaderMakeBuy {
+  margin: 0;
+}
+
+.EditPartHeaderStatus {
+  margin: 0;
+}
+.MuiTabs-indicator {
+  background-color: rgb(63, 178, 216) !important;
+}
+
+.MuiTab-root.Mui-selected {
+  background-color: transparent !important;
+  color: rgb(63, 178, 216) !important;
+}
+.EditFlyoutContent {
+  position: relative;
+  padding: 10px;
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 140px);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  justify-content: space-between !important;
+}
+.EditFlyoutTabPanel {
+  padding: 10px !important;
+}
+.EditFlyoutContentWithFooter {
+  position: relative;
+  padding: 10px;
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  justify-content: space-between !important;
+}
+.EditFlyoutContentLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 70%;
+  gap: 14px;
+}
+.EditFlyoutContentRight {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  width: 25%;
+}
+.EditPartImage,
+.EditOrganizationImage {
+  width: 100%;
+  height: 200px;
+  border: 1px solid #595959;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.EditPartImage img,
+.EditOrganizationImage img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.EditPartImageControls,
+.EditOrganizationImageControls {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.EditPartImageControls p,
+.EditOrganizationImageControls p {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.PartsUsedInDataGrid {
+  height: calc(100vh - 160px);
+  overflow: auto;
+}
+.EditPartReviseButtonDiv {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  margin-right: 10px !important;
+}
+.EditPartReviseButton {
+  background-color: var(--link-color) !important;
+  color: white !important;
+  padding: 8px 16px !important;
+}
+
+.CloneBOMButton {
+  font-size: 14px !important;
+  padding: 8px !important;
+  background-color: var(--clone-bom-button) !important;
+}
+.PartInventoryMain {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 110px);
+  padding: 10px;
+  background-color: transparent;
+}
+.PartInventoryTab {
+  width: 100%;
+  height: 95%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-x: hidden;
+}
+.PartInventoryTabFooter {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.PartInventoryTab .PartDetails {
+  padding: 15px;
+  border: 1px solid rgb(78, 78, 78);
+  border-radius: 8px;
+  border-style: dashed;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: auto;
+  font-size: 15px;
+}
+.PartDetails h3 {
+  font-size: 15px;
+}
+.PartDetails p {
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+.PartDetailsInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.PartInventoryTab .PartInventoryTabHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+.InventoryTable .ant-table-container {
+  border: 1px solid grey !important;
+}
+
+.InventoryTable .ant-table-cell {
+  background-color: #383838 !important;
+  color: white !important;
+  border-color: grey !important;
+}
+
+.InventoryTable .ant-table-thead > tr > th {
+  background-color: rgb(27, 27, 27) !important;
+  color: white !important;
+}
+.bin-row .ant-table-cell {
+  background-color: #484848 !important; /* light orange for bins */
+  color: white !important;
+}
+.PartInventoryAccordion {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  background-color: transparent !important;
+  color: white !important;
+  border: 1px solid grey !important;
+  margin: 0 !important;
+  padding: 10px;
+  border-radius: 5px !important;
+}
+.PartInventoryAccordionContent {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  background-color: transparent !important;
+}
+.PartInventoryAccordionContentInner {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 0.5fr;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding: 5px;
+} /* Entire Table */
+.PartInventoryAntTable {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 14px;
+  border: 1px solid #383838;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #1e1e1e;
+}
+.AntTableDiv {
+  flex: 1;
+  overflow-y: auto !important;
+}
+.PartInventoryAntTable .ant-table-body {
+  overflow-y: auto !important;
+  max-height: 100%;
+}
+
+/* Header Styling */
+.PartInventoryAntTable .ant-table-thead > tr > th {
+  background-color: #1e1e1e;
+  font-weight: bold;
+  color: #fbfbfb;
+  border: 1px solid #141414;
+  border-bottom: 1px solid rgb(87, 87, 87) !important;
+  text-align: left;
+}
+
+/* Row Styling */
+.PartInventoryAntTable .ant-table-tbody > tr > td {
+  background-color: #1e1e1e !important;
+  text-align: left;
+  border: 1px solid #383838 !important;
+  padding: 10px;
+  color: #ddd;
+  transition: background-color 0.3s ease;
+}
+
+/* Row Hover Styling */
+.PartInventoryAntTable .ant-table-tbody > tr:hover > td {
+  background-color: #333 !important;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Pagination */
+.custom-pagination {
+  margin-top: 16px;
+  text-align: right;
+  color: white !important;
+}
+
+/* Search Input Box */
+.PartInventoryDataGridHeader {
+  background-color: #2c2c2c !important;
+  color: #fff !important;
+  border: 1px solid #2c2c2c !important;
+  border-radius: 4px !important;
+}
+
+.PartInventoryDataGridHeader input {
+  color: #fff !important;
+  background-color: #2c2c2c !important;
+}
+
+.PartInventoryDataGridHeader input::placeholder {
+  color: #999 !important;
+  opacity: 1 !important;
+}
+
+.PartInventoryDataGridHeader .anticon {
+  color: #999 !important;
+}
+/* Pagination summary text styling */
+.PartInventoryAntTable .bin-row .ant-pagination-total-text {
+  color: #aaa;
+  font-size: 13px;
+  margin-left: 10px;
+}
+.PartInventoryAntTable .ant-table-cell {
+  color: #aaa;
+  font-size: 13px;
+  margin-left: 10px;
+  border: none !important;
+}
+/* Expand/Collapse button icon styling */
+.PartInventoryAntTable .ant-table-row-expand-icon {
+  background-color: transparent;
+  border: none;
+  color: #ccc;
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+/* On hover */
+.PartInventoryAntTable .ant-table-row-expand-icon:hover {
+  color: #fff;
+  cursor: pointer;
+}
+
+/* When expanded: rotate ▼ */
+.PartInventoryAntTable .ant-table-row-expand-icon-expanded {
+  transform: rotate(180deg);
+}
+/* Pagination section in general */
+.PartInventoryAntTable .ant-pagination {
+  background-color: transparent;
+  color: #fff;
+}
+
+/* Page number buttons */
+.PartInventoryAntTable .ant-pagination-item {
+  background-color: #1e1e1e;
+  border-color: #2d2d2d;
+  color: #aaa;
+}
+.PartInventoryAntTable .ant-pagination-item-active {
+  background-color: #333 !important;
+  border-color: #666 !important;
+  color: #fff !important;
+}
+.PartInventoryAntTable .ant-pagination-item:hover {
+  background-color: #0c0c0c !important;
+  color: #fff !important;
+}
+.location-name {
+  color: #ffffff !important;
+}
+.UploadButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer !important;
+  background-color: transparent !important;
+  color: #00d8ff !important;
+  border: 1px solid #00d8ff !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  padding: 16px 16px !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease;
+  text-align: center;
+  line-height: normal;
+}
+.InventoryAccordion {
+  border: 1px solid rgb(75, 75, 75);
+  border-radius: 5px !important;
+  background-color: #171717 !important;
+}
+.WhereUsedButtons {
+  padding: 5px;
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  font-size: 12px !important;
+  gap: 5px;
+  color: var(--whereused-buttons-text) !important;
+  background-color: var(--clone-bom-button);
+  border: 1px solid #00ccff;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.IsVisibleInUiDiv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.IsVisibleInUiDiv p {
+  font-size: 17px;
+  font-weight: 1000 !important;
+}
+
+.PartRadioButtonsContainer {
+  display: flex;
+  align-items: center !important;
+  gap: 8px;
+}
+
+.radioLabel {
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* Asterisk default */
+.required-asterisk {
+  color: inherit;
+  margin-left: 4px;
+}
+
+/* Radio buttons horizontal layout */
+.radioGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center !important;
+  gap: 20px;
+}
+
+/* Error styling (activated when .error class added to container) */
+.formFieldInline.formFieldError .radioLabel,
+.formFieldInline.formFieldError .required-asterisk,
+.formFieldInline.formFieldError .MuiFormControlLabel-label,
+.formFieldInline.formFieldError .MuiRadio-root {
+  color: #d32f2f !important;
+}
+
+.formFieldInline.formFieldError .Mui-checked {
+  color: #d32f2f !important;
+}
+
+/* Error text below */
+.errorText {
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.required-asterisk {
+  color: inherit; /* default: same color as text (not red) */
+  margin-left: 4px;
+}
+
+.required-asterisk.error {
+  color: #d32f2f; /* red only when error */
+}
+.RadioButtonsContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ConsolidatedBomHeader {
+  display: flex;
+  align-items: center;
+  width: 98%;
+  margin: 20px 10px;
+}
+.ConsolidatedBomGrid {
+  width: 100%;
+  height: calc(100vh - 250px);
+}
+.BOMLocationField {
+  width: 40% !important;
+}
+.subsystem-title {
+  text-align: center;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #4fc3f7;
+}
+.subsystem-row {
+  background-color: rgba(79, 195, 247, 0.08);
+}
+.formFieldInlineWrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.formFieldInline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.fieldLabelInline {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.formFieldError .fieldLabelInline {
+  color: #dc2626;
+}
+
+.radioGroupInline {
+  display: flex;
+  align-items: center;
+}
+
+.errorTextBelow {
+  margin-top: 4px;
+  margin-left: 0;
+  font-size: 12px;
+  color: #dc2626;
+}
+.InPartDetailsHeader {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 10px;
+}

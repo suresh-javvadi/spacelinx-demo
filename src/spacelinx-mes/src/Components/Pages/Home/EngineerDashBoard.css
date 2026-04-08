@@ -1,0 +1,181 @@
+.EDashBoardPageMainDiv {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 98%;
+  gap: 25px;
+  height: 100%;
+}
+.EDashBoardHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+  width: 100%;
+  height: 10%;
+}
+.EDashBoardHeaderInnerDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  height: 60px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 156, 187, 1) 0%,
+    rgba(128, 205, 221, 1) 100%
+  );
+  flex: 1;
+}
+.EDashBoardHeaderInnerDiv:hover {
+  cursor: pointer;
+}
+.EDashBoardHeaderInnerDivP1 {
+  width: 100%;
+  padding-left: 15px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 17.07px;
+  letter-spacing: 0.02em;
+  text-align: left;
+  color: rgba(255, 255, 255, 1);
+}
+.EDashBoardHeaderInnerDivP2 {
+  padding-right: 15px;
+  font-size: 35px;
+  font-weight: 600;
+  line-height: 58.51px;
+  text-align: center;
+}
+.EDashBoardBody {
+  display: flex;
+  padding-left: 20px;
+  width: 95%;
+  gap: 30px;
+  height: 90%;
+}
+.EDashBoardBody1 {
+  display: flex;
+  flex-direction: column;
+  width: 75%;
+  height: 90%;
+  gap: 30px;
+}
+.EDashBoardBody1Inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: 50%;
+}
+.EDashBoardBody1InnerHeader {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.EDashBoardBody1InnerHeader p {
+  font-size: 16px;
+  font-weight: 600;
+}
+.EDashBoardBody1InnerHeader div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.EDashBoardBody1InnerHeader div input {
+  padding: 5px;
+  min-width: 200px;
+}
+.EDashBoardBody1InnerHeader div ion-icon {
+  font-size: 20px;
+}
+.DashBoardDataGrid {
+  height: fit-content;
+}
+.DashBoardDataGrid .MuiDataGrid-footer,
+.DashBoardDataGrid .MuiDataGrid-viewport {
+  display: none !important;
+}
+.AssignedWODataGrid {
+  height: 320px;
+}
+.EDashBoardBody2 {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  height: 100%;
+  width: 25%;
+}
+.EDashBoardBody2Header {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24.38px;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+.ScheduleHeader {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24.38px;
+  letter-spacing: 0.02em;
+  text-align: left;
+}
+.ScheduleMeetingsHeader {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18.38px;
+  letter-spacing: 0.02em;
+  color: rgba(94, 88, 91, 1);
+  text-align: left;
+}
+.ScheduleMeetingsBody {
+  display: flex;
+  justify-content: space-between;
+  height: 52px;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: rgba(232, 232, 232, 1);
+  border-radius: 10px;
+}
+.ScheduleMeetingsBody button {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 3px;
+  border: 0.5px solid rgba(159, 150, 150, 1);
+  color: rgba(159, 150, 150, 1);
+  background-color: transparent;
+}
+.ScheduleMeetingsBody button:hover {
+  cursor: pointer;
+  color: rgb(12, 145, 189);
+}
+.ScheduleMeetingsBodyInner {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+.ScheduleMeetingsBodyInner div {
+  display: flex;
+}
+.ScheduleMeetingsBodyInner div ion-icon {
+  color: rgba(128, 205, 221, 1);
+}
+.react-calendar__month-view__weekdays__weekday abbr {
+  padding-left: 14px !important; /* Make the weekday names bold */
+  color: #333;
+  text-decoration: none !important; /* Set color for weekday names */
+}
+.highlight-today {
+  background-color: rgba(
+    128,
+    205,
+    221,
+    1
+  ); /* Set background color to yellow for today's date */
+}
+.AssignedWONumber {
+  color: blue;
+}

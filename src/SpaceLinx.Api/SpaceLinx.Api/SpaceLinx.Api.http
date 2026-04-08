@@ -1,0 +1,6 @@
+@SpaceLinx.Api_HostAddress = http://localhost:5197
+
+GET {{SpaceLinx.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

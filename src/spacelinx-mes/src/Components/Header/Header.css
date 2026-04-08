@@ -1,0 +1,208 @@
+.logo {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.logo-img {
+  height: 50%;
+  width: auto;
+}
+
+.HeaderIconsContainer {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.HeaderIssuesIcon {
+  color: var(--error-color) !important;
+}
+
+@media (max-width: 960px) {
+}
+
+@media (max-width: 600px) {
+  .HeaderIconsContainer {
+    display: flex;
+    margin-left: 20px;
+  }
+}
+
+@media (min-width: 600px) {
+  .logo {
+    margin-left: 10px;
+  }
+}
+.HeaderCreateMenuDiv {
+  display: flex;
+  justify-content: flex-start;
+  width: 400px;
+  width: 340px;
+  padding: 10px;
+  gap: 20px;
+}
+.HeaderCreateMenuDiv1 {
+  padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 40%;
+}
+.HeaderCreateMenuDiv1 p,
+.HeaderCreateMenuDiv2 p {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+.HeaderCreateMenuDiv1 .MenuLink {
+  color: var(--link-color) !important;
+  font-size: 14px;
+  text-decoration: none;
+  font-size: 13px;
+}
+.HeaderCreateMenuDiv2 {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 50%;
+}
+.HeaderCreateMenuDiv2 .MenuLink {
+  color: var(--link-color) !important;
+  font-size: 14px;
+  text-decoration: none;
+  font-size: 13px;
+}
+.user-information {
+  display: flex;
+  flex-direction: column;
+}
+strong {
+  font-size: 12px;
+}
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  width: 270px;
+}
+
+.profile-container-two {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.profile-name {
+  margin: 0;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.profile-email {
+  margin: 0;
+  font-size: 12px;
+  color: gray;
+}
+
+.profile-roles {
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.defualtRole-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.defualtRole-option.Mui-focused,
+.defualtRole-option:hover {
+  background-color: #a1a1a13d;
+}
+
+.defualtRole-option.Mui-selected {
+  font-weight: 500;
+  background-color: #a1a1a13d;
+}
+
+.DeafaultCheckIcon {
+  color: var(--link-color);
+  font-size: 20px !important;
+}
+
+.DefaultRoleCheckbox {
+  margin-right: 10px !important;
+}
+
+.DefaultRoleCheckbox svg {
+  font-size: 35px !important;
+}
+
+/* .roles-label {
+  font-weight: bold;
+  margin-left: -100px;
+} */
+
+.roles-list {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.role-item {
+  font-size: 10px;
+  color: gray;
+}
+
+.no-roles {
+  font-size: 12px;
+  color: gray;
+}
+
+.profile-actions {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.theme-toggle-icon {
+  font-size: 20px;
+  color: inherit;
+}
+
+.logout-button {
+  padding-left: 0;
+  color: #00ccff;
+  text-align: center;
+  font-weight: bold;
+}
+.RoleChangeCliploader {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#light .RoleChangeCliploader {
+  background-color: var(--light-background-color);
+}
+#dark .RoleChangeCliploader {
+  background-color: var(--dark-background-color);
+}

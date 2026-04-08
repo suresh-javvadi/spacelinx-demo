@@ -1,0 +1,185 @@
+.MPEDashBoardPageMainDiv {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 98%;
+  gap: 40px;
+  height: 100%;
+}
+.MPEDashBoardHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 2%;
+  width: 100%;
+  height: 20%;
+}
+.MPEDashBoardHeaderInnerDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  height: 60px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 156, 187, 1) 0%,
+    rgba(128, 205, 221, 1) 100%
+  );
+  flex: 1;
+}
+.MPEDashBoardHeaderInnerDiv:hover {
+  cursor: pointer;
+}
+.MPEDashBoardHeaderInnerDivP1 {
+  width: 100%;
+  padding-left: 15px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 17.07px;
+  letter-spacing: 0.02em;
+  text-align: left;
+  color: rgba(255, 255, 255, 1);
+}
+.MPEDashBoardHeaderInnerDivP2 {
+  padding-right: 15px;
+  font-size: 35px;
+  font-weight: 600;
+  line-height: 58.51px;
+  text-align: center;
+}
+.MPEDashBoardBody {
+  display: flex;
+  width: 100%;
+  gap: 5px;
+  height: 70%;
+}
+.MPEDashBoardBody1 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 50%;
+  height: 100%;
+}
+.MPEDashBoardBody1Inner1 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+.MPEDashBoardBody1Inner1P1,
+.MPEDashBoardBody1Inner2P1 {
+  font-size: 18px;
+  color: rgba(143, 143, 143, 1);
+  font-weight: 600;
+  line-height: 24.38px;
+  text-align: left;
+  width: auto;
+}
+.MPEDashBoardBody1InnerInner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 3%;
+}
+
+.MPEDashBoardBody1InnerInnerP1 {
+  width: 20%;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 19.5px;
+  text-align: left;
+}
+.GuideProgressBar {
+  width: 65%;
+  padding-top: 10px;
+}
+.MPEDashBoardBody1InnerInnerP2 {
+  width: 15%;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 17.07px;
+  text-align: left;
+}
+.MPEDashBoardBody1Inner2 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.MPEDashBoardBody1Inner2Inner {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.MPEDashBoardBody1Inner2Inner1 {
+  display: flex;
+  width: 50%;
+}
+.MPEDashBoardBody1Inner2Inner2 {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  gap: 10px;
+}
+.MPEDashBoardBody1Inner2Inner2RadioDiv {
+  display: flex;
+  width: 100%;
+  font-size: 13px;
+  gap: 50px;
+  justify-content: center;
+}
+.MPEDashBoardBody1Inner2Inner2RadioDiv div {
+  display: flex;
+  gap: 5px;
+}
+.MPEDashBoardBody1Inner2InnerP2 th {
+  color: rgba(143, 143, 143, 1);
+  padding-bottom: 5px;
+}
+.MPEDashBoardBody1Inner2InnerP2TableBody {
+  position: fixed;
+  height: calc(100vh - 470px);
+  width: 20%;
+  overflow-y: scroll;
+}
+.MPEDashBoardBody1Inner2InnerP2TableBodyInner {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.MPEDashBoardBody1Inner2InnerP2TableBody td {
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.MPEDashBoardBody2 {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+}
+.MPEDashBoardBody2P1 {
+  padding-left: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24.38px;
+  color: rgba(143, 143, 143, 1);
+  text-align: left;
+}
+.MPEDashBoardBody2Inner {
+  position: fixed;
+  margin-top: 50px;
+  width: 46%;
+  height: calc(100vh - 280px);
+  overflow-y: scroll;
+}
+.MPEDashBoardBody2Inner1 {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  margin-left: 10px;
+}
+.MPEDashBoardBody2Inner p {
+  font-size: 12px;
+}

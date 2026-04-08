@@ -1,0 +1,23 @@
+﻿CREATE TABLE application.issue (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    project_name VARCHAR(255),
+    issue_type VARCHAR(100) NOT NULL,
+    priority VARCHAR(50),
+    summary TEXT NOT NULL,
+    description TEXT,
+    product_id UUID,
+    guide_id UUID,
+    work_order_id UUID,
+    jira_id VARCHAR(255),
+    devops_id VARCHAR(255), 
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,         
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    created_by VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMPTZ,          
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMPTZ,
+    deleted_by VARCHAR(255),
+    FOREIGN KEY (product_id) REFERENCES mes.product(id) ON DELETE SET NULL,
+    FOREIGN KEY (guide_id) REFERENCES mes.guide(id) ON DELETE SET NULL,
+    FOREIGN KEY (work_order_id) REFERENCES mes.work_order(id) ON DELETE SET NULL
+);

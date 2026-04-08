@@ -1,0 +1,251 @@
+.BuildFlyoutBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 99%;
+  font-size: 14px;
+  font-family: "Roboto" !important;
+  gap: 10px;
+  overflow-x: hidden;
+  height: 100%;
+}
+div .AddButton {
+  margin-left: 96.3%;
+  margin-bottom: 5px;
+  color: #009cbb;
+}
+.VendorCreateFlyoutFooter ion-icon {
+  margin-right: 68%;
+  font-size: 140%;
+  color: red;
+}
+.VendorCreateFlyoutFooter ion-icon:hover {
+  cursor: pointer;
+}
+.DocumentsDataGrid {
+  display: flex;
+  margin-left: 100px;
+  margin-right: 100px;
+}
+.div1 {
+  display: grid;
+  flex-direction: column;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  font-size: 14px;
+  font-family: "Roboto" !important;
+  gap: 10px;
+  margin-bottom: 5%;
+}
+.div2 {
+  display: grid;
+  flex-direction: column;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  font-size: 14px;
+  font-family: "Roboto" !important;
+  gap: 10px;
+  margin-bottom: 5%;
+}
+.VendorCreateFlyoutFooter {
+  position: fixed;
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  bottom: 0;
+  right: 2%;
+
+  width: 50%;
+  height: 50px;
+  padding: 8px 0 8px;
+  background: #202020;
+}
+
+.DataGrid {
+  height: 350px;
+}
+.ChildDataGrid {
+  width: 100%;
+  right: 1%;
+}
+.LineItemsDataGridDiv {
+  height: auto;
+  width: 100%;
+}
+.LineItemsDataGrid {
+  width: 100%;
+  height: 100% !important;
+  overflow-y: auto !important;
+  min-height: 300px !important;
+}
+.RequestItemsDataGrid {
+  width: 98%;
+  margin: 10px auto;
+  height: 300px;
+}
+
+.CreateFlyoutBodyVendors {
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  right: 0;
+  width: 97%;
+  left: 3%;
+  top: 12%;
+  font-size: 14px;
+  font-family: "Roboto" !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 140px);
+  padding-top: 10px;
+}
+
+.VendorBasicDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 2%;
+  margin-left: 1%;
+}
+
+.VendorDetails {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.Vendorlabel {
+  font-weight: 600;
+  color: whitesmoke;
+  min-width: 130px;
+}
+
+.Vendorcolon {
+  font-weight: 600;
+  color: whitesmoke;
+}
+
+.Vendorvalue {
+  color: white;
+  word-break: break-word;
+}
+
+.Vendornotes {
+  grid-column: span 2;
+}
+.addressline1,
+.addressline2 {
+  margin-bottom: 10px !important;
+}
+.bank-details-container {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: 100%;
+}
+.bank-details-container .MuiAccordion-root {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.bank-details-container .MuiAccordionSummary-root {
+  background-color: transparent;
+  padding: 8px 16px;
+  border-bottom: 1px solid #ccc;
+  min-height: 48px;
+}
+
+.bank-details-container .MuiAccordionSummary-content {
+  margin: 0;
+  align-items: center;
+}
+
+.bank-details-container .MuiTypography-subtitle1 {
+  font-weight: 600;
+}
+
+.bank-details-container .MuiAccordionDetails-root {
+  padding: 16px;
+  background-color: transparent;
+}
+
+.bank-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.bank-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+.dataGridContainer {
+  height: 350px;
+  margin-top: 16px;
+}
+.trash-icon {
+  cursor: pointer;
+  color: #d32f2f;
+  font-size: 18px !important;
+}
+.no-vendors-message {
+  padding: 2rem;
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  color: gray;
+}
+.VendorPartsHeader {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.VendorPartsAutocomplete {
+  width: 40%;
+  margin-right: 16px;
+}
+.VendorPartsAddButton {
+  background-color: #009cbb !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  border: none !important;
+  border-radius: 4px !important;
+}
+.VendorPartsDataGrid {
+  width: 100%;
+  height: calc(100vh - 250px);
+}
+.VendorCheckBoxGroup {
+  display: flex;
+  gap: 5px;
+}
+.VendorCheckBoxGroup.edit {
+  margin-bottom: 60px;
+}
+
+.VendorCheckBoxGroup.create {
+  margin-bottom: 40px;
+}
+.TabButton.Selected {
+  background-color: rgb(69, 69, 69);
+}
+#light .TabButton.Selected {
+  background-color: rgb(173, 170, 170);
+}

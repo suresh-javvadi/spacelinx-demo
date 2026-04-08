@@ -1,0 +1,185 @@
+[
+  {
+    "roleName": "Super Admin"
+  },
+  {
+    "roleName": "Admin",
+    "permissions": {
+      "read": true,
+      "write": true,
+      "delete": true
+    },
+    "accessiblePagesList": [
+      "/",
+      "/home",
+      "/product",
+      "/products/:productId",
+      "/guides",
+      "/guides/:guideId",
+      "/WorkOrders",
+      "/WorkOrders/:workPackageId/WorkOrders",
+      "/WorkOrders/:workPackageNumber/Details/:workOrderId",
+      "/WorkOrderDetails/:subWorkOrderNumber/:selectedStepId",
+      "/materialkits",
+      "/procurement/vendors",
+      "/reports",
+      "/reports/quality",
+      "/reports/list",
+      "/partsmanagement",
+      "/partsmanagement/parts",
+      "/partsmanagement/tools",
+      "/partsmanagement/machines",
+      "/partsmanagement/locations",
+      "/partsmanagement/eco",
+      "/settings/bulkupload",
+      "/settings/issues",
+      "/settings/parttypes",
+      "/settings/news",
+      "/settings/optionsets",
+      "/administration/users",
+      "/bulkupload",
+      "/issues",
+      "/users"
+    ]
+  },
+  {
+    "roleName": "Project Manager",
+    "permissions": {
+      "read": true,
+      "write": true,
+      "delete": true
+    },
+    "accessiblePagesList": [
+      "/",
+      "/home",
+      "/product",
+      "/products/:productId",
+      "/guides",
+      "/guides/:guideId",
+      "/WorkOrders",
+      "/WorkOrders/:workPackageId/WorkOrders",
+      "/WorkOrders/:workPackageNumber/Details/:workOrderId",
+      "/WorkOrderDetails/:subWorkOrderNumber/:selectedStepId",
+      "/materialkits",
+      "/settings/reports",
+      "/settings/reports/quality",
+      "/settings/reports/list",
+      "/partsmanagement/parts",
+      "/partsmanagement/tools",
+      "/partsmanagement/machines",
+      "/partsmanagement/eco",
+      "/settings/bulkupload",
+      "/settings/issues",
+      "/administration/users"
+    ]
+  },
+  {
+    "roleName": "Design Engineer",
+    "permissions": {
+      "read": true,
+      "write": true,
+      "delete": true
+    },
+    "accessiblePagesList": [
+      "/",
+      "/home",
+      "/guides",
+      "/guides/:guideId",
+      "/partsmanagement/parts",
+      "/partsmanagement/tools",
+      "/partsmanagement/machines",
+      "/partsmanagement/eco",
+      "/settings/bulkupload",
+      "/settings/reports",
+      "/settings/reports/quality",
+      "/settings/reports/list"
+    ]
+  },
+  {
+    "roleName": "Engineer/Technician",
+    "permissions": {
+      "read": true,
+      "write": true,
+      "delete": true
+    },
+    "accessiblePagesList": [
+      "/",
+      "/home",
+      "/guides",
+      "/guides/:guideId",
+      "/WorkOrders",
+      "/WorkOrders/:workPackageId/WorkOrders",
+      "/WorkOrders/:workPackageNumber/Details/:workOrderId",
+      "/WorkOrderDetails/:subWorkOrderNumber/:selectedStepId",
+      "/materialkits",
+      "/settings/reports",
+      "/settings/reports/quality",
+      "/settings/reports/list"
+    ]
+  },
+  {
+    "roleName": "Hardware Engineer",
+    "permissions": {
+      "read": true,
+      "write": true,
+      "delete": true
+    },
+    "accessiblePagesList": [
+      "/",
+      "/home",
+      "/guides",
+      "/guides/:guideId",
+      "/partsmanagement/tools",
+      "/partsmanagement/machines",
+      "/settings/locations",
+      "/settings/reports",
+      "/settings/reports/quality",
+      "/settings/reports/list"
+    ]
+  },
+  {
+    "roleName": "Eco Approver",
+    "permissions": {
+      "read": true,
+      "write": false,
+      "delete": false
+    },
+    "accessiblePagesList": ["/", "/home", "/partsmanagement/eco"]
+  },
+  {
+    "roleName": "Viewer",
+    "permissions": {
+      "read": true,
+      "write": false,
+      "delete": false
+    },
+    "accessiblePagesList": [
+      "/",
+      "/home",
+      "/product",
+      "/products/:productId",
+      "/guides",
+      "/guides/:guideId",
+      "/WorkOrders",
+      "/WorkOrders/:workPackageId/WorkOrders",
+      "/WorkOrders/:workPackageNumber/Details/:workOrderId",
+      "/WorkOrderDetails/:subWorkOrderNumber/:selectedStepId",
+      "/materialkits",
+      "/settings/reports",
+      "/settings/reports/quality",
+      "/settings/reports/list",
+      "/partsmanagement",
+      "/partsmanagement/parts",
+      "/partsmanagement/tools",
+      "/partsmanagement/machines",
+      "/partsmanagement/locations",
+      "/partsmanagement/eco",
+      "/settings/bulkupload",
+      "/settings/issues",
+      "/settings/parttypes",
+      "/settings/news",
+      "/settings/optionsets",
+      "/administration/users"
+    ]
+  }
+]

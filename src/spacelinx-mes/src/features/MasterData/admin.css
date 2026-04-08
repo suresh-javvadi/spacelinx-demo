@@ -1,0 +1,66 @@
+.admin-container {
+  display: flex;
+  justify-content: space-between;
+  margin-left: -10px;
+}
+.admin {
+  padding: 10px;
+}
+.masterdata-card {
+  position: relative;
+  width: 250px;
+  height: 220px;
+  margin: 8px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #00ccff;
+  background-size: cover;
+  text-decoration: none;
+  overflow: hidden;
+}
+.masterdata-card img {
+  position: absolute;
+  bottom: -10px;
+  left: -25px;
+  width: 100px;
+  height: 80px;
+}
+
+.number {
+  font-size: 35px;
+  margin-bottom: 8px;
+}
+
+.masterdata-card h2 {
+  margin-top: 8px;
+  font-size: 18px;
+}
+.admin-container h1,
+.admin-container h2 {
+  font-family: "Square721 BdEx BT Bold", sans-serif;
+}
+
+#dark .masterdata-card {
+  background-color: #202020;
+  border: none;
+}
+#dark .masterdata-text {
+  color: #fff;
+}
+#dark .number {
+  color: #fff;
+}
+#light .masterdata-card {
+  background-color: #fff;
+  border: none;
+}
+#light .masterdata-text {
+  color: #000;
+}
+#light .number {
+  color: #000;
+}

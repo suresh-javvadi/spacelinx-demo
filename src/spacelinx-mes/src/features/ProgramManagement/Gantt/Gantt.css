@@ -1,0 +1,136 @@
+.GanttContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 600px;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.GanttLoading,
+.GanttError,
+.GanttEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  gap: 16px;
+}
+
+.GanttToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--divider-color, #e0e0e0);
+}
+
+.GanttToolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.GanttToolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.GanttChartWrapper {
+  flex: 1;
+  overflow: auto;
+  background-color: var(--background-paper, #fff);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Gantt chart styling overrides */
+.GanttChartWrapper .gantt {
+  font-family: inherit;
+}
+
+.GanttChartWrapper ._3T42A {
+  background-color: var(--background-paper, #fff);
+}
+
+.GanttChartWrapper ._2B2zv {
+  fill: var(--text-primary, #333);
+}
+
+.GanttChartWrapper ._1nBOt {
+  background-color: var(--background-default, #fafafa);
+}
+
+/* Today line */
+.GanttChartWrapper ._2qL9F {
+  stroke: #f44336;
+  stroke-width: 2;
+}
+
+/* Tooltip styling */
+.GanttTooltip {
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.87);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 12px;
+  max-width: 250px;
+}
+
+.GanttTooltip strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+
+/* Resize Handle - Active Mode */
+.GanttResizeHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14px; /* Hit area */
+  cursor: col-resize;
+  z-index: 100;
+  background-color: rgba(33, 150, 243, 0.1); /* Slightly visible when enabled */
+  transform: translateX(-7px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Visual Line */
+.GanttResizeHandle::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  width: 2px;
+  top: 0;
+  bottom: 0;
+  background-color: #2196f3; /* Clear blue line */
+  z-index: -1;
+}
+
+/* Grip Indicator */
+.GanttResizeHandle::after {
+  content: "";
+  height: 24px;
+  width: 6px;
+  background-color: #2196f3;
+  border-radius: 4px;
+  position: absolute;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.GanttResizeHandle:hover {
+  background-color: rgba(33, 150, 243, 0.2);
+}
+
+.GanttChartWrapper {
+  position: relative;
+  overflow: hidden; /* Prevent vertical line from overflowing */
+}

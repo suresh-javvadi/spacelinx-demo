@@ -1,0 +1,1760 @@
+@media only screen and (min-width: 168px) and (max-width: 765px) {
+  .SearchBar {
+    min-width: 100px;
+  }
+  .ChildKitDrawerStyles {
+    width: 50%;
+  }
+  .GuideStepDrawerStyles {
+    width: 95%;
+  }
+  .ProductDrawerStyles {
+    width: 95%;
+  }
+  .PlatformDrawerStyles {
+    width: 80%;
+  }
+  .DrawerStyles {
+    width: 100%;
+    height: 100%;
+    z-index: 1300;
+    position: fixed;
+  }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1350px) {
+  .DrawerStyles {
+    width: 50%;
+  }
+  .GuideStepDrawerStyles {
+    width: 95%;
+  }
+  .ProductDrawerStyles {
+    width: 95%;
+  }
+  .AdminChildren {
+    width: 100%;
+    height: 100%;
+  }
+  .AdminChildrenHeader {
+    max-width: 98%;
+  }
+  .SearchBar {
+    min-width: 30%;
+  }
+
+  .ChildKitDrawerStyles {
+    width: 60%;
+  }
+}
+
+@media only screen and (min-width: 1351px) {
+  .GuideStepDrawerStyles {
+    width: 95%;
+  }
+  .SearchBar {
+    min-width: 30%;
+  }
+  .ProductDrawerStyles {
+    width: 95%;
+  }
+  .AdminChildren {
+    width: 98%;
+    height: 100%;
+  }
+  .AdminChildrenHeader {
+    width: 100%;
+  }
+  .DrawerStyles {
+    width: 50%;
+  }
+  .ChildKitDrawerStyles {
+    width: 70%;
+  }
+}
+
+.RoleDrawerStyles {
+  width: 60%;
+  z-index: 1300;
+  position: fixed;
+}
+.role-permission-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+}
+
+.permission-controls-section {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+.permission-autocomplete {
+  width: 40%;
+}
+.permission-autocomplete .MuiOutlinedInput-root {
+  padding: 0;
+  min-height: 40px;
+}
+.permission-autocomplete .MuiInputBase-input {
+  padding: 10px 8px;
+  font-size: 13px;
+}
+.permission-autocomplete .MuiInputLabel-root {
+  font-size: 13px;
+}
+
+.permission-autocomplete .MuiInputLabel-shrink {
+  font-size: 16px;
+}
+
+.permission-button {
+  height: 40px;
+  white-space: nowrap;
+  font-size: 13px;
+  padding: 0 14px;
+  color: #ffffff;
+  background-color: rgb(0, 156, 187);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.permission-button:hover {
+  background-color: rgb(0, 130, 160);
+}
+.data-grid-section {
+  height: calc(100vh - 230px);
+}
+.loader-container-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+button {
+  border: 0;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.AdminChildren {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 99%;
+  padding-top: 7px;
+}
+.AdminChildrenHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 98%;
+  margin-bottom: 5px;
+}
+.PageHeader {
+  margin-right: auto;
+  font-size: 20px;
+  font-weight: 600;
+}
+.SearchBar {
+  height: 35px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  padding-left: 10px;
+}
+
+.CreateFlyout,
+.EditFlyout,
+.AddPartTypeFlyout,
+.AddNewsTypeFlyout,
+.AddMachineTypeFlyout,
+.AddToolTypeFlyout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  overflow-y: hidden;
+}
+.EditFlyoutTabs {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 120px);
+}
+.CreateFlyoutHeader,
+.EditFlyoutHeader,
+.EditFlyoutHeaderNew,
+.AddPartTypeHeader,
+.AddNewsTypeHeader,
+.AddMachineTypeHeader,
+.AddToolTypeHeader {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  padding-left: 10px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.EditFlyoutHeader h3 {
+  font-size: 18px !important;
+}
+.EditFlyoutHeaderNew h3 {
+  font-size: 19px !important;
+  font-weight: 600;
+  margin-left: 10px;
+}
+.EditFlyoutHeader1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 40%;
+}
+
+.EditFlyoutHeader1 p {
+  width: 75%;
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.CreateFlyoutHeader h2,
+.EditFlyoutHeader h3,
+.AddPartTypeHeader h3,
+.AddNewsTypeHeader h3,
+.AddMachineTypeHeader h3,
+.AddToolTypeHeader h3 {
+  margin-left: 2px;
+  font-weight: 600;
+  font-size: 19px;
+}
+
+.EditFlyoutHeader h2 {
+  margin-left: 9px;
+  font-weight: 600;
+  font-size: 19px;
+}
+.CreateFlyoutHeader button,
+.EditFlyoutHeader button,
+.EditFlyoutHeaderNew button,
+.AddPartTypeHeader button,
+.AddNewsTypeHeader button,
+.AddToolTypeHeader button,
+.AddMachineTypeHeader button {
+  font-size: 24px;
+  background-color: transparent;
+}
+.CreateFlyoutHeader button:hover,
+.EditFlyoutHeader button:hover,
+.EditFlyoutHeaderNew button:hover,
+.AddNewsTypeHeader button:hover,
+.AddPartTypeHeader button:hover {
+  cursor: pointer;
+}
+.CreateFlyoutHeader button ion-icon,
+.EditFlyoutHeader button ion-icon,
+.AddPartTypeHeader button ion-icon,
+.AddNewsTypeHeader button ion-icon,
+.EditFlyoutHeaderNew button ion-icon,
+.EditIcon {
+  margin-right: 5px;
+}
+.EditFlyoutHeader div {
+  display: flex;
+}
+.EditFlyoutHeader div button {
+  margin: 0;
+  padding: 0;
+  margin-right: 5px;
+}
+.EditFlyoutTabsPanel {
+  margin-top: 60px;
+  background-color: var(--tab-list-color);
+}
+.HeaderActions {
+  display: flex;
+  align-items: center;
+}
+.CreateFlyoutBody,
+.AddPartTypeBody,
+.AddToolTypeBody,
+.AddNewsTypeBody,
+.AddMachineTypeBody {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 96%;
+  top: 60px;
+  font-size: 14px;
+  margin-bottom: 50px;
+  gap: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 130px);
+  padding-top: 10px;
+}
+.CreateFlyoutBody2 {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 96%;
+
+  font-size: 14px;
+  margin-bottom: 50px;
+  gap: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 130px);
+  padding-top: 10px;
+}
+.EditFlyoutBody3 {
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  flex-direction: column;
+  right: 0;
+  width: 96%;
+  top: 10%;
+  padding-top: 20px;
+  font-size: 14px;
+  font-family: Roboto !important;
+  margin-bottom: 50px;
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 130px);
+}
+.EditFlyoutBody2WithFooter,
+.EditFlyoutBody2 {
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  flex-direction: column;
+  right: 0;
+  width: 96%;
+
+  padding-top: 20px;
+  font-size: 14px;
+  font-family: Roboto !important;
+  margin-bottom: 50px;
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 130px);
+}
+.EditFlyoutBody2WithFooter {
+  max-height: calc(100vh - 180px);
+}
+.EditFlyoutBody4 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  flex-direction: column;
+  padding-top: 6px;
+  font-size: 14px;
+  font-family: Roboto !important;
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(110vh - 130px);
+}
+
+.EditFlyoutBodyContacts {
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  right: 0;
+  width: 97%;
+  left: 3%;
+  top: 15%;
+  font-size: 14px;
+  font-family: "Roboto" !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 10px;
+  padding-right: 20px;
+  max-height: calc(100vh - 120px);
+}
+
+.addresses {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding-top: 1%;
+}
+.EditFlyoutBody {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 98%;
+  padding-top: 20px;
+  font-size: 14px;
+  margin-bottom: 50px;
+  gap: 20px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 130px);
+  top: 90px;
+  margin-top: 20px;
+  overflow-y: auto;
+}
+.EditFlyoutBodyNew {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 98%;
+  padding-top: 20px;
+  font-size: 14px;
+  margin-bottom: 50px;
+  gap: 20px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 130px);
+  top: 50px;
+  overflow-y: auto;
+}
+.PurchaseOrdersCreateMainDiv {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  gap: 10px;
+  width: 100%;
+  height: calc(100vh - 170px);
+}
+.PurchaseOrdersDetailsTab {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+  height: auto !important;
+}
+.EditFlyoutBody1 {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  width: 96%;
+  padding-top: 20px;
+  font-size: 14px;
+  margin-bottom: 50px;
+  gap: 30px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  padding-right: 20px;
+  max-height: calc(100vh - 130px);
+  top: 120px;
+  margin-top: 20px;
+  overflow-y: auto;
+}
+.update-reset {
+  display: flex;
+  gap: 10%;
+}
+
+div.Active-Button {
+  margin-left: 25px;
+}
+
+/* div .Reset-Button {
+  background-color: transparent;
+  color: black !important;
+  }
+  div .Reset-Button:hover {
+  color: black !important;
+  background-color: transparent !important;
+  } */
+
+.EditFlyoutFooter {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  height: 50px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+.EditFlyoutFooterParts {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px;
+  height: 50px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+.EditFlyoutFooter ion-icon[name="trash-outline"] {
+  font-size: 20px;
+  color: red;
+}
+.EditFlyoutFooter ion-icon[name="trash-outline"]:hover {
+  cursor: pointer;
+}
+.roleErrorMessage {
+  color: #ff0000c7;
+  font-size: 15px;
+}
+.CreateFlyoutFooter,
+.AddToolTypeFooter,
+.AddMachineTypeFooter,
+.AddNewsTypeFooter,
+.AddPartTypeFooter {
+  position: absolute;
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin-left: 0;
+  width: 100%;
+  height: 50px;
+  padding: 8px 20px 8px 0;
+}
+.MasterDataDataGridDiv {
+  height: calc(100vh - 180px);
+  width: 100%;
+  overflow: hidden;
+}
+.PartBomHierarchyHeaderDiv {
+  display: flex;
+  align-items: center;
+  padding: 10px 5px;
+  width: 100%;
+  justify-content: space-between;
+}
+.PartViewContainer {
+  justify-content: right;
+}
+.PartBomHierarchyHeaderDivInner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.PartBomHierarchyDataGridDiv {
+  height: calc(100vh - 230px);
+  width: 100%;
+}
+.DataGrid {
+  width: 98% !important;
+  margin: 0px auto;
+  height: 100% !important;
+}
+
+.DataGridDiv {
+  height: calc(100vh - 175px);
+  width: 100%;
+  overflow: hidden;
+}
+
+.MuiDataGrid-virtualScroller::-webkit-scrollbar {
+  height: 5px;
+}
+
+.AddNewMenuItemButton {
+  height: 30px;
+  background-color: rgb(63, 178, 216);
+  width: 100%;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  color: white;
+}
+.AddNewMenuItemButton:hover {
+  cursor: pointer;
+}
+.ChildDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ChildDetailsHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.ChildDetailsHeader .ChildDetailsModify {
+  display: flex;
+  gap: 50px;
+  align-items: center;
+}
+.MuiSelect-select-MuiInputBase-input-MuiInput-input {
+  font-size: 12px;
+}
+.EditButton {
+  display: flex;
+  justify-content: end;
+}
+.EditButton button {
+  background-color: white;
+  font-size: 23px;
+}
+.ChildDetailsDataGridHeader {
+  color: blue;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.ChildPartAvailableTag {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.ChildPartNoAvailableTag {
+  color: #f20909;
+  margin-bottom: 8px;
+  font-weight: 300;
+  font-size: 18px;
+}
+.ChildPartLoading {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+.AlertMessages {
+  position: fixed;
+  top: 70px;
+  right: 10px;
+}
+.messageCancelButton {
+  background-color: transparent;
+  transform: rotate(45deg);
+}
+.ChildPartTextFeild {
+  width: 70%;
+  height: 50px;
+}
+.ChildPartTextFeild2 {
+  width: 20%;
+  height: 50px;
+}
+.AttachButton {
+  width: 150px;
+  height: 50px;
+  background-color: #009cbb !important;
+  color: #ffffff !important;
+}
+.ChildPartCancelButton {
+  width: 150px;
+  height: 50px;
+}
+.TaskNotAvailableMsg {
+  color: red;
+  margin-top: 10px;
+  margin-left: 10px;
+  font-size: 14px;
+}
+.LiveContainer img,
+.LiveContainer video {
+  height: 90vh;
+  width: 100%;
+}
+.VideoCamControls {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: #808080;
+  width: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+  box-shadow: 0 4px 8px #000000c3;
+}
+.VideoCameraCompDiv {
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  height: 98%;
+  background-color: black;
+}
+.VideoCameraCompDivHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+.VideoCameraCompDivHeader ion-icon {
+  cursor: pointer;
+  color: white !important;
+  font-size: 30px;
+}
+.VideoCameraCompDivBody {
+  width: 100%;
+  height: 90%;
+  display: flex;
+  justify-content: center;
+}
+.VideoCameraCompDivBody .CapturedImage {
+  width: 60%;
+  object-fit: contain;
+}
+.RecordingTime {
+  position: absolute;
+  top: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  z-index: 10;
+}
+.SerialNumberRequiredDiv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.SerialNumberRequiredDiv p {
+  font-weight: 1000 !important;
+}
+.yesno-container {
+  display: flex;
+}
+/* .CameraControls,
+  .VideoCamControls ion-icon {
+  cursor: pointer;
+  transition: transform 0.5s ease-in-out;
+  }
+  .CameraControls,
+  .VideoCamControls ion-icon:hover {
+  transform: scale(1.1);
+  }
+  .VideoCamControls ion-icon[name="stop-circle-outline"],
+  .VideoCamControls ion-icon[name="radio-button-on-outline"] {
+  color: #ff0000ba;
+  font-size: 30px;
+  }
+  .CameraControls ion-icon[name="close-outline"],
+  .VideoCamControls ion-icon[name="close-outline"] {
+  color: #090909;
+  position: absolute;
+  bottom: 525px;
+  left: 400px;
+  font-size: 2em;
+  } */
+.CameraControls {
+  top: 85%;
+  left: 35%;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  border-radius: 5px;
+  justify-content: space-between;
+  background-color: #202020;
+  width: 30%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.CameraControls .CameraInputSelect {
+  width: 35% !important;
+  color: white !important;
+  font-size: 10px !important;
+}
+.CameraControls .CapturePic {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border-radius: 50%;
+}
+.CameraControls .SavePic {
+  background-color: transparent;
+  color: white;
+}
+.CameraControls .SavePic ion-icon {
+  padding: 0;
+  margin: 0;
+  font-size: 18px;
+}
+.CameraControls .CapturePic img {
+  width: 70%;
+  border: 1px solid #6b6b6b;
+  padding: 3px;
+  border-radius: 50%;
+}
+.CameraControls .CapturePic ion-icon {
+  padding: 20px;
+  font-size: 20px;
+  color: white;
+  border: 1px solid #6b6b6b;
+  border-radius: 50%;
+}
+.NoDocuments {
+  color: red;
+}
+.ChildPartDataGrid {
+  height: calc(100vh - 300px);
+  width: 100%;
+  overflow: auto;
+}
+
+.ChildPartDataGridReadonly {
+  height: calc(100vh - 200px);
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+}
+
+.BOMHierarchyBtnContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* .CameraControls ion-icon[name="arrow-undo-outline"],
+  .CameraControls ion-icon[name="camera-outline"] {
+  color: #000000a3;
+  font-size: 30px;
+  }
+  .CameraControls ion-icon[name="save-outline"] {
+  font-size: 30px;
+  position: absolute;
+  left: -300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: #808080;
+  width: 100px;
+  box-shadow: 0 4px 8px #000000c3;
+  color: #000000a3;
+  } */
+
+.buttons-container {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+.DownloadUpload {
+  color: #009cbb;
+}
+
+.roles-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.roles-container h4 {
+  grid-column: span 2;
+  margin-bottom: 10px;
+}
+
+.EditFlyoutFooterUser {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  left: 0;
+  margin-left: 0;
+  bottom: 0;
+  gap: 10%;
+  padding: 8px 20px 8px 0;
+}
+
+.AdminChildrenHeaderButtons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.role-permission-container .MuiAccordion-root {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.role-permission-container .MuiAccordionSummary-root {
+  background-color: transparent;
+  padding: 8px 16px;
+  border-bottom: 1px solid #ccc;
+  min-height: 48px;
+}
+
+.role-permission-container .MuiAccordionSummary-content {
+  margin: 0;
+  align-items: center;
+}
+
+.role-permission-container .MuiTypography-subtitle1 {
+  font-weight: 600;
+}
+
+.role-permission-container .MuiAccordionDetails-root {
+  padding: 16px;
+  background-color: transparent;
+}
+
+.permission-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  margin-top: 10px;
+  padding: 10px;
+}
+.TwoColumnGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.description {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 8px;
+}
+.loading-container {
+  height: calc(100vh - 100px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.StockAdjustmentContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.StockAdjustmentEmptyState {
+  border: 2px dashed #a1a1a1;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  margin-top: 20px;
+}
+.NoInventory {
+  color: var(--error-color);
+}
+.InventoryTransactionContainer {
+  margin-top: 20px;
+}
+.AdminPageTabs {
+  display: flex;
+  width: auto;
+  border: 1px solid rgb(50, 50, 50);
+  border-radius: 3px;
+}
+.AdminPageTabs .TabButton {
+  width: 120px;
+  cursor: pointer;
+  padding: 8px 0px;
+  font-size: 11px !important;
+  background-color: transparent;
+  color: var(--TabButton-color);
+  border-right: 1px solid rgb(50, 50, 50);
+}
+.StockMovementContentDiv {
+  display: flex;
+  flex-direction: column;
+  width: 99%;
+  gap: 10px;
+  padding: 10px;
+  max-height: calc(100vh - 140px) !important;
+}
+.StockMovementContentDivHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.StockMovementContentDataGridDiv {
+  height: calc(100vh - 220px);
+  width: 100%;
+  overflow: hidden;
+}
+.PageMainDiv {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  height: calc(100vh - 100px) !important;
+  padding: 5px 15px;
+  gap: 10px;
+}
+.PageMainDivHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.AdminPageTabsDiv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.PageHeading {
+  font-family: var(--header-font-family);
+  font-size: 20px;
+  text-transform: uppercase;
+}
+.AdminPageContent {
+  width: 100%;
+  height: 100% !important;
+  overflow-y: hidden;
+}
+.AdminPageContent .DataGrid {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.AntDesignSearchBar {
+  padding: 5px 10px;
+  background-color: var(--ant-design-search);
+  border: 1px solid rgb(71, 71, 71);
+  color: var(--hierarchy-text-primary);
+  width: 30%;
+  border-radius: 3px;
+}
+
+.ant-spin-container {
+  height: 100% !important;
+}
+
+.AntDesignDataGridHeader {
+  display: flex;
+  width: auto;
+  padding: 0 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.AntDesignDataGrid {
+  padding: 10px;
+  height: 100% !important;
+  width: auto;
+  color: #ffffff !important;
+}
+
+.AntDesignDataGrid .ant-table-row {
+  height: auto;
+  font-size: 12px;
+}
+
+.AntDesignDataGrid .ant-table-thead > tr > th {
+  color: var(--hierarchy-text-primary);
+  font-weight: bold;
+  font-size: 12px;
+  padding: 8px 16px;
+  background-color: var(--ant-design-search) !important;
+  border-bottom: 1px solid rgb(0, 0, 0) !important;
+
+  /* --- START of Ellipsis changes for header --- */
+  white-space: nowrap !important; /* Forces text onto a single line */
+  overflow: hidden !important; /* Hides content that exceeds the cell width */
+  text-overflow: ellipsis !important; /* Displays '...' for truncated text */
+  /* --- END of Ellipsis changes for header --- */
+}
+
+.AntDesignDataGrid .ant-table-tbody > tr > td {
+  color: var(--hierarchy-text-primary);
+  background-color: var(--ant-design-search) !important;
+  padding: 8px 16px;
+  white-space: normal !important;
+  overflow: visible;
+  text-overflow: clip;
+  cursor: pointer;
+  border-bottom: 2px solid #383838;
+}
+
+.AntDesignDataGrid .ant-table-row:hover > td {
+  background-color: var(--ant-design-search) !important;
+}
+
+.AntDesignDataGrid .ant-table-container {
+  overflow: auto;
+}
+
+.AntDesignDataGrid .ant-table-body {
+  min-height: calc(100vh - 400px) !important;
+  overflow-y: auto !important;
+  background-color: var(--ant-design-search) !important;
+}
+
+.AntDesignDataGrid .ant-table {
+  background-color: var(--ant-design-search) !important;
+}
+
+.AntDesignDataGrid .ant-table-cell {
+  --indent-size: 15px;
+  --base-padding: 16px;
+  --row-height: 28px;
+}
+
+.AntDesignDataGrid .ant-table-tbody > tr > td:first-child {
+  position: sticky !important;
+  left: 0 !important;
+  background-color: var(--ant-design-search) !important;
+}
+
+/* Row Level Styles */
+.AntDesignDataGrid .ant-table-row-level-0 > td {
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  border-bottom: 2px solid #383838 !important;
+}
+
+.AntDesignDataGrid .ant-table-row-level-1 > td {
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+  border-bottom: 1.5px solid #383838 !important;
+}
+
+.AntDesignDataGrid .ant-table-row-level-2 > td {
+  padding: 8px 16px !important;
+  font-size: 11px !important;
+  background-color: #141414 !important;
+  border-bottom: 1px solid #383838 !important;
+}
+
+/* Generic nested rows */
+.AntDesignDataGrid
+  .ant-table-row[class*="ant-table-row-level-"]:not(.ant-table-row-level-0):not(
+    .ant-table-row-level-1
+  ):not(.ant-table-row-level-2)
+  > td {
+  padding: 8px 16px !important;
+  font-size: 10px !important;
+  border-bottom: 0.5px solid #383838 !important;
+}
+
+.AntDesignDataGrid .ant-table-row:hover > td:first-child {
+  background-color: var(--ant-design-search) !important;
+}
+
+/* Connector Lines */
+.AntDesignDataGrid
+  .ant-table-row[class*="ant-table-row-level-"]:not(.ant-table-row-level-0)
+  > td:first-child::before {
+  content: "";
+  position: absolute;
+  width: 1px;
+  background-color: #616161;
+  z-index: 0;
+  top: 0;
+  height: 100%;
+}
+
+.AntDesignDataGrid .ant-table-row-level-1 > td:first-child::before {
+  left: var(--base-padding);
+}
+.AntDesignDataGrid .ant-table-row-level-2 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 1);
+}
+.AntDesignDataGrid .ant-table-row-level-3 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 2);
+}
+.AntDesignDataGrid .ant-table-row-level-4 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 3);
+}
+.AntDesignDataGrid .ant-table-row-level-5 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 4);
+}
+.AntDesignDataGrid .ant-table-row-level-6 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 5);
+}
+.AntDesignDataGrid .ant-table-row-level-7 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 6);
+}
+.AntDesignDataGrid .ant-table-row-level-8 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 7);
+}
+.AntDesignDataGrid .ant-table-row-level-9 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 8);
+}
+.AntDesignDataGrid .ant-table-row-level-10 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 9);
+}
+.AntDesignDataGrid .ant-table-row-level-11 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 10);
+}
+.AntDesignDataGrid .ant-table-row-level-12 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 11);
+}
+.AntDesignDataGrid .ant-table-row-level-13 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 12);
+}
+.AntDesignDataGrid .ant-table-row-level-14 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 13);
+}
+.AntDesignDataGrid .ant-table-row-level-15 > td:first-child::before {
+  left: calc(var(--base-padding) + var(--indent-size) * 14);
+}
+
+/* Horizontal Connector Lines */
+.AntDesignDataGrid
+  .ant-table-row[class*="ant-table-row-level-"]:not(.ant-table-row-level-0)
+  > td:first-child::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  background-color: #616161;
+  z-index: 1;
+  width: var(--indent-size);
+}
+
+.AntDesignDataGrid .ant-table-row-level-1 > td:first-child::after {
+  left: calc(var(--base-padding) - var(--indent-size));
+}
+.AntDesignDataGrid .ant-table-row-level-2 > td:first-child::after {
+  left: var(--base-padding);
+}
+.AntDesignDataGrid .ant-table-row-level-3 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 1);
+}
+.AntDesignDataGrid .ant-table-row-level-4 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 2);
+}
+.AntDesignDataGrid .ant-table-row-level-5 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 3);
+}
+.AntDesignDataGrid .ant-table-row-level-6 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 4);
+}
+.AntDesignDataGrid .ant-table-row-level-7 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 5);
+}
+.AntDesignDataGrid .ant-table-row-level-8 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 6);
+}
+.AntDesignDataGrid .ant-table-row-level-9 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 7);
+}
+.AntDesignDataGrid .ant-table-row-level-10 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 8);
+}
+.AntDesignDataGrid .ant-table-row-level-11 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 9);
+}
+.AntDesignDataGrid .ant-table-row-level-12 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 10);
+}
+.AntDesignDataGrid .ant-table-row-level-13 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 11);
+}
+.AntDesignDataGrid .ant-table-row-level-14 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 12);
+}
+.AntDesignDataGrid .ant-table-row-level-15 > td:first-child::after {
+  left: calc(var(--base-padding) + var(--indent-size) * 13);
+}
+
+/* Expand Controls */
+.AntDesignDataGrid .ant-table-row-expand-icon-cell {
+  position: relative;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.AntDesignDataGrid .ant-table-cell-content {
+  padding-left: 0 !important;
+}
+
+.AntD-Expand-Dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+/* Expand/collapse chevron styling */
+.AntD-Expand-Chevron {
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 2px;
+  margin-top: 0;
+  z-index: 1000;
+  margin-left: 0;
+  color: var(--hierarchy-accent-color) !important;
+  background-color: var(--ant-design-search) !important;
+  border: 1px solid var(--hierarchy-border-color) !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.AntD-Expand-Chevron:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 4px var(--hierarchy-border-color);
+}
+
+.ant-table-cell-with-append {
+  display: flex;
+  align-items: center !important;
+  width: 100%;
+  gap: 10px;
+  padding-left: 0 !important;
+}
+
+.AntDesignDataGrid
+  .ant-table-row[class*="ant-table-row-level-"]
+  .ant-table-cell-with-append {
+  padding-left: 0 !important;
+}
+
+/* Pagination */
+.AntDesignDataGrid .ant-table-pagination-right {
+  margin: 10px 0 0 0 !important;
+  justify-content: flex-end;
+  display: flex;
+  width: 100%;
+  padding: 10px !important;
+  border: 1px solid rgb(38, 38, 38);
+  border-top: none;
+  margin-top: 0 !important;
+  color: var(--hierarchy-text-primary) !important;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  background-color: var(--ant-design-search) !important;
+}
+
+.ant-spin-dot-item {
+  background-color: #009cbb !important;
+}
+
+.PartBomHierarchyDataGridDiv .ant-spin-nested-loading > .ant-spin {
+  background-color: rgba(2, 2, 2, 0.7);
+}
+
+.react-resizable-handle {
+  position: absolute;
+  width: 10px;
+  height: 100%;
+  bottom: 0;
+  right: -5px;
+  cursor: col-resize;
+  z-index: 1;
+}
+
+.react-resizable-handle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.wrap-text-cell {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+}
+.first-column {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.single-line-cell-wrapper {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+/* Add or ensure this class is present and correct in your CSS */
+.single-line-cell {
+  /* This is the element inside the AntD table cell (td) that holds the actual text */
+  display: block; /* Important: makes text-overflow: ellipsis work */
+  overflow: hidden; /* Important: hides the overflowing content */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+.single-line-cell-wrapper {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.AntDesignDataGrid .ant-table-tbody > tr > td {
+  white-space: nowrap !important; /* Forces content to a single line */
+  overflow: hidden !important; /* Hides overflowing content */
+  text-overflow: ellipsis !important;
+}
+.ant-table-cell-content-wrapper {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block; /* or inline-block for span */
+  /* Set a max-width if the parent element doesn't have a fixed width */
+  max-width: 100%; /* Adjust as needed */
+}
+.AntDesignDataGrid .ant-table-thead > tr > th {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.AntDesignDataGrid .ant-table-column-sorter-up,
+.AntDesignDataGrid .ant-table-column-sorter-down {
+  color: #3f3f3f !important;
+  transition: color 0.3s;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.AntDesignDataGrid .ant-table-column-sorter-up.active,
+.AntDesignDataGrid .ant-table-column-sorter-down.active {
+  color: #1890ff !important;
+  transition: color 0.3s;
+  width: 12px;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.make-buy-cell {
+  padding: 2px 10px; /* smaller than before */
+  border-radius: 12px;
+  line-height: normal;
+  height: auto;
+}
+
+.make-buy-cell-table {
+  padding: 2px 10px; /* smaller than before */
+  border-radius: 12px;
+  line-height: normal;
+  height: auto;
+}
+
+.make-buy-cell.buy,
+.make-buy-cell-table.buy {
+  background-color: rgba(196, 143, 51, 0.2);
+  color: rgba(196, 143, 51, 1);
+}
+
+.make-buy-cell.make,
+.make-buy-cell-table.make {
+  color: rgba(60, 158, 163, 1);
+  background-color: rgba(60, 158, 163, 0.2);
+}
+
+.MuiDataGrid-virtualScrollerRenderZone {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.MuiDataGrid-row {
+  position: relative;
+  overflow: hidden;
+}
+
+.MuiDataGrid-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.buy-part-row::before,
+.buy-part-row-bom::before {
+  background-color: #c48f33;
+}
+
+.make-part-row::before,
+.make-part-row-bom::before {
+  background-color: #3c9ea3;
+}
+
+.AntDesignDataGrid .ant-table-tbody > tr {
+  position: relative;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 6px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.AntDesignDataGrid .ant-table-tbody > tr.buy-part-row::before,
+.AntDesignDataGrid .ant-table-tbody > tr.make-part-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1px;
+  bottom: 1px;
+  width: 3px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  z-index: 10;
+}
+
+.AntDesignDataGrid .ant-table-tbody > tr.buy-part-row::before {
+  background-color: #c48f33;
+}
+
+.AntDesignDataGrid .ant-table-tbody > tr.make-part-row::before {
+  background-color: #3c9ea3;
+}
+
+.AntDesignDataGrid .ant-table-tbody > tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.AntDesignDataGrid .ant-pagination-item a {
+  color: var(--hierarchy-text-primary) !important;
+}
+
+.AntDesignDataGrid .ant-pagination-item-active {
+  background-color: var(--hierarchy-accent-color) !important;
+  border: none !important;
+}
+.AntDesignDataGrid .ant-pagination-item-active a {
+  color: #fff !important;
+  font-weight: 500 !important;
+}
+
+/* Disabled arrows */
+.AntDesignDataGrid .ant-pagination-disabled .ant-pagination-item-link {
+  color: var(--hierarchy-text-tertiary) !important;
+  opacity: 0.6;
+}
+
+/* Arrows (next/prev) */
+.AntDesignDataGrid .ant-pagination-item-link {
+  color: var(--hierarchy-text-primary) !important;
+  background-color: var(--ant-design-search) !important;
+}
+
+/* Dropdown and total text */
+.AntDesignDataGrid .ant-pagination-options,
+.AntDesignDataGrid .ant-pagination-total-text {
+  color: var(--hierarchy-text-primary) !important;
+}
+/* Page size dropdown (e.g., 50 / page) */
+.AntDesignDataGrid .ant-pagination-options .ant-select-selector {
+  background-color: var(--ant-design-search) !important;
+  color: var(--hierarchy-text-primary) !important;
+  border: 1px solid var(--hierarchy-border-color) !important;
+  border-radius: 4px !important;
+}
+
+/* Dropdown arrow icon color */
+.AntDesignDataGrid .ant-pagination-options .ant-select-arrow {
+  color: var(--hierarchy-text-primary) !important;
+}
+
+/* Fix the dropdown shown for "25/page" pagination selector */
+.ant-select-dropdown {
+  background-color: var(--ant-design-search) !important;
+  color: var(--hierarchy-text-primary) !important;
+  border: 1px solid var(--hierarchy-border-color) !important;
+}
+
+/* Style each option item */
+.ant-select-item {
+  background-color: var(--ant-design-search) !important;
+  color: var(--hierarchy-text-primary) !important;
+}
+
+/* Highlight the active or hovered item */
+.ant-select-item-option-active,
+.ant-select-item-option-selected,
+.ant-select-item-option:hover {
+  background-color: var(--hierarchy-border-color) !important;
+  color: var(--hierarchy-text-primary) !important;
+}
+
+/* Dropdown arrows and text inside pagination select */
+.ant-pagination-options .ant-select-selector {
+  background-color: var(--ant-design-search) !important;
+  color: var(--hierarchy-text-primary) !important;
+  border: 1px solid var(--hierarchy-border-color) !important;
+}
+.icons-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.NewPartImageContainer {
+  display: flex;
+}
+.NewPartIconsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.NewPartIcon {
+  width: 35px !important;
+  padding-top: 8px !important;
+  height: 35px !important;
+  background-color: #4dabf726 !important;
+  color: #a1a1a1 !important;
+  border-radius: 8px !important;
+  border: none !important;
+}
+.EditFlyoutGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px 24px; /* row gap | column gap */
+  width: 100%;
+  padding: 20px 24px;
+}
+
+/* every field wrapper */
+.FlyoutRow {
+  display: contents; /* lets children fall directly into grid */
+}
+
+/* MUI inputs stretch perfectly */
+.AdminTextFeilds {
+  width: 100%;
+}
+
+/* Description textarea full width */
+.AdminTextFeilds[rows] {
+  grid-column: span 2;
+}
+.FlyoutUploadBox {
+  position: relative;
+  width: 340px;
+  height: 240px;
+  background: #1b1b1b;
+  border: 1px solid #2e2e2e;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.FlyoutUploadArea {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.FlyoutUploadArea img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.FlyoutUploadPlaceholder {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #1f7a8c;
+  font-size: 64px;
+  opacity: 0.9;
+}
+
+.FlyoutUploadPlaceholder span {
+  font-size: 48px;
+  margin-top: -18px;
+}
+
+/* Floating buttons */
+.FlyoutFloatingButtons {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Square icon buttons */
+.FlyoutFloatBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: #24323d;
+  color: #d4dde2;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+
+.FlyoutFloatBtn:hover {
+  background: #2f4352;
+  transform: translateY(-1px);
+}
+.test-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.part-grid-des-pop-over {
+  padding: 10px;
+  width: 300px;
+}
+.part-grid-des-pop-over button {
+  margin-top: 10px;
+}
+.RadioRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.SerialNumberRequiredDiv {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.radioLabel {
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.EditPartImageBlock {
+  width: 35%;
+  margin-top: 8px;
+  position: relative;
+  display: flex;
+  background-color: var(--imagebackground-light);
+  padding: 8px;
+  border-radius: 8px;
+}
+.EditPartImageBlock img {
+  width: 300px;
+}
+
+.EditPartImageControls {
+  position: absolute;
+  left: 330px;
+  top: 20px;
+}

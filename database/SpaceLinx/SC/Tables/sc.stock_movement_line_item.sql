@@ -1,0 +1,20 @@
+﻿CREATE TABLE sc.stock_movement_line_item (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    stock_movement_id uuid NOT NULL,
+    part_id uuid NOT NULL,
+    quantity int NOT NULL CHECK (quantity > 0),
+    tracking_type varchar(50) NULL,
+    tracking_id varchar(255) NULL,
+    reason varchar(255) NULL,
+    notes text NULL,
+    adjustment_type varchar(50),
+    is_active boolean NOT NULL DEFAULT true,
+    created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by varchar(255) NOT NULL,
+    updated_at timestamptz NULL,
+    updated_by varchar(255) NULL,
+    deleted_at timestamptz NULL,
+    deleted_by varchar(255) NULL,
+    FOREIGN KEY (stock_movement_id) REFERENCES sc.stock_movement(id) ON DELETE CASCADE,
+    FOREIGN KEY (part_id) REFERENCES mes.part(id) ON DELETE SET NULL
+);

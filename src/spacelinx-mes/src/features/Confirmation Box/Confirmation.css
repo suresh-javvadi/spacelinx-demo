@@ -1,0 +1,72 @@
+.confirmation-box-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirmation-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 20px;
+  padding-top: 20px;
+  padding-bottom: 10px;
+  width: 400px;
+  gap: 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.confirmation-box ion-icon {
+  font-size: 65px;
+  color: rgb(252, 194, 87);
+}
+.confirmationBoxTexts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 20px;
+}
+.confirmationBoxTexts h2 {
+  font-size: 26px;
+  font-weight: 700;
+}
+.confirmationBoxTexts p {
+  font-size: 14px;
+}
+.confirmationBoxBtns {
+  display: flex;
+  gap: 20px;
+}
+.confirmationBoxBtns button {
+  padding: 10px;
+  border-radius: 10px;
+}
+.confirmationBoxBtns button:hover {
+  cursor: pointer;
+}
+.confirmationBoxBtns .Confirm {
+  color: white;
+  background-color: #009cbb;
+  transition: 0.3s;
+  border: 0.1px solid #009cbb;
+}
+.confirmationBoxBtns .Confirm:hover {
+  background-color: white;
+  color: #009cbb;
+  border: 0.1px solid #009cbb;
+  transition: 0.3s;
+}
+.confirmationBoxBtns .CancelBtn {
+  color: white;
+  background-color: rgb(247, 56, 56);
+  border: 0px;
+}
+.CommentsSection {
+  width: 300px !important;
+}
