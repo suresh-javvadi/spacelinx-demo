@@ -28,7 +28,6 @@ variables:
   nodeVersion: '22.x'
   apiProject: 'src/SpaceLinx.Api/SpaceLinx.Api/SpaceLinx.Api.csproj'
   frontendDir: 'src/spacelinx-mes'
-  azureSubscription: 'SpaceLinxProd'
   buildConfiguration: 'Release'
 
 stages:
@@ -174,7 +173,7 @@ stages:
                 - task: AzureWebApp@1
                   displayName: 'Deploy to spacelinxapidev'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxDev'
                     appType: 'webAppLinux'
                     appName: 'spacelinxapidev'
                     resourceGroupName: 'SpaceLinxDev'
@@ -198,7 +197,7 @@ stages:
                 - task: AzureWebApp@1
                   displayName: 'Deploy to spacelinxmesdev'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxDev'
                     appType: 'webApp'
                     appName: 'spacelinxmesdev'
                     resourceGroupName: 'SpaceLinxDev'
@@ -265,7 +264,7 @@ stages:
                 - task: AzureWebApp@1
                   displayName: 'Deploy to spacelinxapiuat'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxUAT'
                     appType: 'webAppLinux'
                     appName: 'spacelinxapiuat'
                     resourceGroupName: 'SpaceLinxUat'
@@ -288,7 +287,7 @@ stages:
                 - task: AzureWebApp@1
                   displayName: 'Deploy to spacelinxmesuat'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxUAT'
                     appType: 'webApp'
                     appName: 'spacelinxmesuat'
                     resourceGroupName: 'SpaceLinxUat'
@@ -395,7 +394,7 @@ stages:
                 - task: AzureWebApp@1
                   displayName: 'Deploy to spacelinxapiprod'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxProd'
                     appType: 'webAppLinux'
                     appName: 'spacelinxapiprod'
                     resourceGroupName: 'SpaceLinxProd'
@@ -405,7 +404,7 @@ stages:
                 - task: AzureAppServiceManage@0
                   displayName: 'Restart API (Prod)'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxProd'
                     action: 'Restart Azure App Service'
                     webAppName: 'spacelinxapiprod'
                     resourceGroupName: 'SpaceLinxProd'
@@ -427,7 +426,7 @@ stages:
                 - task: AzureWebApp@1
                   displayName: 'Deploy to spacelinxapidemo'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxProd'
                     appType: 'webAppLinux'
                     appName: 'spacelinxapidemo'
                     resourceGroupName: 'SpaceLinxProd'
@@ -451,7 +450,7 @@ stages:
                 - task: AzureWebApp@1
                   displayName: 'Deploy to spacelinxmesprod'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxProd'
                     appType: 'webApp'
                     appName: 'spacelinxmesprod'
                     resourceGroupName: 'SpaceLinxProd'
@@ -460,7 +459,7 @@ stages:
                 - task: AzureAppServiceManage@0
                   displayName: 'Restart Frontend (Prod)'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxProd'
                     action: 'Restart Azure App Service'
                     webAppName: 'spacelinxmesprod'
                     resourceGroupName: 'SpaceLinxProd'
@@ -482,7 +481,7 @@ stages:
                 - task: AzureWebApp@1
                   displayName: 'Deploy to spacelinxmesdemo'
                   inputs:
-                    azureSubscription: '$(azureSubscription)'
+                    azureSubscription: 'SpaceLinxProd'
                     appType: 'webApp'
                     appName: 'spacelinxmesdemo'
                     resourceGroupName: 'SpaceLinxProd'
