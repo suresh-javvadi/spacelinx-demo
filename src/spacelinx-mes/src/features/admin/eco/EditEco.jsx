@@ -210,7 +210,13 @@ const EditEco = ({
   useEffect(() => {
     if (!selectedEco?.id) return;
 
-    fetchEcoApprovalHistory(selectedEco.id).then((res) => {
+    loadApprovalHistory();
+  }, [selectedEco?.id]);
+
+  const loadApprovalHistory = async () => {
+    try {
+      const res = await fetchEcoApprovalHistory(selectedEco.id);
+
       setApprovalHistory(res);
 
       const activeStage = res.find(
@@ -218,8 +224,11 @@ const EditEco = ({
       );
 
       setCurrentStage(activeStage?.stageNumber ?? null);
-    });
-  }, [selectedEco?.id]);
+    } catch (error) {
+      console.error("Error fetching approval history:", error);
+    }
+  };
+
   useEffect(() => {
     fetchApprovalConfigs().then((res) => {
       const ecoConfig = res.find((c) => c.entityType === "Eco" && c.isActive);
@@ -681,7 +690,8 @@ const EditEco = ({
     try {
       await updateEco(selectedEco?.id, updatedEco);
       handleRefresh();
-      handleCloseClick();
+      setReadOnlyMode(true);
+      loadApprovalHistory();
       Alert("Updated ECO Details Successfully...!", "success");
     } catch (error) {
       Alert("Couldn't Update ECO Details.. Try Again..!", "error");
@@ -829,12 +839,10 @@ const EditEco = ({
     return Object.values(map).sort((a, b) => a.stage - b.stage);
   }, [approvalHistory]);
   useEffect(() => {
-    if (approversFromHistory.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
-        approvers: approversFromHistory,
-      }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      approvers: approversFromHistory,
+    }));
   }, [approversFromHistory]);
 
   const handleSelectedPartsChange = (value) => {
@@ -1679,18 +1687,6 @@ const EditEco = ({
                     Reset
                   </Button>
                   <div className="update-reset">
-                    <Button
-                      disabled={
-                        selectedParts.length > 0 ||
-                        existingEcoParts.length === 0 ||
-                        loadingData
-                      }
-                      onClick={handleSubmitECO}
-                      className="HighlightBtn"
-                    >
-                      Submit
-                    </Button>
-
                     <Button onClick={handleEditSubmit}>Update</Button>
                   </div>
                 </div>
@@ -1837,6 +1833,8 @@ const EditEco = ({
             anchor="right"
             open={errorDisplay}
             onClose={() => setErrorDisplay(false)}
+            defaultWidth={60}
+            maxWidth={70}
           >
             <ECOErrorDisplay
               handleCloseClick={() => setErrorDisplay(false)}
