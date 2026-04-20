@@ -93,46 +93,53 @@ const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
     loadStaff();
     loadParts();
   }, []);
-  const addEbomPartsToGrid = async (parentPart, parentQty) => {
-    try {
-      const fullBom = await fetchFullBOMConsolidated(parentPart.id);
+  const addOrUpdateParentWithBomLineItems = (
+    parentPart,
+    parentQty,
+    fullBom,
+  ) => {
+    setLineItems((prev) => {
+      const updated = [...prev];
+      const parentIndex = updated.findIndex(
+        (item) => item.part?.id === parentPart.id,
+      );
+      const parentItem = {
+        part: parentPart,
+        quantity: parentQty,
+        description: lineItem.description || "",
+        isBom: false,
+      };
 
-      console.log("FULL CONSOLIDATED BOM:", fullBom);
+      if (parentIndex !== -1) {
+        updated[parentIndex] = parentItem;
+      } else {
+        updated.push(parentItem);
+      }
 
-      setLineItems((prev) => {
-        const updated = [...prev];
+      fullBom.forEach((child) => {
+        if (!child?.id) return;
 
-        fullBom.forEach((item) => {
-          const childPart = item;
-          const bomQty = item.totalQuantity ?? 1;
+        const bomQty = child.totalQuantity ?? 1;
+        const finalQty = parentQty * bomQty;
+        const existingIndex = updated.findIndex(
+          (item) => item.part?.id === child.id,
+        );
+        const childItem = {
+          part: child,
+          quantity: finalQty,
+          description: `Full BOM of ${parentPart.partNumber} (${parentPart.name})`,
+          isBom: true,
+        };
 
-          if (!childPart?.id) {
-            console.warn("Skipping invalid BOM item:", item);
-            return;
-          }
-
-          const finalQty = parentQty * bomQty;
-
-          const exists = updated.find((li) => li?.part?.id === childPart.id);
-
-          if (!exists) {
-            updated.push({
-              part: childPart,
-              quantity: finalQty,
-              description: `Full BOM of ${parentPart.partNumber} (${parentPart.name})`,
-              isBom: true,
-            });
-          }
-        });
-
-        return updated;
+        if (existingIndex !== -1) {
+          updated[existingIndex] = childItem;
+        } else {
+          updated.push(childItem);
+        }
       });
 
-      Alert("Consolidated BOM items added", "info");
-    } catch (error) {
-      console.error(error);
-      Alert("Failed to load full consolidated BOM", "error");
-    }
+      return updated;
+    });
   };
 
   const handleChange = (e) => {
@@ -236,8 +243,14 @@ const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
     try {
       const fullBom = await fetchFullBOMConsolidated(parentPart.id);
 
-      // ✅ CASE 1: HAS CHILD PARTS
       if (Array.isArray(fullBom) && fullBom.length > 0) {
+        addOrUpdateParentWithBomLineItems(parentPart, parentQty, fullBom);
+        Alert("Parent part and consolidated BOM items added", "info");
+        resetLineItemState();
+        return;
+      }
+
+      if (false) {
         setLineItems((prev) => {
           const updated = [...prev];
 

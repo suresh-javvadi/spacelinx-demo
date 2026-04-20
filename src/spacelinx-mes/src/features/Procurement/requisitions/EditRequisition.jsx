@@ -478,6 +478,24 @@ const EditRequisition = ({
   const addEbomPartsToGrid = async (parentPart, parentQty, fullBom) => {
     setLineItems((prev) => {
       const updated = [...prev];
+      const parentIndex = updated.findIndex(
+        (item) => (item.partId || item.part?.id) === parentPart.id,
+      );
+      const parentItem = {
+        partId: parentPart.id,
+        quantity: parentQty,
+        description: newLineItem.description,
+        isBom: false,
+      };
+
+      if (parentIndex !== -1) {
+        updated[parentIndex] = {
+          ...updated[parentIndex],
+          ...parentItem,
+        };
+      } else {
+        updated.push(parentItem);
+      }
 
       fullBom.forEach((child) => {
         if (!child?.id) return;
@@ -485,22 +503,30 @@ const EditRequisition = ({
         const bomQty = child.totalQuantity ?? 1;
         const finalQty = parentQty * bomQty;
 
-        const exists = updated.find((li) => li.partId === child.id);
+        const existingIndex = updated.findIndex(
+          (item) => (item.partId || item.part?.id) === child.id,
+        );
+        const childItem = {
+          partId: child.id,
+          quantity: finalQty,
+          description: `Full BOM of ${parentPart.partNumber} (${parentPart.name})`,
+          isBom: true,
+        };
 
-        if (!exists) {
-          updated.push({
-            partId: child.id,
-            quantity: finalQty,
-            description: `Full BOM of ${parentPart.partNumber} (${parentPart.name})`,
-            isBom: true,
-          });
+        if (existingIndex !== -1) {
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            ...childItem,
+          };
+        } else {
+          updated.push(childItem);
         }
       });
 
       return updated;
     });
 
-    Alert("Consolidated BOM items added", "info");
+    Alert("Parent part and consolidated BOM items added", "info");
   };
 
   const columns = [
@@ -1017,7 +1043,8 @@ const EditRequisition = ({
                           }
 
                           const existingIndex = lineItems.findIndex(
-                            (item) => item.part?.id === newValue?.id,
+                            (item) =>
+                              (item.partId || item.part?.id) === newValue?.id,
                           );
 
                           const matchedItem = lineItems[existingIndex];
