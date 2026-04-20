@@ -35,7 +35,7 @@ public class RequisitionController(
     {
         var record = await spaceLinxContext.Requisitions
             .AsNoTracking()
-            .Include(x => x.RequisitionLineItems)
+            .Include(x => x.RequisitionLineItems.Where(li => li.DeletedBy == null))
                 .ThenInclude(li => li.Part)
             .FirstOrDefaultAsync(x => x.Id == id && x.DeletedBy == null);
 
@@ -129,6 +129,7 @@ public class RequisitionController(
         try
         {
             var requisitionRecord = await spaceLinxContext.Requisitions
+                .Include(r => r.RequisitionLineItems)
                 .FirstOrDefaultAsync(r => r.Id == id && r.DeletedBy == null);
 
             if (requisitionRecord == null)
@@ -156,41 +157,63 @@ public class RequisitionController(
             spaceLinxContext.Requisitions.Update(requisitionRecord);
             await spaceLinxContext.SaveChangesAsync();
 
-            if (requisitionDetails.LineItems != null && requisitionDetails.LineItems.Any())
+            // Determine which line item IDs are present in the incoming payload
+            var incomingLineItems = requisitionDetails.LineItems?.ToList()
+                ?? new List<RequisitionLineItemAlterModel>();
+
+            var incomingItemIds = incomingLineItems
+                .Where(item => item.Id.HasValue && item.Id != Guid.Empty)
+                .Select(item => item.Id!.Value)
+                .ToHashSet();
+
+            // Soft-delete any existing line items that are NOT in the incoming payload
+            var orphanedLineItems = requisitionRecord.RequisitionLineItems
+                .Where(li => li.DeletedBy == null && !incomingItemIds.Contains(li.Id!.Value))
+                .ToList();
+
+            foreach (var orphan in orphanedLineItems)
             {
-                foreach (var item in requisitionDetails.LineItems)
+                orphan.DeletedAt = DateTime.UtcNow;
+                orphan.DeletedBy = UserEmail;
+                orphan.IsActive = false;
+                spaceLinxContext.RequisitionLineItems.Update(orphan);
+            }
+
+            await spaceLinxContext.SaveChangesAsync();
+
+            // Upsert the remaining / new line items
+            foreach (var item in incomingLineItems)
+            {
+                var existingLineItem = await spaceLinxContext.RequisitionLineItems
+                        .FirstOrDefaultAsync(li => li.Id == item.Id && li.RequisitionId == requisitionRecord.Id && li.DeletedBy == null);
+
+                if (existingLineItem == null)
                 {
-                    var existingLineItem = await spaceLinxContext.RequisitionLineItems
-                            .FirstOrDefaultAsync(li => li.Id == item.Id && li.RequisitionId == requisitionRecord.Id && li.DeletedBy == null);
-
-                    if (existingLineItem == null)
+                    var newLineItem = new RequisitionLineItem
                     {
-                        var newLineItem = new RequisitionLineItem
-                        {
-                            RequisitionId = requisitionRecord.Id.Value,
-                            PartId = item.PartId,
-                            Quantity = item.Quantity,
-                            Description = item.Description,
-                            CreatedBy = UserEmail,
-                            CreatedAt = DateTime.UtcNow,
-                            IsActive = true
-                        };
+                        RequisitionId = requisitionRecord.Id.Value,
+                        PartId = item.PartId,
+                        Quantity = item.Quantity,
+                        Description = item.Description,
+                        CreatedBy = UserEmail,
+                        CreatedAt = DateTime.UtcNow,
+                        IsActive = true
+                    };
 
-                        await spaceLinxContext.RequisitionLineItems.AddAsync(newLineItem);
-                        await spaceLinxContext.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        existingLineItem.PartId = item.PartId;
-                        existingLineItem.Quantity = item.Quantity;
-                        existingLineItem.Description = item.Description;
-                        existingLineItem.UpdatedBy = UserEmail;
-                        existingLineItem.UpdatedAt = DateTime.UtcNow;
-                        existingLineItem.IsActive = true;
+                    await spaceLinxContext.RequisitionLineItems.AddAsync(newLineItem);
+                    await spaceLinxContext.SaveChangesAsync();
+                }
+                else
+                {
+                    existingLineItem.PartId = item.PartId;
+                    existingLineItem.Quantity = item.Quantity;
+                    existingLineItem.Description = item.Description;
+                    existingLineItem.UpdatedBy = UserEmail;
+                    existingLineItem.UpdatedAt = DateTime.UtcNow;
+                    existingLineItem.IsActive = true;
 
-                        spaceLinxContext.RequisitionLineItems.Update(existingLineItem);
-                        await spaceLinxContext.SaveChangesAsync();
-                    }
+                    spaceLinxContext.RequisitionLineItems.Update(existingLineItem);
+                    await spaceLinxContext.SaveChangesAsync();
                 }
             }
 
