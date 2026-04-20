@@ -89,7 +89,6 @@ const Requisitions = () => {
 
   const handleRefresh = async () => {
     await fetchData();
-    handleCloseDrawer();
   };
 
   useEffect(() => {

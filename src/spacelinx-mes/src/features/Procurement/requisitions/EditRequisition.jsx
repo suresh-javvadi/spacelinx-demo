@@ -40,6 +40,49 @@ const EditRequisition = ({
   selectedRequisition,
   userData,
 }) => {
+  const normalizeApproverUser = (user) => ({
+    id: user?.id || "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+  });
+
+  const normalizeApprovers = (approversList = []) =>
+    approversList
+      .map((stage) => ({
+        stage: Number(stage?.stage),
+        users: (stage?.users || [])
+          .map(normalizeApproverUser)
+          .sort(
+            (a, b) =>
+              a.email.localeCompare(b.email) || a.id.localeCompare(b.id),
+          ),
+      }))
+      .filter((stage) => stage.users.length > 0)
+      .sort((a, b) => a.stage - b.stage);
+
+  const normalizeFormData = (data) => {
+    if (!data) return null;
+
+    return {
+      requestedById: data.requestedById || "",
+      requiredByDate: data.requiredByDate || "",
+      priority: data.priority || "",
+      title: data.title || "",
+      projectId: data.projectId || null,
+      justification: data.justification || "",
+      approvers: normalizeApprovers(data.approvers),
+    };
+  };
+
+  const normalizeLineItems = (items = []) =>
+    items.map((item) => ({
+      id: item?.id || null,
+      partId: item?.partId || item?.part?.id || null,
+      quantity: Number(item?.quantity || 0),
+      description: item?.description || "",
+    }));
+
   const { Alert } = useContext(AlertsContext);
   const { openPartDetailsDrawer } = usePartDetailsDrawer();
   const filter = createFilterOptions();
@@ -67,6 +110,7 @@ const EditRequisition = ({
   const [readOnlyMode, setReadOnlyMode] = useState(true);
   const [loadingData, setLoadingData] = useState(true);
   const [originalData, setOriginalData] = useState(null);
+  const [originalLineItems, setOriginalLineItems] = useState([]);
   const [newLineItem, setNewLineItem] = useState({
     part: null,
     quantity: "",
@@ -83,10 +127,14 @@ const EditRequisition = ({
   const [loadingConfig, setLoadingConfig] = useState(false);
   const [blockSubmit, setBlockSubmit] = useState(false);
   useEffect(() => {
-    const isSame = JSON.stringify(originalData) === JSON.stringify(formData);
+    const isSame =
+      JSON.stringify(normalizeFormData(originalData)) ===
+        JSON.stringify(normalizeFormData(formData)) &&
+      JSON.stringify(normalizeLineItems(originalLineItems)) ===
+        JSON.stringify(normalizeLineItems(lineItems));
 
     setBlockSubmit(isSame);
-  }, [formData, originalData]);
+  }, [formData, originalData, lineItems, originalLineItems]);
 
   const isRequestorSelf = useMemo(() => {
     if (!selectedRequisition?.userEmail || !currentUser) return false;
@@ -161,6 +209,7 @@ const EditRequisition = ({
         showAlert("success", "Success", successMsg);
       }
       handleRefresh();
+      handleCloseClick();
     } catch (error) {
       console.error("Action failed:", error);
       if (error?.response?.status === 400) {
@@ -178,76 +227,76 @@ const EditRequisition = ({
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoadingData(true);
-        const [user, parts, goodsServices] = await Promise.all([
-          fetchUserLookup(),
-          fetchUniqueParts(),
-          fetchPartsWithGoodsAndServices(),
-        ]);
-
-        const response = await fetchRequisitionById(requisitionId);
-        setApprovals(response.approvals || []);
-        const approvals = response.approvals || [];
-        const req = response.requisition;
-        const groupedApprovers = {};
-        approvals.forEach((approval) => {
-          const stage = approval.stageNumber;
-          if (!groupedApprovers[stage]) {
-            groupedApprovers[stage] = { stage, users: [] };
-          }
-          if (approval.approver) {
-            groupedApprovers[stage].users.push(approval.approver);
-          }
-        });
-
-        const initialData = {
-          requestedById: req?.requestedById || "",
-          requiredByDate: req?.requiredByDate?.split("T")[0] || "",
-          priority: req?.priority || "Low",
-          title: req?.title || "",
-          projectId: req?.projectId || null,
-          justification: req?.justification || "",
-          approvals: approvals,
-          approvers: Object.values(groupedApprovers),
-        };
-
-        setFormData(initialData);
-        setOriginalData(initialData);
-        setApprovers(Object.values(groupedApprovers));
-        setLineItems(req?.requisitionLineItems || []);
-        setUserOptions(user);
-        const existingParts = (req?.requisitionLineItems || [])
-          .map((item) => item.part)
-          .filter(Boolean);
-        const releasedParts = parts.filter((part) => part.status === "Release");
-        const onlyGoodsServices = (goodsServices || []).filter(
-          (item) => item.itemType === "Goods" || item.itemType === "Services",
-        );
-        let mergedParts = [
-          ...releasedParts,
-          ...onlyGoodsServices.filter(
-            (gs) => !releasedParts.some((p) => p.id === gs.id),
-          ),
-        ];
-        mergedParts = [
-          ...mergedParts,
-          ...existingParts.filter(
-            (ep) => !mergedParts.some((mp) => mp.id === ep.id),
-          ),
-        ];
-
-        setPartsOptions(mergedParts);
-      } catch (err) {
-        Alert("Failed to load requisition data", "error");
-      } finally {
-        setLoadingData(false);
-      }
-    };
-
     fetchData();
   }, [requisitionId]);
+  const fetchData = async () => {
+    try {
+      setLoadingData(true);
+      const [user, parts, goodsServices] = await Promise.all([
+        fetchUserLookup(),
+        fetchUniqueParts(),
+        fetchPartsWithGoodsAndServices(),
+      ]);
+
+      const response = await fetchRequisitionById(requisitionId);
+      setApprovals(response.approvals || []);
+      const approvals = response.approvals || [];
+      const req = response.requisition;
+      const groupedApprovers = {};
+      approvals.forEach((approval) => {
+        const stage = approval.stageNumber;
+        if (!groupedApprovers[stage]) {
+          groupedApprovers[stage] = { stage, users: [] };
+        }
+        if (approval.approver) {
+          groupedApprovers[stage].users.push(approval.approver);
+        }
+      });
+
+      const initialData = {
+        requestedById: req?.requestedById || "",
+        requiredByDate: req?.requiredByDate?.split("T")[0] || "",
+        priority: req?.priority || "Low",
+        title: req?.title || "",
+        projectId: req?.projectId || null,
+        justification: req?.justification || "",
+        approvals: approvals,
+        approvers: Object.values(groupedApprovers),
+      };
+
+      setFormData(initialData);
+      setOriginalData(initialData);
+      setApprovers(Object.values(groupedApprovers));
+      setLineItems(req?.requisitionLineItems || []);
+      setOriginalLineItems(req?.requisitionLineItems || []);
+      setUserOptions(user);
+      const existingParts = (req?.requisitionLineItems || [])
+        .map((item) => item.part)
+        .filter(Boolean);
+      const releasedParts = parts.filter((part) => part.status === "Release");
+      const onlyGoodsServices = (goodsServices || []).filter(
+        (item) => item.itemType === "Goods" || item.itemType === "Services",
+      );
+      let mergedParts = [
+        ...releasedParts,
+        ...onlyGoodsServices.filter(
+          (gs) => !releasedParts.some((p) => p.id === gs.id),
+        ),
+      ];
+      mergedParts = [
+        ...mergedParts,
+        ...existingParts.filter(
+          (ep) => !mergedParts.some((mp) => mp.id === ep.id),
+        ),
+      ];
+
+      setPartsOptions(mergedParts);
+    } catch (err) {
+      Alert("Failed to load requisition data", "error");
+    } finally {
+      setLoadingData(false);
+    }
+  };
 
   const rows = useMemo(
     () =>
@@ -340,7 +389,7 @@ const EditRequisition = ({
       await updateRequisition(requisitionId, payload);
       Alert("Requisition updated successfully", "success");
       handleRefresh();
-      handleCloseClick();
+      fetchData();
     } catch (err) {
       console.error("Update Error:", err);
       Alert(
@@ -349,14 +398,15 @@ const EditRequisition = ({
       );
     } finally {
       setLoadingData(false);
-      setReadOnlyMode(true);
     }
   };
 
   const handleReset = () => {
     if (originalData) {
       setFormData(originalData);
+      setApprovers(originalData.approvers || []);
     }
+    setLineItems(originalLineItems || []);
     setReadOnlyMode(true);
     setErrors({});
     setLineItemErrors({});
@@ -1137,6 +1187,7 @@ const EditRequisition = ({
                 </Button>
                 <div className="update-reset">
                   <Button
+                    disabled={!blockSubmit}
                     onClick={() => {
                       if (hasPermission(PERMISSIONS.REQUISITIONS.MODIFY)) {
                         if (lineItems.length === 0) {
@@ -1156,7 +1207,7 @@ const EditRequisition = ({
                         if (!blockSubmit) {
                           Alert(
                             "Please update the requisition before submitting.",
-                            "info",
+                            "warning",
                           );
                           return;
                         }
