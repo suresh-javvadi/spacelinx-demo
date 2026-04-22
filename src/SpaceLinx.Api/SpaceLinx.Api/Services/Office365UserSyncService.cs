@@ -58,11 +58,35 @@ public class Office365UserSyncService : IOffice365UserSyncService
             var o365Users = await FetchAllO365UsersAsync(cancellationToken);
             _logger.LogInformation("Fetched {Count} users from Office 365", o365Users.Count);
 
-            // Get existing user emails for comparison (case-insensitive)
-            var existingEmails = await _context.Users
+            // Fetch existing users to check and update email casing
+            var existingUsers = await _context.Users
                 .Where(u => u.DeletedBy == null)
-                .Select(u => u.Email.ToLower())
-                .ToHashSetAsync(cancellationToken);
+                .ToListAsync(cancellationToken);
+
+            var changedCount = 0;
+            var now = DateTime.UtcNow;
+            foreach (var u in existingUsers)
+            {
+                if (!string.IsNullOrWhiteSpace(u.Email) && u.Email != u.Email.ToLowerInvariant())
+                {
+                    u.Email = u.Email.ToLowerInvariant();
+                    u.UpdatedBy = SystemUserName;
+                    u.UpdatedAt = now;
+                    changedCount++;
+                }
+            }
+
+            if (changedCount > 0)
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation("Updated {Count} existing user emails to lowercase", changedCount);
+            }
+
+            // Get existing user emails for comparison (case-insensitive)
+            var existingEmails = existingUsers
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => u.Email.ToLowerInvariant())
+                .ToHashSet();
 
             // Get the default role for new users
             var defaultRole = await GetDefaultRoleAsync(cancellationToken);
