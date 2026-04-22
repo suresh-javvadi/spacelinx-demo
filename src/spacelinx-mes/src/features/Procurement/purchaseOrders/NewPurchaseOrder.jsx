@@ -1222,7 +1222,6 @@ const NewPurchaseOrder = () => {
                       error={!!formErrors.deliveryDate}
                       helperText={formErrors.deliveryDate}
                       inputProps={{ min: poData.orderDate }}
-                      required
                     />
                     <TextField
                       label="Quotation Refrence"

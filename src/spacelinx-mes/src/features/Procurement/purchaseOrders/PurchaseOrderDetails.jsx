@@ -422,7 +422,7 @@ const PurchaseOrderDetails = () => {
 
     if (
       editPoData.purchaseOrderType === "From Requisition" &&
-      editPoData.requisition?.id
+      editPoData.requisition
     ) {
       formData.append(
         "RequisitionId",
@@ -1218,52 +1218,49 @@ const PurchaseOrderDetails = () => {
                                   </div>
                                 );
 
-                                const {
-                                  addressLine1,
-                                  addressLine2,
-                                  city,
-                                  state,
-                                  postalCode,
-                                } = billing.address;
-                                return (
-                                  <div className="VendorDetailsCardDetails">
-                                    {addressLine1 && <p>{addressLine1},</p>}
-                                    {addressLine2 && <p>{addressLine2},</p>}
-                                    {city && <p>{city},</p>}
-                                    {state && <p>{state},</p>}
-                                    {postalCode && <p>{postalCode}.</p>}
-                                    {!readOnlyMode && (
-                                      <>
-                                        <p
-                                          className="VendorAddressesEditBtn"
-                                          onClick={(e) => {
-                                            setAnchorEl(e.currentTarget);
-                                            setPopperType(
-                                              "vendorBillingAddress",
-                                            );
-                                          }}
-                                        >
-                                          Change Address{" "}
-                                          <EditIcon fontSize="small" />
-                                        </p>
-                                        <p
-                                          className="VendorAddressesEditBtn"
-                                          onClick={() => {
-                                            setDrawerType("address");
-                                            setDrawerEntityId(
-                                              editPoData.companyId,
-                                            );
-                                            setDrawerEntityType("vendor");
-                                            setPageDrawer(true);
-                                          }}
-                                        >
-                                          New Address{" "}
-                                          <AddIcon fontSize="small" />
-                                        </p>
-                                      </>
-                                    )}
-                                  </div>
-                                );
+                              const {
+                                addressLine1,
+                                addressLine2,
+                                city,
+                                state,
+                                postalCode,
+                              } = billing.address;
+                              return (
+                                <div className="VendorDetailsCardDetails">
+                                  {addressLine1 && <p>{addressLine1},</p>}
+                                  {addressLine2 && <p>{addressLine2},</p>}
+                                  {city && <p>{city},</p>}
+                                  {state && <p>{state},</p>}
+                                  {postalCode && <p>{postalCode}.</p>}
+                                  {!readOnlyMode && (
+                                    <>
+                                      <p
+                                        className="VendorAddressesEditBtn"
+                                        onClick={(e) => {
+                                          setAnchorEl(e.currentTarget);
+                                          setPopperType("vendorBillingAddress");
+                                        }}
+                                      >
+                                        Change Address{" "}
+                                        <EditIcon fontSize="small" />
+                                      </p>
+                                      <p
+                                        className="VendorAddressesEditBtn"
+                                        onClick={() => {
+                                          setDrawerType("address");
+                                          setDrawerEntityId(
+                                            editPoData.companyId,
+                                          );
+                                          setDrawerEntityType("vendor");
+                                          setPageDrawer(true);
+                                        }}
+                                      >
+                                        New Address <AddIcon fontSize="small" />
+                                      </p>
+                                    </>
+                                  )}
+                                </div>
+                              );
                             })()}
                             <Divider orientation="vertical" flexItem />
                             {(() => {
