@@ -9,6 +9,8 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import logo from "../../../Assest/Images/logos/xdlinxlogolightmode.png";
+import tarunSignature from "../../../Assest/Images/signatures/tarun-signature.jpeg";
+import sudheerSignature from "../../../Assest/Images/signatures/sudheer-signature.jpeg";
 import NotoSansRegular from "../../../Assest/Fonts/NotoSans-Regular.ttf";
 import NotoSansBold from "../../../Assest/Fonts/NotoSans-Bold.ttf";
 import { formatAmount } from "../../../utils/numberFormatter";
@@ -196,6 +198,52 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     marginLeft: 10,
   },
+  approvalsSection: {
+    textAlign: "center",
+  },
+  approvalsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  approvalStageColumn: {
+    width: "48%",
+    marginBottom: 12,
+    padding: 8,
+  },
+  approvalStageTitle: {
+    fontSize: 10,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "black",
+  },
+  approvalCard: {
+    marginBottom: 12,
+    minHeight: 92,
+    justifyContent: "flex-end",
+  },
+  approvalSignatureImageWrap: {
+    height: 52,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  approvalSignatureImage: {
+    width: 86,
+    height: 40,
+    objectFit: "contain",
+  },
+  approvalSignatureLine: {
+    borderTopWidth: 1,
+    borderTopColor: "#000",
+    paddingTop: 6,
+    width: "78%",
+    alignSelf: "center",
+  },
+  approvalText: {
+    fontSize: 9,
+    lineHeight: 1.5,
+  },
   signature: {
     marginTop: 30,
     textAlign: "right",
@@ -204,7 +252,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#000",
     paddingTop: 5,
-    width: "75%",
+    width: "78%",
     textAlign: "center",
     fontSize: 10,
   },
@@ -221,6 +269,7 @@ const PrintPurchaseOrder = ({
   printOptions,
   poData,
   lineItems,
+  approvals,
   vendors,
   vendorAddresses,
   vendorContacts,
@@ -346,6 +395,47 @@ const PrintPurchaseOrder = ({
       .map((point) => point.trim())
       .filter(Boolean);
   };
+
+  const formatApprovalDateTime = (date) => {
+    if (!date) return "N/A";
+
+    const parsedDate = new Date(date);
+    if (Number.isNaN(parsedDate.getTime())) return "N/A";
+
+    const dd = String(parsedDate.getDate()).padStart(2, "0");
+    const mm = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const yyyy = parsedDate.getFullYear();
+    const hours = String(parsedDate.getHours()).padStart(2, "0");
+    const minutes = String(parsedDate.getMinutes()).padStart(2, "0");
+
+    return `${dd}-${mm}-${yyyy} ${hours}:${minutes}`;
+  };
+
+  const approvedApprovals =
+    approvals?.filter((approval) => approval?.status === "Approved") || [];
+
+  const signatureByEmail = {
+    "tarun@xdlinx.space": tarunSignature,
+    "sudheer@xdlinx.space": sudheerSignature,
+  };
+
+  const approvedApprovalsByStage = approvedApprovals.reduce(
+    (stageMap, approval) => {
+      const stageNumber = approval?.stageNumber || "N/A";
+
+      if (!stageMap[stageNumber]) {
+        stageMap[stageNumber] = [];
+      }
+
+      stageMap[stageNumber].push(approval);
+      return stageMap;
+    },
+    {},
+  );
+
+  const sortedApprovalStages = Object.entries(approvedApprovalsByStage).sort(
+    ([stageA], [stageB]) => Number(stageA) - Number(stageB),
+  );
 
   const {
     hsn,
@@ -678,12 +768,56 @@ const PrintPurchaseOrder = ({
           )}
         </View>
 
+        {approvedApprovals.length > 0 && (
+          <View style={styles.approvalsSection}>
+            <View style={styles.approvalsGrid}>
+              {sortedApprovalStages.map(([stageNumber, stageApprovals]) => (
+                <View key={stageNumber} style={styles.approvalStageColumn}>
+                  {stageApprovals.map((approval, index) => {
+                    const approverName = `${
+                      approval?.approver?.firstName || ""
+                    } ${approval?.approver?.lastName || ""}`.trim();
+                    const approverEmail =
+                      approval?.approver?.email?.toLowerCase() || "";
+                    const signatureImage = signatureByEmail[approverEmail];
+
+                    return (
+                      <View
+                        key={`${approval?.id || approval?.approverId || index}`}
+                        style={styles.approvalCard}
+                      >
+                        <View style={styles.approvalSignatureImageWrap}>
+                          {signatureImage && (
+                            <Image
+                              src={signatureImage}
+                              style={styles.approvalSignatureImage}
+                            />
+                          )}
+                        </View>
+                        <View style={styles.approvalSignatureLine}>
+                          <Text style={styles.approvalText}>
+                            {approverName || "N/A"}
+                          </Text>
+                          <Text style={styles.approvalText}>
+                            {formatApprovalDateTime(approval?.actedAt)}
+                          </Text>
+                          <Text style={styles.approvalText}>
+                            {`Authorized Signature ${stageNumber}`}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         <View style={styles.signatureRow}>
+          <View style={{ flex: 1 }} />
           <View style={{ flex: 1, alignItems: "center" }}>
             <Text style={styles.signatureLine}>Vendor Acknowledgement</Text>
-          </View>
-          <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={styles.signatureLine}>Authorized Signature</Text>
           </View>
         </View>
       </Page>

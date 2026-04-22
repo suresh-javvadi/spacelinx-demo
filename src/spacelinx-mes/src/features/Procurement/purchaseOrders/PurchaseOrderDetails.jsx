@@ -229,6 +229,7 @@ const PurchaseOrderDetails = () => {
         }
         currency={currency}
         standardTermsAndConditions={standardTermsAndConditions}
+        approvals={approvals}
       />
     );
 
