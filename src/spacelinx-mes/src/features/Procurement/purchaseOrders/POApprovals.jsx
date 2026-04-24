@@ -21,6 +21,7 @@ const POApprovals = ({
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingConfig, setLoadingConfig] = useState(false);
   const { isSuperAdmin } = useUserContext();
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -28,7 +29,7 @@ const POApprovals = ({
   }, []);
 
   useEffect(() => {
-    if (!approvalConfig?.numberOfLevels) return;
+    if (!approvalConfig?.numberOfLevels || initialized) return;
 
     const groupedByStage = approvals.reduce((acc, item) => {
       const stage = item.stageNumber;
@@ -37,16 +38,17 @@ const POApprovals = ({
       return acc;
     }, {});
 
-    const initialized = Array.from(
+    const initializedData = Array.from(
       { length: approvalConfig.numberOfLevels },
       (_, i) => ({
         stage: i + 1,
         users: groupedByStage[i + 1] || [],
-      })
+      }),
     );
 
-    setApprovers(initialized);
-  }, [approvalConfig, approvals]);
+    setApprovers(initializedData);
+    setInitialized(true);
+  }, [approvalConfig, approvals, initialized]);
 
   const fetchUsers = async () => {
     setLoadingUsers(true);
