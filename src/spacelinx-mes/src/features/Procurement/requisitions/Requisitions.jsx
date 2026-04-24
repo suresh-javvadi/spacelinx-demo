@@ -155,8 +155,8 @@ const Requisitions = () => {
       flex: 1,
     },
     {
-      field: "Create Purchase Order",
-      headerName: "Create Purchase Order",
+      field: "purchaseOrder",
+      headerName: "Purchase Order",
       flex: 1,
       sortable: false,
       filterable: false,
@@ -170,16 +170,16 @@ const Requisitions = () => {
         const isApprovedOrPoCreated =
           statusNormalized === "approved" || statusNormalized === "pocreated";
 
-        const poId = row.poId || row.purchaseOrder?.id;
+        const poId = row.purchaseOrderId || row.poId || row.purchaseOrder?.id;
 
         if (isApprovedOrPoCreated) {
           if (isPoCreated) {
             return (
-              <Button
-                variant="outlined"
-                size="small"
+              <span
+                className="AppHyperLink"
                 title={"Open Purchase Order"}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   if (!hasPermission(PERMISSIONS.PURCHASEORDERS.VIEW)) {
                     Alert(
                       "You do not have permission to view Purchase Orders!",
@@ -187,11 +187,22 @@ const Requisitions = () => {
                     );
                     return;
                   }
+                  if (!poId) {
+                    Alert(
+                      "Purchase Order ID is missing from the record!",
+                      "error",
+                    );
+                    return;
+                  }
                   navigateTo(`/procurement/purchaseorders/${poId}`);
                 }}
               >
-                View PO
-              </Button>
+                {row.purchaseOrder?.number ||
+                  row.purchaseOrder?.poNumber ||
+                  row.poNumber ||
+                  row.purchaseOrderNumber ||
+                  "View PO"}
+              </span>
             );
           }
 
