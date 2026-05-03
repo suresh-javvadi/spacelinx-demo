@@ -177,11 +177,6 @@ const Eco = () => {
       valueGetter: (_value, row) => (row.status === "Draft" ? "" : row.status),
     },
     {
-      field: "approverFullName",
-      headerName: "Approved By",
-      flex: 1,
-    },
-    {
       field: "delete",
       headerName: " ",
       width: 50,
