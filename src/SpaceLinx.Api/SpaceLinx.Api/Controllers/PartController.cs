@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -475,19 +475,6 @@ public class PartController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
             };
 
             spaceLinxContext.Parts.Add(partEntity);
-            await spaceLinxContext.SaveChangesAsync();
-
-            var inventoryPart = new InventoryPart
-            {
-                PartId = partEntity.Id.Value,
-                UnitPrice = partEntity.UnitPrice,
-                QtyOnhand = 0,
-                CreatedBy = UserEmail,
-                CreatedAt = DateTime.UtcNow,
-                IsActive = true
-            };
-
-            spaceLinxContext.InventoryParts.Add(inventoryPart);
             await spaceLinxContext.SaveChangesAsync();
 
             await transaction.CommitAsync();
