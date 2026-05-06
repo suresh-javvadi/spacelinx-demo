@@ -6,7 +6,7 @@ public partial class GrnLineItemReadModel : BaseReadModel
     public Guid PartId { get; set; }
     public Guid? PoLineItemId { get; set; }
     public int? ReceivedQuantity { get; set; }
-    public string TrackingMethod { get; set; } = null!;
+    public string? TrackingMethod { get; set; }
     public string? TrackingId { get; set; }
     public DateOnly? ManufacturingDate { get; set; }
     public DateOnly? ExpiryDate { get; set; }

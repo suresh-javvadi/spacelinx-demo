@@ -1,9 +1,9 @@
-﻿CREATE TABLE sc.grn_line_item (
+CREATE TABLE sc.grn_line_item (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     grn_id UUID NOT NULL,
     part_id UUID NOT NULL,	
     received_quantity INT,
-    tracking_method VARCHAR(50) NOT NULL CHECK (tracking_method IN ('None', 'Batch', 'Serial')) DEFAULT 'None',
+    tracking_method VARCHAR(50) CHECK (tracking_method IS NULL OR tracking_method IN ('None', 'Batch', 'Serial')),
     tracking_id VARCHAR(255),
     manufacturing_date DATE,
     expiry_date DATE,

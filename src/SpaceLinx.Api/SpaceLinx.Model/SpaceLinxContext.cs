@@ -2045,7 +2045,6 @@ public partial class SpaceLinxContext : DbContext
                 .HasColumnName("tracking_id");
             entity.Property(e => e.TrackingMethod)
                 .HasMaxLength(50)
-                .HasDefaultValueSql("'None'::character varying")
                 .HasColumnName("tracking_method");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.Property(e => e.UpdatedBy)

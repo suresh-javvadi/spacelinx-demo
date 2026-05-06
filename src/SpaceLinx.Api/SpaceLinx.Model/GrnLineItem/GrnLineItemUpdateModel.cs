@@ -1,11 +1,11 @@
-﻿namespace SpaceLinx.Model;
+namespace SpaceLinx.Model;
 
 public partial class GrnLineItemUpdateModel : BaseUpdateModel
 {
     public Guid GrnId { get; set; }
     public Guid PartId { get; set; }
     public int? ReceivedQuantity { get; set; }
-    public string TrackingMethod { get; set; } = null!;
+    public string? TrackingMethod { get; set; }
     public string? TrackingId { get; set; }
     public DateOnly? ManufacturingDate { get; set; }
     public DateOnly? ExpiryDate { get; set; }

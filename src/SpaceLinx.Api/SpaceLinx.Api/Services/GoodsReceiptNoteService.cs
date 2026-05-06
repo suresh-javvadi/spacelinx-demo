@@ -77,6 +77,31 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
 
             foreach (var item in request.LineItems)
             {
+                var itemPart = await spaceLinxContext.Parts.FindAsync(item.PartId);
+                var isGoodsOrService = itemPart != null && (itemPart.ItemType == "Goods" || itemPart.ItemType == "Services");
+
+                if (isGoodsOrService)
+                {
+                    if (!string.IsNullOrWhiteSpace(item.TrackingMethod) && !item.TrackingMethod.Equals("None", StringComparison.OrdinalIgnoreCase) && !item.TrackingMethod.Equals("null", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidOperationException("TrackingMethod must be 'None' or empty for Goods/Services");
+                    }
+                    item.TrackingMethod = null;
+                    item.TrackingId = null;
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(item.TrackingMethod) || item.TrackingMethod.Equals("null", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidOperationException("TrackingMethod is required for Parts");
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(item.TrackingId) || item.TrackingId.Equals("null", StringComparison.OrdinalIgnoreCase))
+                {
+                    item.TrackingId = null;
+                }
+
                 var grnLineItem = new GrnLineItem
                 {
                     GrnId = grnEntity.Id.Value,
