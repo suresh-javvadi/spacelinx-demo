@@ -237,11 +237,7 @@ const PurchaseOrderDetails = () => {
     const url = URL.createObjectURL(blob);
 
     const newWindow = window.open(url, "_blank");
-    if (newWindow) {
-      newWindow.onload = () => {
-        URL.revokeObjectURL(url);
-      };
-    } else {
+    if (!newWindow) {
       console.error("Failed to open new window. Pop-ups might be blocked.");
     }
   };
