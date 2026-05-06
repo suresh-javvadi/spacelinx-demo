@@ -230,10 +230,11 @@ const NewGoodReceiptNote = ({
   const handleSelectPart = (part) => {
     if (!part) return;
 
-    const isSerial = part.isSerialNumberRequired === true;
-    const trackingTypeObj = trackingTypes.find(
-      (t) => t.value === (isSerial ? "serial" : "batch"),
-    );
+    const isPart = !part.itemType || part.itemType === "Part";
+    const isSerial = isPart && part.isSerialNumberRequired === true;
+    const trackingTypeObj = isPart
+      ? trackingTypes.find((t) => t.value === (isSerial ? "serial" : "batch"))
+      : null; // ✅ make it empty
 
     const newEntry = {
       ...part,
@@ -505,6 +506,9 @@ const NewGoodReceiptNote = ({
         trackingType: "",
       };
 
+      // ✅ ADD THIS LINE
+      const isPart = !item.itemType || item.itemType === "Part";
+
       // Quantity validation
       if (item.receivedQuantity === "" || item.receivedQuantity === null) {
         rowErrors.receivedQuantity = "Quantity is required";
@@ -519,17 +523,16 @@ const NewGoodReceiptNote = ({
 
       // Tracking number validation
       if (!item.trackingNumber?.trim()) {
-        if (item.trackingType?.value !== "none") {
+        if (item.trackingType) {
           rowErrors.trackingNumber = "Tracking ID is required";
         }
       }
 
-      // Tracking type validation (usually always valid)
-      if (!item.trackingType) {
+      // ✅ FIXED validation
+      if (isPart && !item.trackingType) {
         rowErrors.trackingType = "Tracking Type is required";
       }
 
-      // If ANY field in this row has an error
       if (
         rowErrors.receivedQuantity ||
         rowErrors.trackingNumber ||
@@ -599,24 +602,34 @@ const NewGoodReceiptNote = ({
 
     payloadLineItems.forEach((item, index) => {
       formDataPayload.append(`LineItems[${index}].partId`, item.id);
+
       if (item.poLineItemId) {
         formDataPayload.append(
           `LineItems[${index}].poLineItemId`,
           item.poLineItemId,
         );
       }
+
       formDataPayload.append(
         `LineItems[${index}].receivedQuantity`,
         item.receivedQuantity,
       );
-      formDataPayload.append(
-        `LineItems[${index}].trackingMethod`,
-        item.trackingType.label,
-      );
-      formDataPayload.append(
-        `LineItems[${index}].trackingId`,
-        item.trackingNumber,
-      );
+
+      const isPart = !item.itemType || item.itemType === "Part";
+
+      // ✅ Only send tracking fields for Parts
+      if (isPart) {
+        formDataPayload.append(
+          `LineItems[${index}].trackingMethod`,
+          item.trackingType?.label || "",
+        );
+
+        formDataPayload.append(
+          `LineItems[${index}].trackingId`,
+          item.trackingNumber || "",
+        );
+      }
+
       formDataPayload.append(`LineItems[${index}].remark`, item.remarks || "");
     });
 
@@ -683,49 +696,57 @@ const NewGoodReceiptNote = ({
       field: "trackingType",
       headerName: "Tracking Type",
       flex: 1,
-      renderCell: ({ row }) => (
-        <div style={{ width: "100%" }}>
-          <Autocomplete
-            fullWidth
-            options={trackingTypes}
-            value={
-              trackingTypes.find((t) => t.value === row.trackingType.value) ||
-              null
-            }
-            disableClearable
-            onChange={(_, newValue) =>
-              handleTrackingTypeChange(row.uniqueId, newValue || "")
-            }
-            getOptionLabel={(option) => option.label || ""}
-            isOptionEqualToValue={(option, value) =>
-              option.value === value?.value
-            }
-            clearIcon
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Select Type"
-                sx={{
-                  "& .MuiInputBase-root": {
-                    height: 40,
-                    padding: "0 10px",
-                    borderRadius: "6px",
-                    marginTop: "4px",
-                  },
-                  "& input": {
-                    padding: "4px 6px !important",
-                    fontSize: "14px",
-                  },
-                }}
-                fullWidth
-                required
-                error={Boolean(lineItemErrors[row.uniqueId]?.trackingType)}
-                helperText={lineItemErrors[row.uniqueId]?.trackingType || ""}
-              />
-            )}
-          />
-        </div>
-      ),
+      renderCell: ({ row }) => {
+        const isPart = !row.itemType || row.itemType === "Part";
+        if (!isPart) {
+          return <span>---</span>; // ✅ empty block instead of dropdown
+        }
+        return (
+          <div style={{ width: "100%" }}>
+            <Autocomplete
+              fullWidth
+              options={trackingTypes}
+              value={
+                trackingTypes.find(
+                  (t) => t.value === row.trackingType?.value,
+                ) || null
+              }
+              disableClearable
+              disabled={!isPart}
+              onChange={(_, newValue) =>
+                handleTrackingTypeChange(row.uniqueId, newValue || "")
+              }
+              getOptionLabel={(option) => option.label || ""}
+              isOptionEqualToValue={(option, value) =>
+                option.value === value?.value
+              }
+              clearIcon
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Select Type"
+                  sx={{
+                    "& .MuiInputBase-root": {
+                      height: 40,
+                      padding: "0 10px",
+                      borderRadius: "6px",
+                      marginTop: "4px",
+                    },
+                    "& input": {
+                      padding: "4px 6px !important",
+                      fontSize: "14px",
+                    },
+                  }}
+                  fullWidth
+                  required={isPart}
+                  error={Boolean(lineItemErrors[row.uniqueId]?.trackingType)}
+                  helperText={lineItemErrors[row.uniqueId]?.trackingType || ""}
+                />
+              )}
+            />
+          </div>
+        );
+      },
     },
     {
       field: "trackingNumber",
@@ -733,12 +754,11 @@ const NewGoodReceiptNote = ({
       flex: 1,
       renderCell: ({ row }) => {
         const errorMsg = lineItemErrors[row.uniqueId];
-
+        const isPart = !row.itemType || row.itemType === "Part";
         const trackingType = row.trackingType;
-        if (trackingType?.value === "none") {
-          return <span>---</span>;
+        if (!isPart || !trackingType) {
+          return <span>---</span>; // ✅ empty block
         }
-
         return (
           <TextField
             size="small"
@@ -773,7 +793,7 @@ const NewGoodReceiptNote = ({
       flex: 0.8,
       minWidth: 100,
       renderCell: ({ row }) => {
-        const isSerial = row.trackingType.value === "serial";
+        const isSerial = row.trackingType?.value === "serial";
 
         return (
           <TextField

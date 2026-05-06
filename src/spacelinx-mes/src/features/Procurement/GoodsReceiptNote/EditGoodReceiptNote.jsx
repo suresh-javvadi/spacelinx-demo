@@ -134,11 +134,21 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       field: "trackingMethod",
       headerName: "Tracking Method",
       flex: 0.8,
+      renderCell: ({ row }) => {
+        const isPart = !row.part?.itemType || row.part?.itemType === "Part";
+
+        return isPart ? row.trackingMethod || "---" : "---";
+      },
     },
     {
       field: "trackingId",
       headerName: "Tracking ID",
       flex: 1,
+      renderCell: ({ row }) => {
+        const isPart = !row.part?.itemType || row.part?.itemType === "Part";
+
+        return isPart ? row.trackingId || "---" : "---";
+      },
     },
     {
       field: "receivedQuantity",
