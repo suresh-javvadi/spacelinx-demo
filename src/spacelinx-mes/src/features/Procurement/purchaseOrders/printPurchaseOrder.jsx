@@ -9,8 +9,8 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import logo from "../../../Assest/Images/logos/xdlinxlogolightmode.png";
-import tarunSignature from "../../../Assest/Images/signatures/tarun-signature.jpeg";
-import sudheerSignature from "../../../Assest/Images/signatures/sudheer-signature.jpeg";
+import tarunSignature from "../../../Assest/Images/signatures/tarun-signature.png";
+import sudheerSignature from "../../../Assest/Images/signatures/sudheer-signature.png";
 import NotoSansRegular from "../../../Assest/Fonts/NotoSans-Regular.ttf";
 import NotoSansBold from "../../../Assest/Fonts/NotoSans-Bold.ttf";
 import { formatAmount } from "../../../utils/numberFormatter";
@@ -223,14 +223,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   approvalSignatureImageWrap: {
-    height: 52,
+    height: 78,
     justifyContent: "flex-end",
     alignItems: "center",
     marginBottom: 6,
   },
   approvalSignatureImage: {
-    width: 86,
-    height: 40,
+    width: 130,
+    height: 60,
     objectFit: "contain",
   },
   approvalSignatureLine: {
