@@ -46,6 +46,7 @@ import { fetchCountryLookUp } from "../../../services/countryService";
 import { fetchSubsystemsLookup } from "../../../services/subsystemService";
 import { fetchPartLevelLookup } from "../../../services/partLevelService";
 import "../../features.css";
+import { Tooltip } from "@mui/material";
 
 const EditPart = ({
   handleCloseClick,
@@ -705,6 +706,9 @@ const EditPart = ({
   };
 
   const InventoryAccesableRoles = ["Super Admin", "SCM Manager", "SCM Staff"];
+  const isBuyPart = selectedPart?.part?.makeBuy === 1;
+
+  const isReviseLoading = loadingData || selectedPart?.part?.makeBuy == null;
   return (
     <div className="EditFlyout">
       {loadingData || loadingMPartNumbersData ? (
@@ -1454,12 +1458,19 @@ const EditPart = ({
                   <div className="EditPartReviseButtonDiv">
                     {selectedPart?.part?.id === partVersionsData[0]?.part?.id &&
                       selectedPart?.part?.status === "Release" && (
-                        <Button
-                          className="EditPartReviseButton"
-                          onClick={revisePart}
+                        <Tooltip
+                          title={isBuyPart ? "Buy parts cannot be revised" : ""}
                         >
-                          Revise Part
-                        </Button>
+                          <span>
+                            <Button
+                              className="EditPartReviseButton"
+                              onClick={revisePart}
+                              disabled={isBuyPart || isReviseLoading}
+                            >
+                              Revise Part
+                            </Button>
+                          </span>
+                        </Tooltip>
                       )}
                   </div>
                 ) : (

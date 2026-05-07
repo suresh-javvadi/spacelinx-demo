@@ -1758,3 +1758,7 @@ div.Active-Button {
   left: 330px;
   top: 20px;
 }
+.EditPartReviseButton.Mui-disabled {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}

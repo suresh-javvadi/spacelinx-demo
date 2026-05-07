@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using SpaceLinx.Api.Interfaces;
 using SpaceLinx.Model;
-
+ 
 namespace SpaceLinx.Api.Services;
-
+ 
 public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHttpContextAccessor _contextAccessor)
     : BaseService(_spaceLinxContext, _contextAccessor), IPartService
 {
@@ -17,10 +17,15 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
             {
                 throw new ApplicationException("Part Not Found.");
             }
-
+ 
+            if (record.MakeBuy == 1)
+            {
+                throw new InvalidOperationException("Buy parts cannot be revised.");
+            }
+ 
             int currentVersion = int.Parse(record.Version);
             string newVersion = (currentVersion + 1).ToString("D2");
-
+ 
             var newPart = new Part
             {
                 Name = record.Name,
@@ -49,10 +54,10 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
                 CreatedBy = UserEmail,
                 IsActive = true
             };
-
+ 
             await _spaceLinxContext.Parts.AddAsync(newPart);
             await _spaceLinxContext.SaveChangesAsync();
-
+ 
             var eboms = await _spaceLinxContext.Eboms.AsNoTracking().Where(x => x.PartId == partId).ToListAsync();
             foreach (var ebom in eboms)
             {
@@ -64,11 +69,11 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
                     CreatedBy = UserEmail,
                     IsActive = true
                 };
-
+ 
                 await _spaceLinxContext.AddAsync(newEbom);
             }
             await _spaceLinxContext.SaveChangesAsync();
-
+ 
             return newPart;
         }
         catch (Exception ex)
@@ -76,7 +81,7 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
             throw new ApplicationException(ex.Message);
         }
     }
-
+ 
     public bool IsPartEditable(Guid partId)
     {
         var record =  _spaceLinxContext.Parts.AsNoTracking().FirstOrDefault(x => x.Id == partId);
@@ -84,17 +89,18 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
         {
             return false;
         }
-
+ 
         return true;
     }
-
+ 
     public bool IsPartEditable(string status)
     {
         if (status != "Draft")
         {
             return false;
         }
-
+ 
         return true;
     }
 }
+ 
