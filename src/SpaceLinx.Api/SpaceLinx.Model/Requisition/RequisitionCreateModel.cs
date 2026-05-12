@@ -10,5 +10,6 @@ public partial class RequisitionCreateModel
     public string? Justification { get; set; }
     public string Priority { get; set; } = null!;
     public decimal TotalEstimatedAmount { get; set; }
+    public Guid? DepartmentId { get; set; }
     public List<RequisitionLineItemCreateModel>? LineItems { get; set; }
 }

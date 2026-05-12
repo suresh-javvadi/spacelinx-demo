@@ -1308,6 +1308,10 @@ public partial class SpaceLinxContext : DbContext
 
             entity.ToTable("department", "common");
 
+            entity.HasIndex(e => e.Code, "ux_department_code_active")
+                .IsUnique()
+                .HasFilter("(deleted_at IS NULL)");
+
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
@@ -1318,6 +1322,8 @@ public partial class SpaceLinxContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("name");
             entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.ParentDepartmentId).HasColumnName("parent_department_id");
+            entity.Property(e => e.HeadOfDepartmentUserId).HasColumnName("head_of_department_user_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnName("created_at");
@@ -1335,6 +1341,18 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(255)
                 .HasColumnName("updated_by");
+
+            entity.HasOne(d => d.ParentDepartment)
+                .WithMany(p => p.ChildDepartments)
+                .HasForeignKey(d => d.ParentDepartmentId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_department_parent");
+
+            entity.HasOne(d => d.HeadOfDepartmentUser)
+                .WithMany(u => u.HeadedDepartments)
+                .HasForeignKey(d => d.HeadOfDepartmentUserId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_department_head");
         });
 
         modelBuilder.Entity<DashboardWidget>(entity =>
@@ -4798,6 +4816,13 @@ public partial class SpaceLinxContext : DbContext
                 .HasColumnName("updated_by");
             entity.Property(e => e.VendorBillingAddressId).HasColumnName("vendor_billing_address_id");
             entity.Property(e => e.VendorBillingContactId).HasColumnName("vendor_billing_contact_id");
+            entity.Property(e => e.DepartmentId).HasColumnName("department_id");
+
+            entity.HasOne(d => d.Department)
+                .WithMany(p => p.PurchaseOrders)
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_purchase_order_department");
 
             entity.HasOne(d => d.BillingAddress).WithMany(p => p.PurchaseOrderBillingAddresses)
                 .HasForeignKey(d => d.BillingAddressId)
@@ -4980,6 +5005,8 @@ public partial class SpaceLinxContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("updated_by");
 
+            entity.Property(e => e.DepartmentId).HasColumnName("department_id");
+
             entity.HasOne(d => d.Project).WithMany(p => p.Requisitions)
                 .HasForeignKey(d => d.ProjectId)
                 .OnDelete(DeleteBehavior.SetNull)
@@ -4989,6 +5016,12 @@ public partial class SpaceLinxContext : DbContext
                 .HasForeignKey(d => d.RequestedById)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("requisition_requested_by_id_fkey");
+
+            entity.HasOne(d => d.Department)
+                .WithMany(p => p.Requisitions)
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_requisition_department");
         });
 
         modelBuilder.Entity<RequisitionLineItem>(entity =>
@@ -6537,6 +6570,13 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.UserNumber)
                 .ValueGeneratedOnAdd()
                 .HasColumnName("user_number");
+            entity.Property(e => e.DepartmentId).HasColumnName("department_id");
+
+            entity.HasOne(d => d.DepartmentRef)
+                .WithMany(p => p.Users)
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_user_department");
         });
 
         modelBuilder.Entity<UserRole>(entity =>

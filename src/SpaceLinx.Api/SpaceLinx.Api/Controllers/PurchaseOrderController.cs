@@ -20,13 +20,79 @@ public class PurchaseOrderController(
     IPurchaseOrderApprovalService purchaseOrderApprovalService) :
     GenericRestController<PurchaseOrder, PurchaseOrderWriteModel, PurchaseOrderUpdateModel, PurchaseOrderReadModel, PurchaseOrderRefModel>(spaceLinxContext, mapper, httpContextAccessor)
 {
+    [HttpGet]
+    public override async Task<List<PurchaseOrderReadModel>> Get()
+    {
+        var departmentId = HttpContext.Request.Query.TryGetValue("departmentId", out var depIdRaw)
+            && Guid.TryParse(depIdRaw, out var parsed) ? parsed : (Guid?)null;
+        var allDepartments = HttpContext.Request.Query.TryGetValue("allDepartments", out var allRaw)
+            && bool.TryParse(allRaw, out var parsedAll) && parsedAll;
+
+        Guid? scopedDeptId = departmentId;
+        if (scopedDeptId == null && !allDepartments)
+        {
+            scopedDeptId = await spaceLinxContext.Users
+                .AsNoTracking()
+                .Where(u => u.Email == UserEmail && u.DeletedBy == null)
+                .Select(u => u.DepartmentId)
+                .FirstOrDefaultAsync();
+        }
+
+        var query = spaceLinxContext.PurchaseOrders
+            .AsNoTracking()
+            .Include(x => x.Buyer)
+            .Include(x => x.SupplyChainLead)
+            .Include(x => x.Company)
+            .Include(x => x.Currency)
+            .Include(x => x.PaymentTerm)
+            .Include(x => x.Project)
+            .Include(x => x.Requisition)
+            .Include(x => x.BillingAddress)
+            .Include(x => x.DeliveryAddress)
+            .Include(x => x.ShippingAddress)
+            .Include(x => x.VendorBillingAddress)
+            .Include(x => x.VendorBillingContact)
+            .Include(x => x.Department)
+            .Where(x => x.DeletedBy == null);
+
+        if (scopedDeptId.HasValue)
+        {
+            query = query.Where(x => x.DepartmentId == scopedDeptId);
+        }
+
+        var records = await query.ToListAsync();
+        return mapper.Map<List<PurchaseOrderReadModel>>(records);
+    }
+
     [HttpGet("purchase-order")]
     public async Task<IActionResult> GetPurchaseOrders()
     {
-        var result = await spaceLinxContext.PurchaseOrdersVws
-            .AsNoTracking()
-            .ToListAsync();
+        var departmentId = HttpContext.Request.Query.TryGetValue("departmentId", out var depIdRaw)
+            && Guid.TryParse(depIdRaw, out var parsed) ? parsed : (Guid?)null;
+        var allDepartments = HttpContext.Request.Query.TryGetValue("allDepartments", out var allRaw)
+            && bool.TryParse(allRaw, out var parsedAll) && parsedAll;
 
+        Guid? scopedDeptId = departmentId;
+        if (scopedDeptId == null && !allDepartments)
+        {
+            scopedDeptId = await spaceLinxContext.Users
+                .AsNoTracking()
+                .Where(u => u.Email == UserEmail && u.DeletedBy == null)
+                .Select(u => u.DepartmentId)
+                .FirstOrDefaultAsync();
+        }
+
+        var query = spaceLinxContext.PurchaseOrdersVws.AsNoTracking();
+
+        if (scopedDeptId.HasValue)
+        {
+            var allowedIds = spaceLinxContext.PurchaseOrders
+                .Where(x => x.DepartmentId == scopedDeptId && x.DeletedBy == null)
+                .Select(x => x.Id);
+            query = query.Where(x => allowedIds.Contains(x.Id));
+        }
+
+        var result = await query.ToListAsync();
         return Ok(result);
     }
 
@@ -137,10 +203,19 @@ public class PurchaseOrderController(
                     TermsAndConditions = purchaseOrderDetails.TermsAndConditions,
                     ApprovedBy = purchaseOrderDetails.ApprovedBy,
                     ApprovedDate = purchaseOrderDetails.ApprovedDate,
+                    DepartmentId = purchaseOrderDetails.DepartmentId,
                     IsActive = true,
                     CreatedBy = UserEmail,
                     CreatedAt = DateTime.UtcNow
                 };
+
+                if (purchaseOrder.DepartmentId == null && purchaseOrderDetails.BuyerId.HasValue)
+                {
+                    purchaseOrder.DepartmentId = await spaceLinxContext.Users
+                        .Where(u => u.Id == purchaseOrderDetails.BuyerId && u.DeletedBy == null)
+                        .Select(u => u.DepartmentId)
+                        .FirstOrDefaultAsync();
+                }
 
                 spaceLinxContext.PurchaseOrders.Add(purchaseOrder);
                 await spaceLinxContext.SaveChangesAsync();

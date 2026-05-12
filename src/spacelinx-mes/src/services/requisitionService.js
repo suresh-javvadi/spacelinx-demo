@@ -2,8 +2,9 @@ import api from "./api";
 
 const apiUrl = "Requisition";
 
-export const fetchRequisitions = async () => {
-  const response = await api.get(`${apiUrl}/requisition`);
+export const fetchRequisitions = async ({ allDepartments = false } = {}) => {
+  const params = allDepartments ? { allDepartments: true } : undefined;
+  const response = await api.get(`${apiUrl}/requisition`, { params });
   return response.data;
 };
 

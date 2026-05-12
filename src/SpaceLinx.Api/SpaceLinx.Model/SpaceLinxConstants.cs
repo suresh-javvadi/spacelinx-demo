@@ -131,10 +131,10 @@ public class SpaceLinxConstants
                 { x => x.Program, x => x.ProjectManager}
             },
             { typeof(PurchaseOrder), new Expression<Func<PurchaseOrder, object>>[]
-                { x => x.BillingAddress, x => x.Buyer, x => x.Currency, x => x.DeliveryAddress, x => x.PaymentTerm, x => x.Project, x => x.Requisition, x => x.ShippingAddress, x => x.SupplyChainLead, x => x.Company, x => x.VendorBillingAddress, x => x.VendorBillingContact}
+                { x => x.BillingAddress, x => x.Buyer, x => x.Currency, x => x.DeliveryAddress, x => x.PaymentTerm, x => x.Project, x => x.Requisition, x => x.ShippingAddress, x => x.SupplyChainLead, x => x.Company, x => x.VendorBillingAddress, x => x.VendorBillingContact, x => x.Department! }
             },
             { typeof(Requisition), new Expression<Func<Requisition, object>>[]
-                { x => x.RequestedBy, x => x.Project}
+                { x => x.RequestedBy, x => x.Project!, x => x.Department! }
             },
             { typeof(RequisitionLineItem), new Expression<Func<RequisitionLineItem, object>>[]
                 { x => x.Part, x => x.Requisition}
@@ -194,7 +194,10 @@ public class SpaceLinxConstants
                 { x => x.ToolType }
             },
             { typeof(User), new Expression<Func<User, object>>[]
-                { x => x.UserRoles }
+                { x => x.UserRoles, x => x.DepartmentRef! }
+            },
+            { typeof(Department), new Expression<Func<Department, object>>[]
+                { x => x.ParentDepartment!, x => x.HeadOfDepartmentUser! }
             },
             { typeof(UserRole), new Expression<Func<UserRole, object>>[]
                 { x => x.Role , x => x.User }

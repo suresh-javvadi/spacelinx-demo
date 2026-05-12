@@ -1,4 +1,13 @@
-import { Button, FormControlLabel, TextField, Checkbox } from "@mui/material";
+import {
+  Button,
+  FormControlLabel,
+  TextField,
+  Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
 import { useState, useEffect, useContext } from "react";
 import { AlertsContext } from "../../AlertsContext/Context";
@@ -9,6 +18,7 @@ import {
   updateactivate,
   updatedeactivate,
 } from "../../../services/userService";
+import { fetchDepartmentLookup } from "../../../services/departmentService";
 import { useUserContext } from "../../userContext/UserContext";
 import "../../materialKits/Kits.css";
 
@@ -19,7 +29,9 @@ const EditUser = ({ handleCloseClick, selectedUserData, fetchUsersData }) => {
     lastName: "",
     email: "",
     status: "",
+    departmentId: "",
   });
+  const [departmentOptions, setDepartmentOptions] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [allFetchedRoles, setAllFetchedRoles] = useState([]);
   const [roleOptions, setRoleOptions] = useState([]);
@@ -41,9 +53,21 @@ const EditUser = ({ handleCloseClick, selectedUserData, fetchUsersData }) => {
       lastName: selectedUserData.lastName,
       email: selectedUserData.email,
       status: selectedUserData.isActive ? "Active" : "Inactive",
+      departmentId: selectedUserData.departmentId ?? "",
     });
     setSelectedRoles(selectedUserData.roles.map((role) => role.id));
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchDepartmentLookup();
+        setDepartmentOptions(data ?? []);
+      } catch (err) {
+        console.error("Failed to load departments", err);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     const fetchRolesData = async () => {
@@ -158,6 +182,7 @@ const EditUser = ({ handleCloseClick, selectedUserData, fetchUsersData }) => {
         firstName: formValues.firstName,
         lastName: formValues.lastName,
         email: formValues.email,
+        departmentId: formValues.departmentId || null,
         roles: updatedRoles,
         isActive: formValues.status === "Active",
       };
@@ -240,6 +265,30 @@ const EditUser = ({ handleCloseClick, selectedUserData, fetchUsersData }) => {
           />
 
           <TextField label="Email" value={formValues.email} disabled />
+
+          <FormControl fullWidth disabled={readOnlyMode}>
+            <InputLabel>Department</InputLabel>
+            <Select
+              label="Department"
+              value={formValues.departmentId}
+              onChange={(e) =>
+                setFormValues({
+                  ...formValues,
+                  departmentId: e.target.value,
+                })
+              }
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {departmentOptions.map((d) => (
+                <MenuItem key={d.id} value={d.id}>
+                  {d.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <div className="roles-container">
             <h4>Roles:</h4>
 

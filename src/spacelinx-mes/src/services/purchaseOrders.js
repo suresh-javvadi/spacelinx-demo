@@ -2,8 +2,9 @@ import api from "./api";
 
 const apiUrl = "PurchaseOrder";
 
-export const fetchPurchaseOrders = async () => {
-  const response = await api.get(`${apiUrl}/purchase-order`);
+export const fetchPurchaseOrders = async ({ allDepartments = false } = {}) => {
+  const params = allDepartments ? { allDepartments: true } : undefined;
+  const response = await api.get(`${apiUrl}/purchase-order`, { params });
   return response.data;
 };
 export const fetchPurchaseOrderwithId = async (id) => {

@@ -33,7 +33,8 @@
     rejected_date TIMESTAMPTZ,
 	discount DECIMAL(18,2),
 	discount_type VARCHAR(50),  -- Percentage, Amount
-	is_active BOOLEAN NOT NULL DEFAULT TRUE,	
+	department_id UUID,
+	is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(255) NOT NULL,
     updated_at TIMESTAMPTZ,
@@ -52,5 +53,6 @@
 	FOREIGN KEY(shipping_address_id) REFERENCES common.address(id) ON DELETE SET NULL,
 	FOREIGN KEY(vendor_billing_address_id) REFERENCES common.address(id) ON DELETE SET NULL,
 	FOREIGN KEY (vendor_billing_contact_id) REFERENCES common.contact(id) ON DELETE SET NULL,
-	FOREIGN KEY(quotation_reference_id) REFERENCES common.document(id) ON DELETE SET NULL
+	FOREIGN KEY(quotation_reference_id) REFERENCES common.document(id) ON DELETE SET NULL,
+	FOREIGN KEY(department_id) REFERENCES common.department(id) ON DELETE SET NULL
 );

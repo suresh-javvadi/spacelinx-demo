@@ -20,13 +20,69 @@ public class RequisitionController(
     IPurchaseOrderService purchaseOrderService) :
     GenericRestController<Requisition, RequisitionWriteModel, RequisitionUpdateModel, RequisitionReadModel, RequisitionRefModel>(spaceLinxContext, mapper, httpContextAccessor)
 {
+    [HttpGet]
+    public override async Task<List<RequisitionReadModel>> Get()
+    {
+        var departmentId = HttpContext.Request.Query.TryGetValue("departmentId", out var depIdRaw)
+            && Guid.TryParse(depIdRaw, out var parsed) ? parsed : (Guid?)null;
+        var allDepartments = HttpContext.Request.Query.TryGetValue("allDepartments", out var allRaw)
+            && bool.TryParse(allRaw, out var parsedAll) && parsedAll;
+
+        Guid? scopedDeptId = departmentId;
+        if (scopedDeptId == null && !allDepartments)
+        {
+            scopedDeptId = await spaceLinxContext.Users
+                .AsNoTracking()
+                .Where(u => u.Email == UserEmail && u.DeletedBy == null)
+                .Select(u => u.DepartmentId)
+                .FirstOrDefaultAsync();
+        }
+
+        var query = spaceLinxContext.Requisitions
+            .AsNoTracking()
+            .Include(x => x.RequestedBy)
+            .Include(x => x.Project)
+            .Include(x => x.Department)
+            .Where(x => x.DeletedBy == null);
+
+        if (scopedDeptId.HasValue)
+        {
+            query = query.Where(x => x.DepartmentId == scopedDeptId);
+        }
+
+        var records = await query.ToListAsync();
+        return mapper.Map<List<RequisitionReadModel>>(records);
+    }
+
     [HttpGet("requisition")]
     public async Task<IActionResult> GetRequisition()
     {
-        var result = await spaceLinxContext.RequisitionsWithUserVws
-            .AsNoTracking()
-            .ToListAsync();
+        var departmentId = HttpContext.Request.Query.TryGetValue("departmentId", out var depIdRaw)
+            && Guid.TryParse(depIdRaw, out var parsed) ? parsed : (Guid?)null;
+        var allDepartments = HttpContext.Request.Query.TryGetValue("allDepartments", out var allRaw)
+            && bool.TryParse(allRaw, out var parsedAll) && parsedAll;
 
+        Guid? scopedDeptId = departmentId;
+        if (scopedDeptId == null && !allDepartments)
+        {
+            scopedDeptId = await spaceLinxContext.Users
+                .AsNoTracking()
+                .Where(u => u.Email == UserEmail && u.DeletedBy == null)
+                .Select(u => u.DepartmentId)
+                .FirstOrDefaultAsync();
+        }
+
+        var query = spaceLinxContext.RequisitionsWithUserVws.AsNoTracking();
+
+        if (scopedDeptId.HasValue)
+        {
+            var allowedIds = spaceLinxContext.Requisitions
+                .Where(x => x.DepartmentId == scopedDeptId && x.DeletedBy == null)
+                .Select(x => x.Id);
+            query = query.Where(x => allowedIds.Contains(x.Id));
+        }
+
+        var result = await query.ToListAsync();
         return Ok(result);
     }
 
@@ -82,10 +138,19 @@ public class RequisitionController(
                 Justification = requisitionCreateWithLineItems.Justification,
                 Priority = requisitionCreateWithLineItems.Priority,
                 TotalEstimatedAmount = requisitionCreateWithLineItems.TotalEstimatedAmount,
+                DepartmentId = requisitionCreateWithLineItems.DepartmentId,
                 IsActive = true,
                 CreatedBy = UserEmail,
                 CreatedAt = DateTime.UtcNow
             };
+
+            if (requisition.DepartmentId == null)
+            {
+                requisition.DepartmentId = await spaceLinxContext.Users
+                    .Where(u => u.Id == requisitionCreateWithLineItems.RequestedById && u.DeletedBy == null)
+                    .Select(u => u.DepartmentId)
+                    .FirstOrDefaultAsync();
+            }
 
             spaceLinxContext.Requisitions.Add(requisition);
             await spaceLinxContext.SaveChangesAsync();

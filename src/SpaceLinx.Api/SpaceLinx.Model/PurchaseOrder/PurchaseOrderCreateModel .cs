@@ -39,6 +39,7 @@ public partial class PurchaseOrderCreateModel
     public DateTime? ApprovedDate { get; set; }
     public string? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
+    public Guid? DepartmentId { get; set; }
     public List<PoLineItemCreateModel>? PoLineItems { get; set; }
     public List<DocumentCreateModel>? DocumentFiles { get; set; }
 }

@@ -8,6 +8,7 @@ import {
   fetchPurchaseOrders,
   fetchZohoCsvByIds,
 } from "../../../services/purchaseOrders";
+import { fetchDepartmentLookup } from "../../../services/departmentService";
 import "../../Procurement/procurement.css";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../userContext/UserContext";
@@ -21,6 +22,7 @@ const PurchaseOrders = () => {
   const { hasPermission } = useUserContext();
   const navigateTo = useNavigate();
   const [purchaseOrders, setPurchaseOrders] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [rowSelectionModel, setRowSelectionModel] = useState({
@@ -114,6 +116,13 @@ const PurchaseOrders = () => {
       flex: 1,
       type: "singleSelect",
       valueOptions: ["Draft", "Submitted", "Issued", "Delivered", "Pending", "Cancelled"],
+    },
+    {
+      field: "departmentName",
+      headerName: "Department",
+      flex: 1,
+      type: "singleSelect",
+      valueOptions: departments.map((d) => d.name),
     },
     // {
     //   field: "deliveryStatus",
@@ -221,13 +230,30 @@ const PurchaseOrders = () => {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const purchaseOrdersData = await fetchPurchaseOrders();
+      const allDepartments = hasPermission(
+        PERMISSIONS.PURCHASEORDERS.VIEW_ALL_DEPARTMENTS,
+      );
+      const [purchaseOrdersData, departmentsData] = await Promise.all([
+        fetchPurchaseOrders({ allDepartments }),
+        fetchDepartmentLookup().catch(() => []),
+      ]);
+
+      const deptMap = new Map(
+        (departmentsData ?? []).map((d) => [d.id, d.name]),
+      );
+      setDepartments(departmentsData ?? []);
 
       if (purchaseOrdersData) {
         purchaseOrdersData.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         );
-        setPurchaseOrders(purchaseOrdersData);
+        const enriched = purchaseOrdersData.map((row) => ({
+          ...row,
+          departmentName: row.departmentId
+            ? (deptMap.get(row.departmentId) ?? "")
+            : "",
+        }));
+        setPurchaseOrders(enriched);
       }
     } catch (error) {
       Alert("Error fetching Purchase Orders data", "error");
@@ -235,7 +261,7 @@ const PurchaseOrders = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [hasPermission]);
   useEffect(() => {
     fetchData();
   }, []);

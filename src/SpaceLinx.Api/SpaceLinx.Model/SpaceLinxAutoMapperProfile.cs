@@ -126,7 +126,9 @@ public class SpaceLinxAutoMapperProfile : Profile
         CreateMap<CustomerUpdateModel, Customer>();
 
         //Department
-        CreateMap<Department, DepartmentReadModel>();
+        CreateMap<Department, DepartmentReadModel>()
+            .ForMember(d => d.ParentDepartment, opt => opt.MapFrom(s => s.ParentDepartment))
+            .ForMember(d => d.HeadOfDepartmentUser, opt => opt.MapFrom(s => s.HeadOfDepartmentUser));
         CreateMap<Department, DepartmentRefModel>();
         CreateMap<DepartmentWriteModel, Department>();
         CreateMap<DepartmentUpdateModel, Department>();

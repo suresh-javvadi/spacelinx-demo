@@ -6,9 +6,14 @@ import {
   FormGroup,
   FormControlLabel,
   FormHelperText,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { fetchRoles } from "../../../services/roleService";
 import { createUser } from "../../../services/userService";
+import { fetchDepartmentLookup } from "../../../services/departmentService";
 import { AlertsContext } from "../../AlertsContext/Context";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
 import Cliploader from "../../../Components/Loaders/Cliploader";
@@ -27,10 +32,12 @@ const NewUser = ({
     firstName: "",
     lastName: "",
     email: "",
+    departmentId: "",
   });
   const [loadingData, setLoadingData] = useState(true);
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [roleOptions, setRoleOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
   const [formErrors, setFormErrors] = useState({
     firstName: "",
     lastName: "",
@@ -79,6 +86,17 @@ const NewUser = ({
     fetchRolesData();
   }, [selectedRoleId]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchDepartmentLookup();
+        setDepartmentOptions(data ?? []);
+      } catch (err) {
+        console.error("Failed to load departments", err);
+      }
+    })();
+  }, []);
+
   const validateCreateUserFields = () => {
     let valid = true;
     const errors = {
@@ -125,6 +143,7 @@ const NewUser = ({
       firstName: capitalizeFirstLetter(formValues.firstName),
       lastName: capitalizeFirstLetter(formValues.lastName),
       email: formValues.email,
+      departmentId: formValues.departmentId || null,
       roles: selectedRoles.map((role) => ({
         id: role.id,
         roleName: role.roleName,
@@ -138,6 +157,7 @@ const NewUser = ({
         firstName: "",
         lastName: "",
         email: "",
+        departmentId: "",
       });
       setFormErrors({
         firstName: "",
@@ -251,6 +271,31 @@ const NewUser = ({
               <FormHelperText error={!!formErrors.email}>
                 {formErrors.email}
               </FormHelperText>
+            </FormGroup>
+
+            <FormGroup>
+              <FormControl fullWidth>
+                <InputLabel>Department</InputLabel>
+                <Select
+                  label="Department"
+                  value={formValues.departmentId}
+                  onChange={(e) =>
+                    setFormValues({
+                      ...formValues,
+                      departmentId: e.target.value,
+                    })
+                  }
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {departmentOptions.map((d) => (
+                    <MenuItem key={d.id} value={d.id}>
+                      {d.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </FormGroup>
 
             <div className="roles-container">

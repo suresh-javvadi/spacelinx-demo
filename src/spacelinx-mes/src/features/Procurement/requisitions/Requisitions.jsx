@@ -19,6 +19,7 @@ import { useUserContext } from "../../userContext/UserContext";
 import { PERMISSIONS } from "../../../constants/PagePermissions";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import { fetchUserLookup } from "../../../services/userService";
+import { fetchDepartmentLookup } from "../../../services/departmentService";
 import { useDeepLink } from "../../../DeepLinkContext";
 import { useNavigate } from "react-router-dom";
 
@@ -33,6 +34,7 @@ const Requisitions = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [projectsData, setProjectsData] = useState([]);
   const [userData, setUserData] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     if (deepLinkInfo && deepLinkInfo.basePath === "/procurement/requisitions") {
@@ -98,11 +100,27 @@ const Requisitions = () => {
   const fetchData = async () => {
     setLoadingData(true);
     try {
-      const data = await fetchRequisitions();
+      const allDepartments = hasPermission(
+        PERMISSIONS.REQUISITIONS.VIEW_ALL_DEPARTMENTS,
+      );
+      const [data, departmentsData] = await Promise.all([
+        fetchRequisitions({ allDepartments }),
+        fetchDepartmentLookup().catch(() => []),
+      ]);
+      const deptMap = new Map(
+        (departmentsData ?? []).map((d) => [d.id, d.name]),
+      );
+      setDepartments(departmentsData ?? []);
       const sortedData = data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
-      setRequisitionData(sortedData);
+      const enriched = sortedData.map((row) => ({
+        ...row,
+        departmentName: row.departmentId
+          ? (deptMap.get(row.departmentId) ?? "")
+          : "",
+      }));
+      setRequisitionData(enriched);
     } catch (error) {
       console.error("Error fetching requisitions:", error);
       Alert("Failed to fetch requisitions", "error");
@@ -148,6 +166,13 @@ const Requisitions = () => {
       flex: 1,
       type: "singleSelect",
       valueOptions: ["Draft", "Submitted", "Approved", "Rejected", "PoCreated"],
+    },
+    {
+      field: "departmentName",
+      headerName: "Department",
+      flex: 1,
+      type: "singleSelect",
+      valueOptions: departments.map((d) => d.name),
     },
     {
       field: "managerFullName",

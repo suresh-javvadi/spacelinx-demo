@@ -28,6 +28,9 @@ const PartTypes = lazy(
 const Tools = lazy(() => import("../../features/admin/tools/Tools"));
 const Machines = lazy(() => import("../../features/admin/machines/Machines"));
 const Users = lazy(() => import("../../features/adminuser/Users/User"));
+const Departments = lazy(
+  () => import("../../features/adminuser/Departments/Departments"),
+);
 const News = lazy(() => import("../../features/admin/news/News"));
 const Locations = lazy(
   () => import("../../features/admin/locations/Locations"),
@@ -617,6 +620,13 @@ const Content = ({ status }) => {
           <Route
             path="/administration/users"
             element={renderProtectedComponent(PERMISSIONS.USERS.VIEW, Users)}
+          />
+          <Route
+            path="/administration/departments"
+            element={renderProtectedComponent(
+              PERMISSIONS.DEPARTMENTS.VIEW,
+              Departments,
+            )}
           />
           <Route
             path="/administration/features"

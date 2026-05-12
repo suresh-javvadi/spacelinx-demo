@@ -39,6 +39,8 @@ public partial class PurchaseOrderReadModel : BaseReadModel
     public DateTime? ApprovedDate { get; set; }
     public string? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
+    public Guid? DepartmentId { get; set; }
+    public virtual DepartmentRefModel? Department { get; set; }
     public virtual AddressRefModel BillingAddress { get; set; } = null!;
     public virtual UserRefModel? Buyer { get; set; }
     public virtual CurrencyRefModel? Currency { get; set; }

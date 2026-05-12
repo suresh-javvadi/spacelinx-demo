@@ -10,6 +10,9 @@ public partial class User : BaseModel
     public string? ImageUrl { get; set; }
     public string? Department { get; set; }
     public string? JobTitle { get; set; }
+    public Guid? DepartmentId { get; set; }
+    public virtual Department? DepartmentRef { get; set; }
+    public virtual ICollection<Department> HeadedDepartments { get; set; } = new List<Department>();
     public virtual ICollection<ApprovalNotificationRecipient> ApprovalNotificationRecipients { get; set; } = new List<ApprovalNotificationRecipient>();
     public virtual ICollection<Approval> Approvals { get; set; } = new List<Approval>();
     public virtual ICollection<GoodsReceiptNote> GoodsReceiptNotes { get; set; } = new List<GoodsReceiptNote>();

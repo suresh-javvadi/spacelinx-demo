@@ -17,6 +17,8 @@ public partial class RequisitionReadModel : BaseReadModel
     public string? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
     public string? ApproverComment { get; set; }
+    public Guid? DepartmentId { get; set; }
+    public virtual DepartmentRefModel? Department { get; set; }
     public virtual ProjectRefModel? Project { get; set; }
     public virtual UserRefModel RequestedBy { get; set; } = null!;
 }

@@ -39,6 +39,8 @@ public partial class PurchaseOrder : BaseModel
     public DateTime? ApprovedDate { get; set; }
     public string? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
+    public Guid? DepartmentId { get; set; }
+    public virtual Department? Department { get; set; }
     public virtual Address BillingAddress { get; set; } = null!;
     public virtual User? Buyer { get; set; }
     public virtual Currency? Currency { get; set; }

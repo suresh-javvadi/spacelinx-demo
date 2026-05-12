@@ -17,6 +17,8 @@ public partial class Requisition : BaseModel
     public string? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
     public string? ApproverComment { get; set; }
+    public Guid? DepartmentId { get; set; }
+    public virtual Department? Department { get; set; }
     public virtual Project? Project { get; set; }
     public virtual ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
     public virtual User RequestedBy { get; set; } = null!;

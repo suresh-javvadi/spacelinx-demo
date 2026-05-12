@@ -15,6 +15,7 @@
     rejected_by VARCHAR(255),
     rejected_date TIMESTAMPTZ,
     approver_comment TEXT,
+    department_id UUID,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(255) NOT NULL,
@@ -23,5 +24,6 @@
     deleted_at TIMESTAMPTZ,
     deleted_by VARCHAR(255),
     FOREIGN KEY(requested_by_id) REFERENCES application."user"(id) ON DELETE SET NULL,
-    FOREIGN KEY(project_id) REFERENCES pm.project(id) ON DELETE SET NULL
+    FOREIGN KEY(project_id) REFERENCES pm.project(id) ON DELETE SET NULL,
+    FOREIGN KEY(department_id) REFERENCES common.department(id) ON DELETE SET NULL
 );

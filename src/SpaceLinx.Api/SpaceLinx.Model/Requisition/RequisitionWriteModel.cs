@@ -15,4 +15,5 @@ public partial class RequisitionWriteModel : BaseWriteModel
     public string? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
     public string? ApproverComment { get; set; }
+    public Guid? DepartmentId { get; set; }
 }
