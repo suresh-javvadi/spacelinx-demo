@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model;
+namespace SpaceLinx.Model;
 
 public partial class RequisitionAlterModel
 {
@@ -15,6 +15,7 @@ public partial class RequisitionAlterModel
     public string? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
     public string? ApproverComment { get; set; }
+    public Guid? DepartmentId { get; set; }
     public List<RequisitionLineItemAlterModel>? LineItems { get; set; }
     public List<ApprovalWriteModel>? Approvals { get; set; }
 }

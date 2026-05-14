@@ -215,6 +215,16 @@ public class RequisitionController(
             requisitionRecord.RejectedBy = requisitionDetails.RejectedBy;
             requisitionRecord.RejectedDate = requisitionDetails.RejectedDate;
             requisitionRecord.ApproverComment = requisitionDetails.ApproverComment;
+            requisitionRecord.DepartmentId = requisitionDetails.DepartmentId;
+
+            if (requisitionRecord.DepartmentId == null)
+            {
+                requisitionRecord.DepartmentId = await spaceLinxContext.Users
+                    .Where(u => u.Id == requisitionDetails.RequestedById && u.DeletedBy == null)
+                    .Select(u => u.DepartmentId)
+                    .FirstOrDefaultAsync();
+            }
+
             requisitionRecord.UpdatedBy = UserEmail;
             requisitionRecord.UpdatedAt = DateTime.UtcNow;
             requisitionRecord.IsActive = true;

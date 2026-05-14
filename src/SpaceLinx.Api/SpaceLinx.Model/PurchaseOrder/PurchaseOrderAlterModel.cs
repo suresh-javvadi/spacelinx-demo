@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model;
+namespace SpaceLinx.Model;
 
 public partial class PurchaseOrderAlterModel
 {
@@ -37,6 +37,7 @@ public partial class PurchaseOrderAlterModel
     public DateTime? ApprovedDate { get; set; }
     public string? RejectedBy { get; set; }
     public DateTime? RejectedDate { get; set; }
+    public Guid? DepartmentId { get; set; }
     public List<PoLineItemAlterModel>? PoLineItems { get; set; }
     public List<ApprovalWriteModel>? Approvals { get; set; }
 }
