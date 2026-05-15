@@ -91,7 +91,7 @@ const Documents = ({
     } catch (error) {
       Alert(
         "Failed to fetch accepted document types. Please try again.",
-        "error"
+        "error",
       );
       console.error("Error fetching accepted document types:", error);
     } finally {
@@ -104,7 +104,7 @@ const Documents = ({
     try {
       const data = await fetchDocumentsByEntityIdWithUsers(entityId);
       const sortedData = data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
       setExistingDocuments(sortedData);
     } catch (error) {
@@ -178,7 +178,7 @@ const Documents = ({
   const handleDeleteDocument = async (id) => {
     const isConfirmed = await showConfirmation(
       "Are you sure?",
-      "You won't be able to undo this!"
+      "You won't be able to undo this!",
     );
 
     if (isConfirmed) {
@@ -334,13 +334,13 @@ const Documents = ({
 
     if (
       [".docx", ".doc", ".xls", ".xlsx", ".ppt", ".pptx"].includes(
-        previewDoc.fileExtension
+        previewDoc.fileExtension,
       )
     ) {
       return (
         <iframe
           src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-            previewDoc.filePath
+            previewDoc.filePath,
           )}`}
           className="DocumentPreview"
           title="Document Preview"
@@ -363,7 +363,7 @@ const Documents = ({
       return (
         <iframe
           src={`https://docs.google.com/gview?url=${encodeURIComponent(
-            previewDoc.filePath
+            previewDoc.filePath,
           )}&embedded=true`}
           className="DocumentPreview"
           title="Document Preview"
@@ -407,7 +407,7 @@ const Documents = ({
                     e.preventDefault();
                     Alert(
                       `Only ${entityType} in Draft status can be modified`,
-                      "warning"
+                      "warning",
                     );
                     return;
                   }
@@ -415,7 +415,7 @@ const Documents = ({
                     e.preventDefault();
                     Alert(
                       `You do not have permission to modify ${entityType} documents`,
-                      "warning"
+                      "warning",
                     );
                     return;
                   }
@@ -537,7 +537,7 @@ const Documents = ({
                   onClick={() => {
                     handleDocDownload(
                       selectedDoc?.filePath,
-                      selectedDoc?.fileName
+                      selectedDoc?.fileName,
                     );
                     handleMenuClose();
                   }}

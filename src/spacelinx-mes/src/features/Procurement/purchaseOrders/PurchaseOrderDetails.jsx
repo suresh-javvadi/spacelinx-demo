@@ -1722,7 +1722,6 @@ const PurchaseOrderDetails = () => {
                 canEdit={hasPermission(
                   PERMISSIONS.PURCHASEORDERS.DOCUMENTS.MODIFY,
                 )}
-                isDraft={editPoData?.status === "Draft"}
                 tittle="Line Items Documents"
               />
             </div>
