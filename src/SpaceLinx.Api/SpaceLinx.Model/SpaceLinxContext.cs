@@ -5087,6 +5087,9 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.PoNumber)
                 .HasMaxLength(255)
                 .HasColumnName("po_number");
+            entity.Property(e => e.PoStatus)
+                .HasMaxLength(255)
+                .HasColumnName("po_status");
             entity.Property(e => e.Priority)
                 .HasMaxLength(255)
                 .HasColumnName("priority");

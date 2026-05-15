@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model
+namespace SpaceLinx.Model
 {
     public partial class RequisitionsWithUserVw
     {
@@ -25,5 +25,6 @@
         public string? UserEmail { get; set; }
         public Guid? PoId { get; set; }
         public string? PoNumber { get; set; }
+        public string? PoStatus { get; set; }
     }
 }

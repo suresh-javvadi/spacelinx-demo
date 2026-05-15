@@ -1,3 +1,15 @@
+-- Migration: Add PO status to requisitions_with_user_vw and fix fan-out join
+-- Work Item: 2406
+-- Date: 2026-05-15
+-- Description:
+--   Recreates sc.requisitions_with_user_vw to:
+--   1. Add po_status column (linked Purchase Order status)
+--   2. Replace plain LEFT JOIN with LEFT JOIN LATERAL to pick exactly one
+--      canonical PO per requisition (most recently created, excluding
+--      Cancelled/Rejected), preventing duplicate rows when multiple POs exist.
+--
+-- This is idempotent — CREATE OR REPLACE VIEW is safe to re-run.
+
 CREATE OR REPLACE VIEW sc.requisitions_with_user_vw AS
 SELECT
     r.id,
@@ -17,9 +29,9 @@ SELECT
     r.approved_date,
     r.rejected_by,
     r.rejected_date,
-    r.approver_comment,    
+    r.approver_comment,
     rb.id AS user_id,
-    rb.first_name || ' ' || COALESCE(rb.last_name, '') AS user_full_name,  
+    rb.first_name || ' ' || COALESCE(rb.last_name, '') AS user_full_name,
     rb.email AS user_email,
     po.id AS po_id,
     po.number AS po_number,
