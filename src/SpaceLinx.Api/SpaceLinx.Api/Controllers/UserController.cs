@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +49,7 @@ public class UserController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
     public async Task<IActionResult> GetUsersByAppName()
     {
         var users = await spaceLinxContext.Users.AsNoTracking()
+                           .Include(x => x.DepartmentRef)
                            .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName))
                            .ThenInclude(x => x.Role)
                            .Where(x => x.DeletedBy == null && x.UserRoles.Any(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))

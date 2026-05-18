@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model
+namespace SpaceLinx.Model
 {
     public partial class UserDetailReadModel : BaseReadModel
     {
@@ -7,6 +7,8 @@
         public string? LastName { get; set; }
         public string Email { get; set; } = null!;
         public string? Phone { get; set; }
+        public Guid? DepartmentId { get; set; }
+        public DepartmentRefModel? DepartmentRef { get; set; }
         public virtual ICollection<RoleRefModel> Roles { get; set; } = new List<RoleRefModel>();
     }
 }
