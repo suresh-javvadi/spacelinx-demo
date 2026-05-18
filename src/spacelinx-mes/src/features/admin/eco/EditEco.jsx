@@ -845,42 +845,70 @@ const EditEco = ({
     }));
   }, [approversFromHistory]);
 
-  const handleSelectedPartsChange = (value) => {
-    setSelectedParts((prevSelected) => {
-      const newParts = value.map((part) => {
-        const existing = prevSelected.find((p) => p.partId === part.id);
-        const currentStatus = part.status?.toLowerCase();
-        let newStatus = "";
-        if (currentStatus === "draft" || currentStatus === "Draft") {
-          newStatus = "Release";
-        } else if (currentStatus === "release" || currentStatus === "Release") {
-          newStatus = "Obsolete";
+  const handleSelectedPartsChange = async (value) => {
+    const updatedParts = [];
+
+    for (const part of value) {
+      const existing = selectedParts.find((p) => p.partId === part.id);
+
+      const currentStatus = part.status?.toLowerCase();
+      let newStatus = "";
+
+      // Draft -> Release
+      if (currentStatus === "draft") {
+        newStatus = "Release";
+      }
+
+      // Release -> Obsolete
+      else if (currentStatus === "release") {
+        // Prevent confirmation popup again
+        const alreadyConfirmed = selectedParts.find(
+          (p) => p.partId === part.id && p.newStatus === "Obsolete",
+        );
+
+        if (!alreadyConfirmed) {
+          const confirmed = await showConfirmation(
+            "Mark as Obsolete?",
+            "This part will move from Released to Obsolete. This cannot be undone.",
+            "Obsolete it",
+          );
+
+          // Skip part if cancelled
+          if (!confirmed) {
+            continue;
+          }
         }
 
-        return {
-          id: part.id,
-          partId: part.id,
-          newPart: true,
-          ecoId: part.ecoId,
-          effectiveDate: part.effectiveDate,
-          newVersion: part.newVersion,
-          previousStatus: part.status,
-          description: existing?.description || "",
-          newStatus: newStatus,
-          partDetails: {
-            name: part.name,
-            partNumber: part.partNumber,
-            partNumberSuffix: part.partNumberSuffix,
-            version: part.version,
-            status: part.status,
-          },
-        };
+        newStatus = "Obsolete";
+      }
+
+      updatedParts.push({
+        id: part.id,
+        partId: part.id,
+        newPart: true,
+        ecoId: part.ecoId,
+        effectiveDate: part.effectiveDate,
+        newVersion: part.newVersion,
+        previousStatus: part.status,
+        description: existing?.description || "",
+        newStatus: newStatus,
+        partDetails: {
+          name: part.name,
+          partNumber: part.partNumber,
+          partNumberSuffix: part.partNumberSuffix,
+          version: part.version,
+          status: part.status,
+        },
       });
+    }
 
-      return newParts.reverse();
-    });
+    setSelectedParts(updatedParts.reverse());
+
+    // Optional: keep autocomplete synced
+    setAutocompleteValue(
+      value.filter((part) => updatedParts.some((p) => p.partId === part.id)),
+    );
   };
-
   const handleSubmitECO = async () => {
     if (!canModify) {
       Alert("You don't have permission to submit an ECO.", "warning");
@@ -1615,7 +1643,6 @@ const EditEco = ({
                   }
                   value={autocompleteValue}
                   onChange={(e, value) => {
-                    setAutocompleteValue(value);
                     handleSelectedPartsChange(value);
                   }}
                   renderTags={() => null}
