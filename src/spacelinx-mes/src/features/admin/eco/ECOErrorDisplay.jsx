@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { usePartDetailsDrawer } from "../parts/PartDetailsContext";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -8,6 +8,8 @@ import { FlyoutAlerts } from "../../AlertsContext/Alerts";
 import { createEcoPart } from "../../../services/ecoPartService";
 import { createDocumentWithEntity } from "../../../services/documentsService";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
+import UploadDialog from "../../../Components/Documents/UploadDialog";
+import { fetchOptionSetByName } from "../../../services/optionSetService";
 
 const ECOErrorDisplay = ({
   handleCloseClick,
@@ -19,8 +21,11 @@ const ECOErrorDisplay = ({
   const { Alert } = useContext(AlertsContext);
   const [addedParts, setAddedParts] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
-  const fileInputRef = useRef(null);
   const [currentPartToUpload, setCurrentPartToUpload] = useState(null);
+  const currentPartRef = useRef(null);
+  const [dialogUploadOpen, setDialogUploadOpen] = useState(false);
+  const [acceptedDocTypes, setAcceptedDocTypes] = useState([]);
+  const [acceptedDocTypesLoading, setAcceptedDocTypesLoading] = useState(true);
 
   const [localMissingDocs, setLocalMissingDocs] = useState(
     Array.from(
@@ -28,10 +33,32 @@ const ECOErrorDisplay = ({
         [
           ...(errorData?.partsWithNoDocuments || []),
           ...(errorData?.bomPartsWithNoDocuments || []),
-        ].map((item) => [item.id, item])
-      ).values()
-    )
+        ].map((item) => [item.id, item]),
+      ).values(),
+    ),
   );
+
+  useEffect(() => {
+    fetchAcceptedDocTypes();
+  }, []);
+
+  const fetchAcceptedDocTypes = async () => {
+    setAcceptedDocTypesLoading(true);
+    try {
+      const data = await fetchOptionSetByName("accepted_doc_types");
+      const parsedData = data?.values ? JSON.parse(data.values) : [];
+      const types = parsedData.map((item) => item.type);
+      setAcceptedDocTypes(types);
+    } catch (error) {
+      Alert(
+        "Failed to fetch accepted document types. Please try again.",
+        "error",
+      );
+      console.error("Error fetching accepted document types:", error);
+    } finally {
+      setAcceptedDocTypesLoading(false);
+    }
+  };
 
   const addPartToECO = async (id) => {
     setLoadingData(true);
@@ -54,57 +81,91 @@ const ECOErrorDisplay = ({
     }
   };
 
-  const handleFileChange = async (event) => {
-    const files = Array.from(event.target.files);
-    if (files.length === 0 || !currentPartToUpload) {
-      return;
-    }
+  const handleUploadDocuments = async ({
+    files = [],
+    url = null,
+    documentType = "",
+    fileName = "",
+  }) => {
+    const part = currentPartRef.current;
+    if (!part) throw new Error("No part selected for upload");
 
-    setLoadingData(true);
     const formData = new FormData();
 
-    files.forEach((file, index) => {
-      formData.append(`documentFiles[${index}].documentFile`, file);
-      formData.append(
-        `documentFiles[${index}].entityId`,
-        currentPartToUpload.id
-      );
+    const appendCommonFields = (index) => {
+      formData.append(`documentFiles[${index}].entityId`, part.id);
       formData.append(`documentFiles[${index}].entityType`, "Part");
-      formData.append(`documentFiles[${index}].documentType`, file.type);
+      formData.append(`documentFiles[${index}].documentType`, documentType);
+    };
+
+    if (url) {
+      appendCommonFields(0);
+      formData.append(`documentFiles[0].externalUrl`, url);
+      formData.append(`documentFiles[0].fileName`, fileName);
+      return await createDocumentWithEntity(formData);
+    }
+
+    if (!files || files.length === 0) return;
+
+    files.forEach((file, index) => {
+      appendCommonFields(index);
+      formData.append(`documentFiles[${index}].documentFile`, file);
     });
 
+    return await createDocumentWithEntity(formData);
+  };
+
+  const markPartAsUploaded = () => {
+    const part = currentPartRef.current;
+    if (!part) return;
+    setLocalMissingDocs((prevDocs) =>
+      prevDocs.map((p) => (p.id === part.id ? { ...p, isUploaded: true } : p)),
+    );
+  };
+
+  const handleInstantUpload = async (files, documentType) => {
+    setLoadingData(true);
     try {
-      await createDocumentWithEntity(formData);
-      const partNumber = currentPartToUpload.partNumber;
+      await handleUploadDocuments({ files, documentType });
+      const partNumber = currentPartRef.current?.partNumber;
       if (files.length === 1) {
         Alert(`Uploaded 1 document for part ${partNumber}.`, "success");
       } else {
         Alert(
           `Uploaded ${files.length} documents for part ${partNumber}.`,
-          "success"
+          "success",
         );
       }
-      setLocalMissingDocs((prevDocs) =>
-        prevDocs.map((part) =>
-          part.id === currentPartToUpload.id
-            ? { ...part, isUploaded: true }
-            : part
-        )
-      );
+      markPartAsUploaded();
+      setDialogUploadOpen(false);
     } catch (error) {
       console.error("Error uploading documents:", error);
       Alert("Failed to upload documents.", "error");
     } finally {
       setLoadingData(false);
-      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleUrlSubmit = async (url, documentType, fileName) => {
+    setLoadingData(true);
+    try {
+      await handleUploadDocuments({ url, documentType, fileName });
+      const partNumber = currentPartRef.current?.partNumber;
+      Alert(`Uploaded URL document for part ${partNumber}.`, "success");
+      markPartAsUploaded();
+      setDialogUploadOpen(false);
+    } catch (error) {
+      console.error("Error uploading URL document:", error);
+      Alert("Failed to upload URL document.", "error");
+    } finally {
+      setLoadingData(false);
     }
   };
 
   const handleUploadClick = (part) => {
     setCurrentPartToUpload(part);
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    currentPartRef.current = part;
+    setDialogUploadOpen(true);
   };
 
   const commonColumns = [
@@ -223,7 +284,7 @@ const ECOErrorDisplay = ({
     description,
     rows,
     useAddButton = false,
-    loading
+    loading,
   ) =>
     rows?.length > 0 && (
       <div className="ECOErrorDisplayDataGridDiv">
@@ -260,23 +321,25 @@ const ECOErrorDisplay = ({
           "(Ensure each part has at least one document)",
           localMissingDocs,
           false,
-          loadingData
+          loadingData,
         )}
         {renderGrid(
           "Below BOM Parts are still in Draft State",
           "(Release them or add them to this ECO)",
           errorData?.nonReleasedMissingParts,
           true,
-          loadingData
+          loadingData,
         )}
       </div>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        multiple
-        style={{ display: "none" }}
-        accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+
+      <UploadDialog
+        open={dialogUploadOpen}
+        onClose={() => setDialogUploadOpen(false)}
+        onInstantUpload={handleInstantUpload}
+        onUrlSubmit={handleUrlSubmit}
+        acceptedDocTypes={acceptedDocTypes}
+        acceptedDocTypesLoading={acceptedDocTypesLoading}
+        fetchAcceptedDocTypes={fetchAcceptedDocTypes}
       />
 
       <div className="AlertMessages">
