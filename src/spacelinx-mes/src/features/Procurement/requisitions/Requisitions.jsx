@@ -175,11 +175,6 @@ const Requisitions = () => {
       valueOptions: departments.map((d) => d.name),
     },
     {
-      field: "managerFullName",
-      headerName: "Manager",
-      flex: 1,
-    },
-    {
       field: "purchaseOrder",
       headerName: "Purchase Order",
       flex: 1,
@@ -255,6 +250,10 @@ const Requisitions = () => {
         }
         return null;
       },
+    },
+    {
+      field: "poStatus",
+      headerName: "PO Status",
     },
     {
       field: "actions",
