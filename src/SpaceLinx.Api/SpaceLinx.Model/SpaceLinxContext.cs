@@ -4945,6 +4945,11 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.VendorPhone)
                 .HasMaxLength(20)
                 .HasColumnName("vendor_phone");
+            entity.Property(e => e.DepartmentId).HasColumnName("department_id");
+            entity.Property(e => e.DepartmentName)
+                .HasMaxLength(255)
+                .HasColumnName("department_name");
+            entity.Property(e => e.ManagerFullName).HasColumnName("manager_full_name");
         });
 
         modelBuilder.Entity<Requisition>(entity =>

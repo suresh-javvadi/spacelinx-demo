@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -277,6 +277,7 @@
     <None Include="Application\Tables\application.organization_address.sql" />
     <None Include="SC\Tables\sc.company_part.sql" />
     <None Include="SC\Views\sc.requisitions_with_user_vw.sql" />
+    <None Include="SC\Views\sc.purchase_orders_vw.sql" />
     <None Include="SC\Views\sc.grns_by_purchase_order_vw.sql" />
     <None Include="SC\Views\sc.inventory_part_vw.sql" />
     <None Include="SC\Views\sc.inventory_goods_vw.sql" />
