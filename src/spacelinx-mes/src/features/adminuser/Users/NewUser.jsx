@@ -6,11 +6,8 @@ import {
   FormGroup,
   FormControlLabel,
   FormHelperText,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { fetchRoles } from "../../../services/roleService";
 import { createUser } from "../../../services/userService";
 import { fetchDepartmentLookup } from "../../../services/departmentService";
@@ -274,28 +271,25 @@ const NewUser = ({
             </FormGroup>
 
             <FormGroup>
-              <FormControl fullWidth>
-                <InputLabel>Department</InputLabel>
-                <Select
-                  label="Department"
-                  value={formValues.departmentId}
-                  onChange={(e) =>
-                    setFormValues({
-                      ...formValues,
-                      departmentId: e.target.value,
-                    })
-                  }
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {departmentOptions.map((d) => (
-                    <MenuItem key={d.id} value={d.id}>
-                      {d.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Autocomplete
+                options={departmentOptions}
+                getOptionLabel={(option) => option.name ?? ""}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={
+                  departmentOptions.find(
+                    (d) => String(d.id) === String(formValues.departmentId)
+                  ) ?? null
+                }
+                onChange={(_, selected) =>
+                  setFormValues({
+                    ...formValues,
+                    departmentId: selected ? String(selected.id) : "",
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Department" />
+                )}
+              />
             </FormGroup>
 
             <div className="roles-container">

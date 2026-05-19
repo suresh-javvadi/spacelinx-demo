@@ -57,6 +57,12 @@ const User = () => {
       flex: 0.5,
     },
     {
+      field: "departmentRef",
+      headerName: "Department",
+      flex: 0.4,
+      valueGetter: (_value, row) => row.departmentRef?.name ?? "",
+    },
+    {
       field: "isActive",
       headerName: "Status",
       flex: 0.2,
