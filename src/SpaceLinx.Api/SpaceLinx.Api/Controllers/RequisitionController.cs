@@ -311,6 +311,13 @@ public class RequisitionController(
 
     #region Multi-Level Approval Endpoints
 
+    [HttpGet("my-approvals")]
+    public async Task<IActionResult> GetMyApprovals()
+    {
+        var result = await requisitionApprovalService.GetMyApprovalsAsync();
+        return Ok(result);
+    }
+
     [HttpPost("{id}/approvers")]
     public async Task<IActionResult> AddApprovers(Guid id, [FromBody] List<ApprovalWriteModel> approvers)
     {

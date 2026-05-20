@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpaceLinx.Api.Interfaces;
@@ -10,12 +11,14 @@ public class RequisitionApprovalService : BaseService, IRequisitionApprovalServi
     private readonly SpaceLinxContext _context;
     private readonly IApprovalService _approvalService;
     private readonly IApprovalNotificationService _notificationService;
+    private readonly IMapper _mapper;
     private readonly ILogger<RequisitionApprovalService> _logger;
 
     public RequisitionApprovalService(
         SpaceLinxContext context,
         IApprovalService approvalService,
         IApprovalNotificationService notificationService,
+        IMapper mapper,
         IHttpContextAccessor contextAccessor,
         ILogger<RequisitionApprovalService> logger)
         : base(context, contextAccessor)
@@ -23,6 +26,7 @@ public class RequisitionApprovalService : BaseService, IRequisitionApprovalServi
         _context = context;
         _approvalService = approvalService;
         _notificationService = notificationService;
+        _mapper = mapper;
         _logger = logger;
     }
 
@@ -215,5 +219,45 @@ public class RequisitionApprovalService : BaseService, IRequisitionApprovalServi
             recipients.Count, requisitionId);
 
         return new OkResult();
+    }
+
+    public async Task<List<RequisitionsWithUserVw>> GetMyApprovalsAsync()
+    {
+        // 1. Resolve the current user
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == UserEmail && u.DeletedBy == null);
+
+        if (user == null)
+            return new List<RequisitionsWithUserVw>();
+
+        // 2. Get requisition IDs where this user is a pending approver at the active stage
+        var pending = await _context.Approvals
+            .AsNoTracking()
+            .Where(a => a.EntityType == SpaceLinxEntities.Requisition
+                        && a.Status == ApprovalStatus.Pending
+                        && a.DeletedBy == null)
+            .Select(a => new { a.EntityId, a.StageNumber, a.ApproverId })
+            .ToListAsync();
+
+        var pendingRequisitionIds = pending
+            .GroupBy(a => a.EntityId)
+            .Where(g => {
+                var currentStage = g.Min(x => x.StageNumber);
+                return g.Any(x => x.StageNumber == currentStage && x.ApproverId == user.Id);
+            })
+            .Select(g => g.Key)
+            .ToList();
+
+        if (!pendingRequisitionIds.Any())
+            return new List<RequisitionsWithUserVw>();
+
+        // 3. Fetch the requisitions with related data for the grid from the view
+        var requisitions = await _context.RequisitionsWithUserVws
+            .AsNoTracking()
+            .Where(r => r.Id.HasValue && pendingRequisitionIds.Contains(r.Id.Value))
+            .ToListAsync();
+
+        return requisitions;
     }
 }

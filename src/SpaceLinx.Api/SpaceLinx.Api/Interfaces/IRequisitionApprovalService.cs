@@ -12,4 +12,5 @@ public interface IRequisitionApprovalService
     Task<IActionResult> UpdateApproversAsync(Guid requisitionId, List<ApprovalWriteModel> approvers);
     Task<List<ApprovalReadModel>> GetApprovalHistoryAsync(Guid requisitionId);
     Task<IActionResult> AddNotificationRecipientsAsync(Guid requisitionId, List<ApprovalNotificationRecipientWriteModel> recipients);
+    Task<List<RequisitionsWithUserVw>> GetMyApprovalsAsync();
 }
