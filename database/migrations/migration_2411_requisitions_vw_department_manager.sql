@@ -1,3 +1,13 @@
+-- Migration: Add department and manager fields to requisitions_with_user_vw
+-- Work Item: 2411
+-- Description:
+--   Recreates sc.requisitions_with_user_vw to:
+--   1. Add department_id, department_name, and manager_full_name columns
+--      by joining the common.department table using r.department_id, and
+--      the application."user" table for the head of department.
+--
+-- This is idempotent — CREATE OR REPLACE VIEW is safe to re-run.
+
 CREATE OR REPLACE VIEW sc.requisitions_with_user_vw AS
 SELECT
     r.id,
@@ -17,9 +27,9 @@ SELECT
     r.approved_date,
     r.rejected_by,
     r.rejected_date,
-    r.approver_comment,    
+    r.approver_comment,
     rb.id AS user_id,
-    rb.first_name || ' ' || COALESCE(rb.last_name, '') AS user_full_name,  
+    rb.first_name || ' ' || COALESCE(rb.last_name, '') AS user_full_name,
     rb.email AS user_email,
     dept.id AS department_id,
     dept.name AS department_name,

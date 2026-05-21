@@ -5123,6 +5123,11 @@ public partial class SpaceLinxContext : DbContext
                 .HasColumnName("user_email");
             entity.Property(e => e.UserFullName).HasColumnName("user_full_name");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.DepartmentId).HasColumnName("department_id");
+            entity.Property(e => e.DepartmentName)
+                .HasMaxLength(255)
+                .HasColumnName("department_name");
+            entity.Property(e => e.ManagerFullName).HasColumnName("manager_full_name");
         });
 
         modelBuilder.Entity<ResourceAllocation>(entity =>

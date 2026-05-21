@@ -23,6 +23,9 @@ namespace SpaceLinx.Model
         public Guid? UserId { get; set; }
         public string? UserFullName { get; set; }
         public string? UserEmail { get; set; }
+        public Guid? DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
+        public string? ManagerFullName { get; set; }
         public Guid? PoId { get; set; }
         public string? PoNumber { get; set; }
         public string? PoStatus { get; set; }
