@@ -239,6 +239,45 @@ public class PurchaseOrderApprovalService : BaseService, IPurchaseOrderApprovalS
         return new OkResult();
     }
 
+    public async Task<List<PurchaseOrdersVw>> GetMyApprovalsAsync()
+    {
+        // 1. Resolve the current user
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == UserEmail && u.DeletedBy == null);
+
+        if (user == null)
+            return new List<PurchaseOrdersVw>();
+
+        // 2. Get purchase order IDs where this user is a pending approver at the active stage
+        var pendingPoIds = await (
+            from a in _context.Approvals
+            where a.EntityType == SpaceLinxEntities.PurchaseOrder
+               && a.Status == ApprovalStatus.Pending
+               && a.ApproverId == user.Id
+               && a.DeletedBy == null
+            let minStage = _context.Approvals
+                .Where(x => x.EntityType == SpaceLinxEntities.PurchaseOrder
+                         && x.EntityId == a.EntityId
+                         && x.Status == ApprovalStatus.Pending
+                         && x.DeletedBy == null)
+                .Min(x => x.StageNumber)
+            where a.StageNumber == minStage
+            select a.EntityId
+        ).Distinct().ToListAsync();
+
+        if (!pendingPoIds.Any())
+            return new List<PurchaseOrdersVw>();
+
+        // 3. Fetch the purchase orders with related data for the grid from the view
+        var purchaseOrders = await _context.PurchaseOrdersVws
+            .AsNoTracking()
+            .Where(r => pendingPoIds.Contains(r.Id.Value))
+            .ToListAsync();
+
+        return purchaseOrders;
+    }
+
     /// <summary>
     /// Updates part unit prices from PO line items when PO is fully approved
     /// This preserves the existing business logic from PurchaseOrderController.Approve

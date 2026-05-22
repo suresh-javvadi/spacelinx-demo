@@ -12,4 +12,5 @@ public interface IPurchaseOrderApprovalService
     Task<IActionResult> UpdateApproversAsync(Guid poId, List<ApprovalWriteModel> approvers);
     Task<List<ApprovalReadModel>> GetApprovalHistoryAsync(Guid poId);
     Task<IActionResult> AddNotificationRecipientsAsync(Guid poId, List<ApprovalNotificationRecipientWriteModel> recipients);
+    Task<List<PurchaseOrdersVw>> GetMyApprovalsAsync();
 }
