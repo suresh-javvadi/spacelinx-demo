@@ -980,6 +980,27 @@ div.Active-Button {
   color: var(--TabButton-color);
   border-right: 1px solid rgb(50, 50, 50);
 }
+.AdminPageTabs .TabButton.Selected {
+  background-color: #454545;
+}
+.RequisitionsHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.RequisitionsHeaderTitle {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.RequisitionsHeaderTabs {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.RequisitionsHeaderActions {
+  flex: 0 0 auto;
+}
 .StockMovementContentDiv {
   display: flex;
   flex-direction: column;

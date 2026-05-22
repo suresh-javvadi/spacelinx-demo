@@ -8,6 +8,11 @@ export const fetchRequisitions = async ({ allDepartments = false } = {}) => {
   return response.data;
 };
 
+export const fetchMyApprovals = async () => {
+  const response = await api.get(`${apiUrl}/my-approvals`);
+  return response.data;
+};
+
 export const fetchRequisitionLookup = async () => {
   const response = await api.get(`${apiUrl}/Lookup`);
   return response.data;
@@ -31,7 +36,7 @@ export const fetchRequisitionById = async (id) => {
 export const updateRequisition = async (id, data) => {
   const response = await api.put(
     `${apiUrl}/requisition-details-update/${id}`,
-    data
+    data,
   );
   return response.data;
 };

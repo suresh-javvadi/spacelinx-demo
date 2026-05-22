@@ -3,6 +3,7 @@ import { Button } from "@mui/material";
 import {
   deleteRequisition,
   fetchRequisitions,
+  fetchMyApprovals,
 } from "../../../services/requisitionService";
 import { AlertsContext } from "../../AlertsContext/Context";
 import { HomeAlerts } from "../../AlertsContext/Alerts";
@@ -25,11 +26,12 @@ import { useNavigate } from "react-router-dom";
 
 const Requisitions = () => {
   const { Alert } = useContext(AlertsContext);
-  const { hasPermission, isSuperAdmin } = useUserContext();
+  const { hasPermission, isSuperAdmin, activeRole } = useUserContext();
   const { deepLinkInfo, clearDeepLink } = useDeepLink();
   const navigateTo = useNavigate();
   const [requisitionData, setRequisitionData] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [activeTab, setActiveTab] = useState("MY_DEPT");
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [projectsData, setProjectsData] = useState([]);
@@ -53,6 +55,16 @@ const Requisitions = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    // default to My Approvals for approvers, otherwise My Department
+    if (!activeRole?.permissions) return;
+    if (hasPermission(PERMISSIONS.REQUISITIONS.APPROVER)) {
+      setActiveTab("MY_APPROVALS");
+    } else {
+      setActiveTab("MY_DEPT");
+    }
+  }, [activeRole]);
 
   const fetchUserData = async () => {
     setLoadingData(true);
@@ -95,18 +107,25 @@ const Requisitions = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [activeTab]);
 
   const fetchData = async () => {
     setLoadingData(true);
     try {
-      const allDepartments = hasPermission(
-        PERMISSIONS.REQUISITIONS.VIEW_ALL_DEPARTMENTS,
-      );
+      let dataPromise;
+      if (activeTab === "ALL") {
+        dataPromise = fetchRequisitions({ allDepartments: true });
+      } else if (activeTab === "MY_APPROVALS") {
+        dataPromise = fetchMyApprovals();
+      } else {
+        dataPromise = fetchRequisitions({ allDepartments: false });
+      }
+
       const [data, departmentsData] = await Promise.all([
-        fetchRequisitions({ allDepartments }),
+        dataPromise,
         fetchDepartmentLookup().catch(() => []),
       ]);
+
       const deptMap = new Map(
         (departmentsData ?? []).map((d) => [d.id, d.name]),
       );
@@ -307,25 +326,59 @@ const Requisitions = () => {
   return (
     <>
       <div className="AdminChildren">
-        <div className="AdminChildrenHeader">
-          <p className="PageHeader">Requisitions</p>
-          <Button
-            onClick={() => {
-              if (hasPermission(PERMISSIONS.REQUISITIONS.MODIFY)) {
-                setSelectedRequisition(null);
-                setDrawerOpen(true);
-              } else {
-                Alert("You do not have access to create..!", "warning");
-              }
-            }}
-            // className={
-            // hasPermission(PERMISSIONS.REQUISITIONS.MODIFY)
-            // ? undefined
-            // : "IonIconDisabled"
-            // }
-          >
-            + Add New
-          </Button>
+        <div className="AdminChildrenHeader RequisitionsHeader">
+          <div className="RequisitionsHeaderTitle">
+            <p className="PageHeader">Requisitions</p>
+          </div>
+
+          <div className="RequisitionsHeaderTabs">
+            <div className="AdminPageTabs">
+              {(() => {
+                const tabs = [];
+                if (
+                  hasPermission(PERMISSIONS.REQUISITIONS.VIEW_ALL_DEPARTMENTS)
+                ) {
+                  tabs.push({ key: "ALL", label: "ALL" });
+                }
+                tabs.push({ key: "MY_DEPT", label: "My Department" });
+                if (hasPermission(PERMISSIONS.REQUISITIONS.APPROVER)) {
+                  tabs.push({ key: "MY_APPROVALS", label: "My Approvals" });
+                }
+
+                return tabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    className={`TabButton ${
+                      activeTab === tab.key ? "Selected" : ""
+                    }`}
+                    onClick={() => setActiveTab(tab.key)}
+                  >
+                    {tab.label}
+                  </button>
+                ));
+              })()}
+            </div>
+          </div>
+
+          <div className="RequisitionsHeaderActions">
+            <Button
+              onClick={() => {
+                if (hasPermission(PERMISSIONS.REQUISITIONS.MODIFY)) {
+                  setSelectedRequisition(null);
+                  setDrawerOpen(true);
+                } else {
+                  Alert("You do not have access to create..!", "warning");
+                }
+              }}
+              // className={
+              // hasPermission(PERMISSIONS.REQUISITIONS.MODIFY)
+              // ? undefined
+              // : "IonIconDisabled"
+              // }
+            >
+              + Add New
+            </Button>
+          </div>
         </div>
         <div className="DataGridDiv RequisitionGrid">
           <StyledDataGrid
