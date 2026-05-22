@@ -6,25 +6,23 @@ import { Button } from "@mui/material";
 import {
   deletePO,
   fetchPurchaseOrders,
+  fetchPurchaseOrderMyApprovals,
   fetchZohoCsvByIds,
 } from "../../../services/purchaseOrders";
-import { fetchDepartmentLookup } from "../../../services/departmentService";
 import "../../Procurement/procurement.css";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../userContext/UserContext";
 import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
 import { PERMISSIONS } from "../../../constants/PagePermissions";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
-import { Description } from "@mui/icons-material";
 
 const PurchaseOrders = () => {
   const { Alert } = useContext(AlertsContext);
   const { hasPermission } = useUserContext();
   const navigateTo = useNavigate();
   const [purchaseOrders, setPurchaseOrders] = useState([]);
-  const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [activeTab, setActiveTab] = useState("MY_DEPT");
   const [rowSelectionModel, setRowSelectionModel] = useState({
     type: "include",
     ids: new Set(),
@@ -80,7 +78,6 @@ const PurchaseOrders = () => {
       headerName: "Vendor Name",
       flex: 1,
     },
-
     {
       field: "vendorCode",
       headerName: "Vendor Code",
@@ -115,14 +112,19 @@ const PurchaseOrders = () => {
       headerName: "Status",
       flex: 1,
       type: "singleSelect",
-      valueOptions: ["Draft", "Submitted", "Issued", "Delivered", "Pending", "Cancelled"],
+      valueOptions: [
+        "Draft",
+        "Submitted",
+        "Issued",
+        "Delivered",
+        "Pending",
+        "Cancelled",
+      ],
     },
     {
       field: "departmentName",
       headerName: "Department",
       flex: 1,
-      type: "singleSelect",
-      valueOptions: departments.map((d) => d.name),
     },
     // {
     //   field: "deliveryStatus",
@@ -136,7 +138,6 @@ const PurchaseOrders = () => {
       flex: 1,
       type: "number",
     },
-
     {
       field: "approvedBy",
       headerName: "Approved By",
@@ -229,31 +230,26 @@ const PurchaseOrders = () => {
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
+    setPurchaseOrders([]);
     try {
-      const allDepartments = hasPermission(
-        PERMISSIONS.PURCHASEORDERS.VIEW_ALL_DEPARTMENTS,
-      );
-      const [purchaseOrdersData, departmentsData] = await Promise.all([
-        fetchPurchaseOrders({ allDepartments }),
-        fetchDepartmentLookup().catch(() => []),
-      ]);
-
-      const deptMap = new Map(
-        (departmentsData ?? []).map((d) => [d.id, d.name]),
-      );
-      setDepartments(departmentsData ?? []);
+      let purchaseOrdersData;
+      if (activeTab === "ALL") {
+        purchaseOrdersData = await fetchPurchaseOrders({
+          allDepartments: true,
+        });
+      } else if (activeTab === "MY_APPROVALS") {
+        purchaseOrdersData = await fetchPurchaseOrderMyApprovals();
+      } else {
+        purchaseOrdersData = await fetchPurchaseOrders({
+          allDepartments: false,
+        });
+      }
 
       if (purchaseOrdersData) {
         purchaseOrdersData.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         );
-        const enriched = purchaseOrdersData.map((row) => ({
-          ...row,
-          departmentName: row.departmentId
-            ? (deptMap.get(row.departmentId) ?? "")
-            : "",
-        }));
-        setPurchaseOrders(enriched);
+        setPurchaseOrders(purchaseOrdersData);
       }
     } catch (error) {
       Alert("Error fetching Purchase Orders data", "error");
@@ -261,18 +257,11 @@ const PurchaseOrders = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [hasPermission]);
-  useEffect(() => {
-    fetchData();
-  }, []);
+  }, [activeTab, Alert]);
 
   useEffect(() => {
-    setIsLoading(true);
     fetchData();
-    if (shouldRefresh) {
-      setShouldRefresh(false);
-    }
-  }, [shouldRefresh, fetchData]);
+  }, [fetchData]);
 
   const handleDownloadZohoCsv = async (ids) => {
     setIsLoading(true);
@@ -298,9 +287,34 @@ const PurchaseOrders = () => {
     <>
       <div className="AdminChildren">
         <div className="AdminChildrenHeader">
-          <div>
-            <p className="PageHeader">Purchase Orders</p>
+          <p className="PageHeader">Purchase Orders</p>
+        </div>
+
+        <div className="POContentDivHeader">
+          <div className="AdminPageTabs POTabs">
+            {(() => {
+              const tabs = [];
+              if (
+                hasPermission(PERMISSIONS.PURCHASEORDERS.VIEW_ALL_DEPARTMENTS)
+              ) {
+                tabs.push({ key: "ALL", label: "ALL" });
+              }
+              tabs.push({ key: "MY_DEPT", label: "My Department" });
+
+              tabs.push({ key: "MY_APPROVALS", label: "My Approvals" });
+
+              return tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  className={`TabButton ${activeTab === tab.key ? "Selected" : ""}`}
+                  onClick={() => setActiveTab(tab.key)}
+                >
+                  {tab.label}
+                </button>
+              ));
+            })()}
           </div>
+
           <div className="PoHeaderButtons">
             <Button
               disabled={(rowSelectionModel?.ids?.size || 0) > 0}
@@ -340,7 +354,8 @@ const PurchaseOrders = () => {
             </Button>
           </div>
         </div>
-        <div className="DataGridDiv">
+
+        <div className="PODataGridDiv">
           <StyledDataGrid
             rows={purchaseOrders}
             columns={columns}

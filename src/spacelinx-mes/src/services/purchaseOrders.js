@@ -50,6 +50,11 @@ export const fetchZohoCsv = async (id) => {
   return response.data;
 };
 
+export const fetchPurchaseOrderMyApprovals = async () => {
+  const response = await api.get(`${apiUrl}/my-approvals`);
+  return response.data;
+};
+
 export const fetchZohoCsvByIds = async (ids) => {
   const response = await api.post(
     `${apiUrl}/export/zoho-csv-multiple`,

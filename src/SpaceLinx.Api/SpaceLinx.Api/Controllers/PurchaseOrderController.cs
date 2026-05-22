@@ -396,16 +396,7 @@ public class PurchaseOrderController(
             poRecord.TermsAndConditions = purchaseOrderDetails.TermsAndConditions;
             poRecord.ApprovedBy = purchaseOrderDetails.ApprovedBy;
             poRecord.ApprovedDate = purchaseOrderDetails.ApprovedDate;
-            poRecord.DepartmentId = purchaseOrderDetails.DepartmentId;
-
-            if (poRecord.DepartmentId == null && purchaseOrderDetails.BuyerId.HasValue)
-            {
-                poRecord.DepartmentId = await spaceLinxContext.Users
-                    .Where(u => u.Id == purchaseOrderDetails.BuyerId && u.DeletedBy == null)
-                    .Select(u => u.DepartmentId)
-                    .FirstOrDefaultAsync();
-            }
-
+            
             poRecord.UpdatedBy = UserEmail;
             poRecord.UpdatedAt = DateTime.UtcNow;
 
