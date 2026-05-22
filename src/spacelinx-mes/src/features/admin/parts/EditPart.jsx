@@ -502,12 +502,16 @@ const EditPart = ({
         );
         valid = false;
       } else if (
-        manufacturingPartNumbers.includes(editManufacturingPartNumber.trim()) &&
-        editManufacturingPartNumber.trim() !==
-          selectedPart?.part?.manufacturingPartNumber
+        manufacturingPartNumbers.some(
+          (num) =>
+            num.trim().toLowerCase() ===
+            editManufacturingPartNumber.trim().toLowerCase(),
+        ) &&
+        editManufacturingPartNumber.trim().toLowerCase() !==
+          selectedPart?.part?.manufacturingPartNumber?.trim().toLowerCase()
       ) {
         setEditManufacturingPartNumberError(
-          "This Manufacturing Part Number already exists",
+          "Manufacturing Part Number already exists.",
         );
         valid = false;
       } else {
@@ -940,12 +944,18 @@ const EditPart = ({
                                   "Manufacturing Part Number is required",
                                 );
                               } else if (
-                                manufacturingPartNumbers.includes(value) &&
-                                value !==
+                                manufacturingPartNumbers.some(
+                                  (num) =>
+                                    num.trim().toLowerCase() ===
+                                    value.toLowerCase(),
+                                ) &&
+                                value.toLowerCase() !==
                                   selectedPart?.part?.manufacturingPartNumber
+                                    ?.trim()
+                                    .toLowerCase()
                               ) {
                                 setEditManufacturingPartNumberError(
-                                  "This Manufacturing Part Number already exists",
+                                  "Manufacturing Part Number already exists.",
                                 );
                               } else {
                                 setEditManufacturingPartNumberError("");

@@ -252,9 +252,11 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
       newErrors[name] = `${requiredFields[name]} is required`;
     } else if (
       name === "manufacturingPartNumber" &&
-      manufacturingPartNumbers.includes(trimmedValue)
+      manufacturingPartNumbers.some(
+        (num) => num.trim().toLowerCase() === trimmedValue.toLowerCase(),
+      )
     ) {
-      newErrors[name] = "This Manufacturing Part Number already exists";
+      newErrors[name] = "Manufacturing Part Number already exists.";
     } else {
       newErrors[name] = "";
     }
@@ -349,9 +351,13 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
         errors.manufacturingPartNumber =
           "Manufacturing Part Number is required";
         valid = false;
-      } else if (manufacturingPartNumbers.includes(value)) {
+      } else if (
+        manufacturingPartNumbers.some(
+          (num) => num.trim().toLowerCase() === value.toLowerCase(),
+        )
+      ) {
         errors.manufacturingPartNumber =
-          "This Manufacturing Part Number already exists";
+          "Manufacturing Part Number already exists.";
         valid = false;
       }
       if (!manufacturerName) {
