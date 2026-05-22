@@ -265,7 +265,7 @@ const Documents = ({
 
         const previewData = {
           fileName: doc.name,
-          fileExtension: "." + doc.name.split(".").pop(),
+          fileExtension: "." + doc.name.split(".").pop().toLowerCase(),
           filePath: blobUrl,
           isBlob: true,
         };
@@ -275,9 +275,15 @@ const Documents = ({
           await fetchCsvContent(previewData.filePath);
         }
       } else {
-        setPreviewDoc(doc);
-        if (doc.fileExtension === ".csv") {
-          await fetchCsvContent(doc.filePath);
+        // Normalize extension to lowercase so previews work regardless
+        // of how the server stored it (e.g. ".PDF", ".Pdf", ".pdf")
+        const normalizedDoc = {
+          ...doc,
+          fileExtension: doc.fileExtension?.toLowerCase(),
+        };
+        setPreviewDoc(normalizedDoc);
+        if (normalizedDoc.fileExtension === ".csv") {
+          await fetchCsvContent(normalizedDoc.filePath);
         }
       }
     } catch (error) {
