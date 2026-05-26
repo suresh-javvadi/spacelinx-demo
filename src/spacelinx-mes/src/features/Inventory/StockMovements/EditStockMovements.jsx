@@ -238,21 +238,21 @@ const EditStockMovements = ({
       const match = userData.find(
         (s) => s.id === formData.responsiblePerson.id,
       );
-      if (match) {
+      if (match && formData.responsiblePerson !== match) {
         setFormData((prev) => ({ ...prev, responsiblePerson: match }));
       }
     }
-  }, [userData]);
+  }, [userData, formData.responsiblePerson?.id]);
 
   // Resolve project once projects are loaded
   useEffect(() => {
     if (projects.length > 0 && formData.project?.id) {
       const match = projects.find((p) => p.id === formData.project.id);
-      if (match) {
+      if (match && formData.project !== match) {
         setFormData((prev) => ({ ...prev, project: match }));
       }
     }
-  }, [projects]);
+  }, [projects, formData.project?.id]);
 
   // Resolve department once departments are loaded
   useEffect(() => {
@@ -260,11 +260,11 @@ const EditStockMovements = ({
       const match = departments.find(
         (d) => d.name === formData.department.name,
       );
-      if (match) {
+      if (match && formData.department !== match) {
         setFormData((prev) => ({ ...prev, department: match }));
       }
     }
-  }, [departments]);
+  }, [departments, formData.department?.name]);
 
   // Resolve location once locations are loaded
   useEffect(() => {
@@ -272,11 +272,11 @@ const EditStockMovements = ({
       const match = locationsData.find(
         (l) => l.id === formData.fromLocation.id,
       );
-      if (match) {
+      if (match && formData.fromLocation !== match) {
         setFormData((prev) => ({ ...prev, fromLocation: match }));
       }
     }
-  }, [locationsData]);
+  }, [locationsData, formData.fromLocation?.id]);
 
   // Filter parts based on bin and stock
   useEffect(() => {
