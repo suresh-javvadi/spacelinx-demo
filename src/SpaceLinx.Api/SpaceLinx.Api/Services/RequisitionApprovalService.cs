@@ -227,20 +227,12 @@ public class RequisitionApprovalService : BaseService, IRequisitionApprovalServi
         if (user == null)
             return new List<RequisitionsWithUserVw>();
 
-        // 2. Get requisition IDs where this user is a pending approver at the active stage
+        // 2. Get requisition IDs where this user is an approver (any status, any stage)
         var pendingRequisitionIds = await (
             from a in _context.Approvals
             where a.EntityType == SpaceLinxEntities.Requisition
-               && a.Status == ApprovalStatus.Pending
                && a.ApproverId == user.Id
                && a.DeletedBy == null
-            let minStage = _context.Approvals
-                .Where(x => x.EntityType == SpaceLinxEntities.Requisition
-                         && x.EntityId == a.EntityId
-                         && x.Status == ApprovalStatus.Pending
-                         && x.DeletedBy == null)
-                .Min(x => x.StageNumber)
-            where a.StageNumber == minStage
             select a.EntityId
         ).Distinct().ToListAsync();
 

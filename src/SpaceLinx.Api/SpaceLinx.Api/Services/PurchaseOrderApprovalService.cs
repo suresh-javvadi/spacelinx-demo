@@ -249,20 +249,12 @@ public class PurchaseOrderApprovalService : BaseService, IPurchaseOrderApprovalS
         if (user == null)
             return new List<PurchaseOrdersVw>();
 
-        // 2. Get purchase order IDs where this user is a pending approver at the active stage
+        // 2. Get purchase order IDs where this user is an approver (any status, any stage)
         var pendingPoIds = await (
             from a in _context.Approvals
             where a.EntityType == SpaceLinxEntities.PurchaseOrder
-               && a.Status == ApprovalStatus.Pending
                && a.ApproverId == user.Id
                && a.DeletedBy == null
-            let minStage = _context.Approvals
-                .Where(x => x.EntityType == SpaceLinxEntities.PurchaseOrder
-                         && x.EntityId == a.EntityId
-                         && x.Status == ApprovalStatus.Pending
-                         && x.DeletedBy == null)
-                .Min(x => x.StageNumber)
-            where a.StageNumber == minStage
             select a.EntityId
         ).Distinct().ToListAsync();
 
