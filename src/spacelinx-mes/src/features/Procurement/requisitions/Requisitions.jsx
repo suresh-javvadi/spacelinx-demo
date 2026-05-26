@@ -56,16 +56,6 @@ const Requisitions = () => {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    // default to My Approvals for approvers, otherwise My Department
-    if (!activeRole?.permissions) return;
-    if (hasPermission(PERMISSIONS.REQUISITIONS.APPROVER)) {
-      setActiveTab("MY_APPROVALS");
-    } else {
-      setActiveTab("MY_DEPT");
-    }
-  }, [activeRole]);
-
   const fetchUserData = async () => {
     setLoadingData(true);
     try {
@@ -330,34 +320,34 @@ const Requisitions = () => {
           <div className="RequisitionsHeaderTitle">
             <p className="PageHeader">Requisitions</p>
           </div>
+        </div>
 
-          <div className="RequisitionsHeaderTabs">
-            <div className="AdminPageTabs">
-              {(() => {
-                const tabs = [];
-                if (
-                  hasPermission(PERMISSIONS.REQUISITIONS.VIEW_ALL_DEPARTMENTS)
-                ) {
-                  tabs.push({ key: "ALL", label: "ALL" });
-                }
-                tabs.push({ key: "MY_DEPT", label: "My Department" });
-                if (hasPermission(PERMISSIONS.REQUISITIONS.APPROVER)) {
-                  tabs.push({ key: "MY_APPROVALS", label: "My Approvals" });
-                }
+        <div className="POContentDivHeader">
+          <div className="AdminPageTabs">
+            {(() => {
+              const tabs = [];
+              if (
+                hasPermission(PERMISSIONS.REQUISITIONS.VIEW_ALL_DEPARTMENTS)
+              ) {
+                tabs.push({ key: "ALL", label: "ALL" });
+              }
+              tabs.push({ key: "MY_DEPT", label: "My Department" });
+              if (hasPermission(PERMISSIONS.REQUISITIONS.APPROVER)) {
+                tabs.push({ key: "MY_APPROVALS", label: "My Approvals" });
+              }
 
-                return tabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    className={`TabButton ${
-                      activeTab === tab.key ? "Selected" : ""
-                    }`}
-                    onClick={() => setActiveTab(tab.key)}
-                  >
-                    {tab.label}
-                  </button>
-                ));
-              })()}
-            </div>
+              return tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  className={`TabButton ${
+                    activeTab === tab.key ? "Selected" : ""
+                  }`}
+                  onClick={() => setActiveTab(tab.key)}
+                >
+                  {tab.label}
+                </button>
+              ));
+            })()}
           </div>
 
           <div className="RequisitionsHeaderActions">
