@@ -209,10 +209,10 @@ public class PurchaseOrderController(
                     CreatedAt = DateTime.UtcNow
                 };
 
-                if (purchaseOrder.DepartmentId == null && purchaseOrderDetails.BuyerId.HasValue)
+                if (purchaseOrder.DepartmentId == null)
                 {
                     purchaseOrder.DepartmentId = await spaceLinxContext.Users
-                        .Where(u => u.Id == purchaseOrderDetails.BuyerId && u.DeletedBy == null)
+                        .Where(u => u.Email == UserEmail && u.DeletedBy == null)
                         .Select(u => u.DepartmentId)
                         .FirstOrDefaultAsync();
                 }
