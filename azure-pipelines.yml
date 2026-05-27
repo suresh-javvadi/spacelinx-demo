@@ -117,7 +117,16 @@ stages:
   - stage: DeployDev
     displayName: 'Deploy to Dev'
     dependsOn: [BuildAPI, BuildFrontend]
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    # Auto-deploys on main. From feature/*, bugfix/*, users/* branches: only when
+    # the run is manually queued (Pipelines → Run pipeline → pick branch). Dev is
+    # a shared env — coordinate before deploying a branch and revert to main after.
+    condition: |
+      and(succeeded(),
+          or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),
+             and(eq(variables['Build.Reason'], 'Manual'),
+                 or(startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/'),
+                    startsWith(variables['Build.SourceBranch'], 'refs/heads/bugfix/'),
+                    startsWith(variables['Build.SourceBranch'], 'refs/heads/users/')))))
     jobs:
       - job: BuildFrontendDev
         displayName: 'Build Frontend (Dev)'
