@@ -1,0 +1,2002 @@
+{
+  "$schema": "./permissions.catalog.schema.json",
+  "description": "Single source of truth for SpaceLinx authorization permissions. Generated initially from UAT application.permission + frontend PagePermissions.js (2026-05-30). Edit this file; then run `node tools/permission-catalog/generate.mjs` to regenerate C#, TS, and SQL seed.",
+  "version": 1,
+  "permissions": [
+    {
+      "key": "ADDITIONALRECIPIENTS.DELETE",
+      "category": "ADDITIONALRECIPIENTS",
+      "description": "Delete additional notification recipients.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ADDITIONALRECIPIENTS.MODIFY",
+      "category": "ADDITIONALRECIPIENTS",
+      "description": "Modify additional notification recipients.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ADDITIONALRECIPIENTS.VIEW",
+      "category": "ADDITIONALRECIPIENTS",
+      "description": "View additional notification recipients.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ASSEMBLYLOCATIONS.DELETE",
+      "category": "ASSEMBLYLOCATIONS",
+      "description": "Delete assembly locations.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ASSEMBLYLOCATIONS.MODIFY",
+      "category": "ASSEMBLYLOCATIONS",
+      "description": "Modify assembly locations.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ASSEMBLYLOCATIONS.VIEW",
+      "category": "ASSEMBLYLOCATIONS",
+      "description": "View assembly locations.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ApprovalsConfig.CREATE",
+      "category": "ApprovalsConfig",
+      "description": "Create approval configurations.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ApprovalsConfig.DELETE",
+      "category": "ApprovalsConfig",
+      "description": "Delete approval configurations.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ApprovalsConfig.MODIFY",
+      "category": "ApprovalsConfig",
+      "description": "Modify approval configurations.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ApprovalsConfig.VIEW",
+      "category": "ApprovalsConfig",
+      "description": "View approval configurations.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "BINMANAGEMENT.DELETE",
+      "category": "BINMANAGEMENT",
+      "description": "Delete bin management.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "BINMANAGEMENT.MODIFY",
+      "category": "BINMANAGEMENT",
+      "description": "Modify bin management.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "BINMANAGEMENT.VIEW",
+      "category": "BINMANAGEMENT",
+      "description": "View bin management.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "BOM.VIEW",
+      "category": "BOM",
+      "description": "View the bill of materials.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "BULKUPLOAD.MODIFY",
+      "category": "BULKUPLOAD",
+      "description": "Perform a bulk upload.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "BULKUPLOAD.VIEW",
+      "category": "BULKUPLOAD",
+      "description": "View bulk upload history.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "COMPANIES.DELETE",
+      "category": "COMPANIES",
+      "description": "Delete companies.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "COMPANIES.DOCUMENTS.DELETE",
+      "category": "COMPANIES",
+      "description": "Delete documents for companies.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "COMPANIES.DOCUMENTS.MODIFY",
+      "category": "COMPANIES",
+      "description": "Modify documents for companies.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "COMPANIES.DOCUMENTS.VIEW",
+      "category": "COMPANIES",
+      "description": "View documents for companies.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "COMPANIES.MODIFY",
+      "category": "COMPANIES",
+      "description": "Modify companies.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "COMPANIES.VIEW",
+      "category": "COMPANIES",
+      "description": "View companies.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "CONTACTS.DELETE",
+      "category": "CONTACTS",
+      "description": "Delete contacts.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "CONTACTS.MODIFY",
+      "category": "CONTACTS",
+      "description": "Modify contacts.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "CONTACTS.VIEW",
+      "category": "CONTACTS",
+      "description": "View contacts.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "CUSTOMERS.DELETE",
+      "category": "CUSTOMERS",
+      "description": "Delete Customers",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "CUSTOMERS.MODIFY",
+      "category": "CUSTOMERS",
+      "description": "Modify Customers",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "CUSTOMERS.VIEW",
+      "category": "CUSTOMERS",
+      "description": "View Customers",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "DASHBOARDS.CONFIGURE",
+      "category": "DASHBOARDS",
+      "description": "Configure dashboards.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "DASHBOARDS.VIEW",
+      "category": "DASHBOARDS",
+      "description": "View dashboards.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "DEPARTMENTS.DELETE",
+      "category": "DEPARTMENTS",
+      "description": "Delete departments.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "DEPARTMENTS.MODIFY",
+      "category": "DEPARTMENTS",
+      "description": "Modify departments.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "DEPARTMENTS.VIEW",
+      "category": "DEPARTMENTS",
+      "description": "View departments.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ECO.APPROVER",
+      "category": "ECO",
+      "description": "Approve Engineering Change Orders (ECOs).",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.DELETE",
+      "category": "ECO",
+      "description": "Delete Engineering Change Orders (ECOs).",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.DOCUMENTS.DELETE",
+      "category": "ECO",
+      "description": "Delete documents related to ECOs.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.DOCUMENTS.MODIFY",
+      "category": "ECO",
+      "description": "Modify documents related to ECOs.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.DOCUMENTS.VIEW",
+      "category": "ECO",
+      "description": "View documents related to ECOs.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.EFFECTEDPARTS.DELETE",
+      "category": "ECO",
+      "description": "Delete parts affected by an ECO.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.EFFECTEDPARTS.MODIFY",
+      "category": "ECO",
+      "description": "Modify parts affected by an ECO.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.EFFECTEDPARTS.VIEW",
+      "category": "ECO",
+      "description": "View parts affected by an ECO.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.MODIFY",
+      "category": "ECO",
+      "description": "Modify Engineering Change Orders (ECOs).",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ECO.VIEW",
+      "category": "ECO",
+      "description": "View Engineering Change Orders (ECOs).",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "EMAILLOGS.VIEW",
+      "category": "EMAILLOGS",
+      "description": "View email logs.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "EMAILTEMPLATES.DELETE",
+      "category": "EMAILTEMPLATES",
+      "description": "Delete email templates.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "EMAILTEMPLATES.MODIFY",
+      "category": "EMAILTEMPLATES",
+      "description": "Modify email templates.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "EMAILTEMPLATES.VIEW",
+      "category": "EMAILTEMPLATES",
+      "description": "View email templates.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "FEATURES.DELETE",
+      "category": "FEATURES",
+      "description": "Delete feature flags.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "FEATURES.MODIFY",
+      "category": "FEATURES",
+      "description": "Modify feature flags.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "FEATURES.VIEW",
+      "category": "FEATURES",
+      "description": "View feature flags.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "GANTT.MODIFY",
+      "category": "GANTT",
+      "description": "Modify the Gantt chart.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "GANTT.VIEW",
+      "category": "GANTT",
+      "description": "View the Gantt chart.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "GOODS.DELETE",
+      "category": "GOODS",
+      "description": "Delete goods.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODS.MODIFY",
+      "category": "GOODS",
+      "description": "Modify goods.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODS.TRANSACTIONS.VIEW",
+      "category": "GOODS",
+      "description": "View goods transactions.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODS.VIEW",
+      "category": "GOODS",
+      "description": "View goods.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODSRECEIPTS.APPROVER",
+      "category": "GOODSRECEIPTS",
+      "description": "Approve goods receipts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODSRECEIPTS.DELETE",
+      "category": "GOODSRECEIPTS",
+      "description": "Delete goods receipts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODSRECEIPTS.DOCUMENTS.DELETE",
+      "category": "GOODSRECEIPTS",
+      "description": "Delete documents related to goods receipts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODSRECEIPTS.DOCUMENTS.MODIFY",
+      "category": "GOODSRECEIPTS",
+      "description": "Modify documents related to goods receipts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODSRECEIPTS.DOCUMENTS.VIEW",
+      "category": "GOODSRECEIPTS",
+      "description": "View documents related to goods receipts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODSRECEIPTS.MODIFY",
+      "category": "GOODSRECEIPTS",
+      "description": "Modify goods receipts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GOODSRECEIPTS.VIEW",
+      "category": "GOODSRECEIPTS",
+      "description": "View goods receipts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GUIDES.CLONE",
+      "category": "GUIDES",
+      "description": "Clone guides.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GUIDES.DELETE",
+      "category": "GUIDES",
+      "description": "Delete guides.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GUIDES.MODIFY",
+      "category": "GUIDES",
+      "description": "Modify guides.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GUIDES.PRINT",
+      "category": "GUIDES",
+      "description": "Print guides.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GUIDES.PUBLISH",
+      "category": "GUIDES",
+      "description": "Publish guides.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "GUIDES.VIEW",
+      "category": "GUIDES",
+      "description": "View guides.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ISSUES.DELETE",
+      "category": "ISSUES",
+      "description": "Delete issues.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ISSUES.MODIFY",
+      "category": "ISSUES",
+      "description": "Modify issues.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ISSUES.VIEW",
+      "category": "ISSUES",
+      "description": "View issues.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "KANBAN.CONFIGURE",
+      "category": "KANBAN",
+      "description": "Configure the Kanban board.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "KANBAN.MODIFY",
+      "category": "KANBAN",
+      "description": "Modify the Kanban board.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "KANBAN.VIEW",
+      "category": "KANBAN",
+      "description": "View the Kanban board.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "LOCATIONS.DELETE",
+      "category": "LOCATIONS",
+      "description": "Delete locations.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "LOCATIONS.MODIFY",
+      "category": "LOCATIONS",
+      "description": "Modify locations.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "LOCATIONS.VIEW",
+      "category": "LOCATIONS",
+      "description": "View locations.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "MACHINES.DELETE",
+      "category": "MACHINES",
+      "description": "Delete machines.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "MACHINES.MODIFY",
+      "category": "MACHINES",
+      "description": "Modify machines.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "MACHINES.VIEW",
+      "category": "MACHINES",
+      "description": "View machines.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "MATERIALKITS.ASSIGNWORKORDER",
+      "category": "MATERIALKITS",
+      "description": "Assign a work order to a material kit.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "MATERIALKITS.DELETE",
+      "category": "MATERIALKITS",
+      "description": "Delete material kits.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "MATERIALKITS.MODIFY",
+      "category": "MATERIALKITS",
+      "description": "Modify material kits.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "MATERIALKITS.VIEW",
+      "category": "MATERIALKITS",
+      "description": "View material kits.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "NEWS.DELETE",
+      "category": "NEWS",
+      "description": "Delete news.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "NEWS.MODIFY",
+      "category": "NEWS",
+      "description": "Modify news.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "NEWS.VIEW",
+      "category": "NEWS",
+      "description": "View news.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ORGANIZATION.ADDRESS.DELETE",
+      "category": "ORGANIZATION",
+      "description": "Delete organization addresses.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "ORGANIZATION.ADDRESS.MODIFY",
+      "category": "ORGANIZATION",
+      "description": "Modify organization addresses.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ORGANIZATION.ADDRESS.VIEW",
+      "category": "ORGANIZATION",
+      "description": "View organization addresses.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ORGANIZATION.DELETE",
+      "category": "ORGANIZATION",
+      "description": "Delete organization details.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "ORGANIZATION.MODIFY",
+      "category": "ORGANIZATION",
+      "description": "Modify organization details.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "ORGANIZATION.VIEW",
+      "category": "ORGANIZATION",
+      "description": "View organization details.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTLEVELS.DELETE",
+      "category": "PARTLEVELS",
+      "description": "Delete part levels.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTLEVELS.MODIFY",
+      "category": "PARTLEVELS",
+      "description": "Modify part levels.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTLEVELS.VIEW",
+      "category": "PARTLEVELS",
+      "description": "View part levels.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTNERS.DELETE",
+      "category": "PARTNERS",
+      "description": "Delete partners.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "PARTNERS.DOCUMENTS.DELETE",
+      "category": "PARTNERS",
+      "description": "Delete documents for partners.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTNERS.DOCUMENTS.MODIFY",
+      "category": "PARTNERS",
+      "description": "Modify documents for partners.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTNERS.DOCUMENTS.VIEW",
+      "category": "PARTNERS",
+      "description": "View documents for partners.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTNERS.MODIFY",
+      "category": "PARTNERS",
+      "description": "Modify partners.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTNERS.VIEW",
+      "category": "PARTNERS",
+      "description": "View partners.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.BOM.CLONE",
+      "category": "PARTS",
+      "description": "Clone the Bill of Materials (BOM) for parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.BOM.DELETE",
+      "category": "PARTS",
+      "description": "Delete the Bill of Materials (BOM) for parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.BOM.MODIFY",
+      "category": "PARTS",
+      "description": "Modify the Bill of Materials (BOM) for parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.BOM.VIEW",
+      "category": "PARTS",
+      "description": "View the Bill of Materials (BOM) for parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.DELETE",
+      "category": "PARTS",
+      "description": "Delete parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.DOCUMENTS.DELETE",
+      "category": "PARTS",
+      "description": "Delete documents related to parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.DOCUMENTS.MODIFY",
+      "category": "PARTS",
+      "description": "Modify documents related to parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.DOCUMENTS.VIEW",
+      "category": "PARTS",
+      "description": "View documents related to parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.INVENTORY.MODIFY",
+      "category": "PARTS",
+      "description": "Modify part inventory.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.INVENTORY.PRICE",
+      "category": "PARTS",
+      "description": "Set the price for part inventory.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.INVENTORY.VIEW",
+      "category": "PARTS",
+      "description": "View part inventory.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.MODIFY",
+      "category": "PARTS",
+      "description": "Modify parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.REVISE",
+      "category": "PARTS",
+      "description": "Revise parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.TRANSACTIONS.VIEW",
+      "category": "PARTS",
+      "description": "View part transactions.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.VIEW",
+      "category": "PARTS",
+      "description": "View parts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTS.WHEREUSED.VIEW",
+      "category": "PARTS",
+      "description": "View where a part is used.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTTYPECATEGORIES.DELETE",
+      "category": "PARTTYPECATEGORIES",
+      "description": "Delete part type categories.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTTYPECATEGORIES.MODIFY",
+      "category": "PARTTYPECATEGORIES",
+      "description": "Modify part type categories.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTTYPECATEGORIES.VIEW",
+      "category": "PARTTYPECATEGORIES",
+      "description": "View part type categories.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PARTTYPES.DELETE",
+      "category": "PARTTYPES",
+      "description": "Delete part types.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTTYPES.MODIFY",
+      "category": "PARTTYPES",
+      "description": "Modify part types.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PARTTYPES.VIEW",
+      "category": "PARTTYPES",
+      "description": "View part types.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PAYMENTTERMS.DELETE",
+      "category": "PAYMENTTERMS",
+      "description": "Delete payment terms.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PAYMENTTERMS.MODIFY",
+      "category": "PAYMENTTERMS",
+      "description": "Modify payment terms.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PAYMENTTERMS.VIEW",
+      "category": "PAYMENTTERMS",
+      "description": "View payment terms.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PERMISSIONS.DELETE",
+      "category": "PERMISSIONS",
+      "description": "Delete permissions.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PERMISSIONS.MODIFY",
+      "category": "PERMISSIONS",
+      "description": "Modify permissions.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PERMISSIONS.VIEW",
+      "category": "PERMISSIONS",
+      "description": "View permissions.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "PRODUCTS.BOM.DELETE",
+      "category": "PRODUCTS",
+      "description": "Delete the Bill of Materials (BOM) for products.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PRODUCTS.BOM.MODIFY",
+      "category": "PRODUCTS",
+      "description": "Modify the Bill of Materials (BOM) for products.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PRODUCTS.BOM.VIEW",
+      "category": "PRODUCTS",
+      "description": "View the Bill of Materials (BOM) for products.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PRODUCTS.DELETE",
+      "category": "PRODUCTS",
+      "description": "Delete products.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PRODUCTS.MODIFY",
+      "category": "PRODUCTS",
+      "description": "Modify products.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PRODUCTS.VIEW",
+      "category": "PRODUCTS",
+      "description": "View products.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PRODUCTS.WORKORDERS.VIEW",
+      "category": "PRODUCTS",
+      "description": "View work orders related to products.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PROGRAMS.DELETE",
+      "category": "PROGRAMS",
+      "description": "Delete programs.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "PROGRAMS.LINKEDPROJECTS.VIEW",
+      "category": "PROGRAMS",
+      "description": "View projects linked to a program.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PROGRAMS.MILESTONES.VIEW",
+      "category": "PROGRAMS",
+      "description": "View program milestones.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PROGRAMS.MODIFY",
+      "category": "PROGRAMS",
+      "description": "Modify programs.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "PROGRAMS.VIEW",
+      "category": "PROGRAMS",
+      "description": "View programs.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PROJECTS.DELETE",
+      "category": "PROJECTS",
+      "description": "Delete projects.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "PROJECTS.MODIFY",
+      "category": "PROJECTS",
+      "description": "Modify projects.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "PROJECTS.VIEW",
+      "category": "PROJECTS",
+      "description": "View projects.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.APPROVER",
+      "category": "PURCHASEORDERS",
+      "description": "Approve purchase orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.DELETE",
+      "category": "PURCHASEORDERS",
+      "description": "Delete purchase orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.DOCUMENTS.DELETE",
+      "category": "PURCHASEORDERS",
+      "description": "Delete documents related to purchase orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.DOCUMENTS.MODIFY",
+      "category": "PURCHASEORDERS",
+      "description": "Modify documents related to purchase orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.DOCUMENTS.VIEW",
+      "category": "PURCHASEORDERS",
+      "description": "View documents related to purchase orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.MODIFY",
+      "category": "PURCHASEORDERS",
+      "description": "Modify purchase orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.PRINT",
+      "category": "PURCHASEORDERS",
+      "description": "Print purchase orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.VIEW",
+      "category": "PURCHASEORDERS",
+      "description": "View purchase orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "PURCHASEORDERS.VIEW_ALL_DEPARTMENTS",
+      "category": "PURCHASEORDERS",
+      "description": "View purchase orders across all departments.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "QUALITYCHECK.DELETE",
+      "category": "QUALITYCHECK",
+      "description": "Delete qualitycheck.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "QUALITYCHECK.MODIFY",
+      "category": "QUALITYCHECK",
+      "description": "Modify qualitycheck.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "QUALITYCHECK.VIEW",
+      "category": "QUALITYCHECK",
+      "description": "View qualitycheck.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "QUALITYCHECKS.APPROVER",
+      "category": "QUALITYCHECKS",
+      "description": "Approve quality checks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "QUALITYCHECKS.DELETE",
+      "category": "QUALITYCHECKS",
+      "description": "Delete quality checks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "QUALITYCHECKS.DOCUMENTS.DELETE",
+      "category": "QUALITYCHECKS",
+      "description": "Delete documents for quality checks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "QUALITYCHECKS.DOCUMENTS.MODIFY",
+      "category": "QUALITYCHECKS",
+      "description": "Modify documents for quality checks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "QUALITYCHECKS.DOCUMENTS.VIEW",
+      "category": "QUALITYCHECKS",
+      "description": "View documents for quality checks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "QUALITYCHECKS.MODIFY",
+      "category": "QUALITYCHECKS",
+      "description": "Modify quality checks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "QUALITYCHECKS.VIEW",
+      "category": "QUALITYCHECKS",
+      "description": "View quality checks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "REPORTS.BOMCONSOLIDATED.VIEW",
+      "category": "REPORTS",
+      "description": "View the consolidated BOM report.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "REPORTS.DELETE",
+      "category": "REPORTS",
+      "description": "Delete reports.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REPORTS.MODIFY",
+      "category": "REPORTS",
+      "description": "Modify reports.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REPORTS.VIEW",
+      "category": "REPORTS",
+      "description": "View reports.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REQUISITIONS.APPROVER",
+      "category": "REQUISITIONS",
+      "description": "Approve requisitions.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REQUISITIONS.DELETE",
+      "category": "REQUISITIONS",
+      "description": "Delete requisitions.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REQUISITIONS.DOCUMENTS.DELETE",
+      "category": "REQUISITIONS",
+      "description": "Delete requisitions documents.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "REQUISITIONS.DOCUMENTS.MODIFY",
+      "category": "REQUISITIONS",
+      "description": "Modify requisitions documents.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REQUISITIONS.DOCUMENTS.VIEW",
+      "category": "REQUISITIONS",
+      "description": "View requisitions documents.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REQUISITIONS.MODIFY",
+      "category": "REQUISITIONS",
+      "description": "Modify requisitions.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REQUISITIONS.VIEW",
+      "category": "REQUISITIONS",
+      "description": "View requisitions.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "REQUISITIONS.VIEW_ALL_DEPARTMENTS",
+      "category": "REQUISITIONS",
+      "description": "View requisitions across all departments.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "RESOURCES.ALLOCATE",
+      "category": "RESOURCES",
+      "description": "Allocate resources.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "RESOURCES.VIEW",
+      "category": "RESOURCES",
+      "description": "View resources.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "ROLES.CREATE",
+      "category": "ROLES",
+      "description": "Create new roles.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "ROLES.DELETE",
+      "category": "ROLES",
+      "description": "Delete roles.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "ROLES.MODIFY",
+      "category": "ROLES",
+      "description": "Modify roles.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "ROLES.VIEW",
+      "category": "ROLES",
+      "description": "View roles.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "SCRAP.APPROVE",
+      "category": "SCRAP",
+      "description": "Approve scrap requests.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "SCRAP.MODIFY",
+      "category": "SCRAP",
+      "description": "Modify scrap requests.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "SCRAP.VIEW",
+      "category": "SCRAP",
+      "description": "View scrap requests.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "SERVICES.DELETE",
+      "category": "SERVICES",
+      "description": "Delete services.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "SERVICES.MODIFY",
+      "category": "SERVICES",
+      "description": "Modify services.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "SERVICES.TRANSACTIONS.VIEW",
+      "category": "SERVICES",
+      "description": "View service transactions.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "SERVICES.VIEW",
+      "category": "SERVICES",
+      "description": "View services.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "STAFF.DELETE",
+      "category": "STAFF",
+      "description": "Delete staff members.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "STAFF.MODIFY",
+      "category": "STAFF",
+      "description": "Modify staff members.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "STAFF.VIEW",
+      "category": "STAFF",
+      "description": "View staff members.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "STOCKMOVEMENTS.MODIFY",
+      "category": "STOCKMOVEMENTS",
+      "description": "Modify stock movements.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "STOCKMOVEMENTS.VIEW",
+      "category": "STOCKMOVEMENTS",
+      "description": "View stock movements.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "SUBSYSTEMS.DELETE",
+      "category": "SUBSYSTEMS",
+      "description": "Delete subsystems.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "SUBSYSTEMS.MODIFY",
+      "category": "SUBSYSTEMS",
+      "description": "Modify subsystems.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "SUBSYSTEMS.VIEW",
+      "category": "SUBSYSTEMS",
+      "description": "View subsystems.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.ASSIGN",
+      "category": "TASKS",
+      "description": "Assign tasks to users.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.COMMENTS.DELETE",
+      "category": "TASKS",
+      "description": "Delete comments on tasks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.COMMENTS.MODIFY",
+      "category": "TASKS",
+      "description": "Modify comments on tasks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.COMMENTS.VIEW",
+      "category": "TASKS",
+      "description": "View comments on tasks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.DELETE",
+      "category": "TASKS",
+      "description": "Delete tasks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.DEPENDENCIES.MODIFY",
+      "category": "TASKS",
+      "description": "Modify task dependencies.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.DEPENDENCIES.VIEW",
+      "category": "TASKS",
+      "description": "View task dependencies.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.MODIFY",
+      "category": "TASKS",
+      "description": "Modify tasks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.SUBTASKS.MODIFY",
+      "category": "TASKS",
+      "description": "Modify subtasks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.SUBTASKS.VIEW",
+      "category": "TASKS",
+      "description": "View subtasks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TASKS.VIEW",
+      "category": "TASKS",
+      "description": "View tasks.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TIMETRACKING.LOG_ANY",
+      "category": "TIMETRACKING",
+      "description": "Log time entries on behalf of any user.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TIMETRACKING.LOG_OWN",
+      "category": "TIMETRACKING",
+      "description": "Log your own time entries.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TIMETRACKING.REPORTS",
+      "category": "TIMETRACKING",
+      "description": "View time tracking reports.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TIMETRACKING.VIEW",
+      "category": "TIMETRACKING",
+      "description": "View time tracking.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "TOOLS.DELETE",
+      "category": "TOOLS",
+      "description": "Delete tools.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "TOOLS.MODIFY",
+      "category": "TOOLS",
+      "description": "Modify tools.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "TOOLS.VIEW",
+      "category": "TOOLS",
+      "description": "View tools.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "USERS.MODIFY",
+      "category": "USERS",
+      "description": "Modify users.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "USERS.VIEW",
+      "category": "USERS",
+      "description": "View users.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORRETURNS.APPROVE",
+      "category": "VENDORRETURNS",
+      "description": "Approve vendor returns.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "VENDORRETURNS.MODIFY",
+      "category": "VENDORRETURNS",
+      "description": "Modify vendor returns.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "VENDORRETURNS.VIEW",
+      "category": "VENDORRETURNS",
+      "description": "View vendor returns.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "VENDORS.ADDRESS.DELETE",
+      "category": "VENDORS",
+      "description": "Delete vendor addresses.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.ADDRESS.MODIFY",
+      "category": "VENDORS",
+      "description": "Modify vendor addresses.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.ADDRESS.VIEW",
+      "category": "VENDORS",
+      "description": "View vendor addresses.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.BANKS.DELETE",
+      "category": "VENDORS",
+      "description": "Delete vendor bank details.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.BANKS.MODIFY",
+      "category": "VENDORS",
+      "description": "Modify vendor bank details.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.BANKS.VIEW",
+      "category": "VENDORS",
+      "description": "View vendor bank details.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.CONTACTS.DELETE",
+      "category": "VENDORS",
+      "description": "Delete vendor contacts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.CONTACTS.MODIFY",
+      "category": "VENDORS",
+      "description": "Modify vendor contacts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.CONTACTS.VIEW",
+      "category": "VENDORS",
+      "description": "View vendor contacts.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.DELETE",
+      "category": "VENDORS",
+      "description": "Delete vendors.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "VENDORS.DOCUMENTS.DELETE",
+      "category": "VENDORS",
+      "description": "Delete documents related to vendors.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true,
+      "legacyAliases": [
+        "VENDORS.DOC.DELETE"
+      ]
+    },
+    {
+      "key": "VENDORS.DOCUMENTS.MODIFY",
+      "category": "VENDORS",
+      "description": "Modify documents related to vendors.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.DOCUMENTS.VIEW",
+      "category": "VENDORS",
+      "description": "View documents related to vendors.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.MODIFY",
+      "category": "VENDORS",
+      "description": "Modify vendors.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.PARTS.DELETE",
+      "category": "VENDORS",
+      "description": "Delete parts associated with a vendor.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.PARTS.MODIFY",
+      "category": "VENDORS",
+      "description": "Modify parts associated with a vendor.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.PARTS.VIEW",
+      "category": "VENDORS",
+      "description": "View parts associated with a vendor.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "VENDORS.VIEW",
+      "category": "VENDORS",
+      "description": "View vendors.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "WORKORDERS.ASSIGNKIT",
+      "category": "WORKORDERS",
+      "description": "Assign a material kit to a work order.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "WORKORDERS.ASSIGNPRODUCT",
+      "category": "WORKORDERS",
+      "description": "Assign a product to a work order.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "WORKORDERS.ASSIGNTECHNICIAN",
+      "category": "WORKORDERS",
+      "description": "Assign a technician to a work order.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "WORKORDERS.DELETE",
+      "category": "WORKORDERS",
+      "description": "Delete work orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "WORKORDERS.DOCUMENTS.DELETE",
+      "category": "WORKORDERS",
+      "description": "Delete workorders documents.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "WORKORDERS.DOCUMENTS.MODIFY",
+      "category": "WORKORDERS",
+      "description": "Modify workorders documents.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": false
+    },
+    {
+      "key": "WORKORDERS.DOCUMENTS.VIEW",
+      "category": "WORKORDERS",
+      "description": "View workorders documents.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "WORKORDERS.MODIFY",
+      "category": "WORKORDERS",
+      "description": "Modify work orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "WORKORDERS.PRINT",
+      "category": "WORKORDERS",
+      "description": "Print work orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "WORKORDERS.VIEW",
+      "category": "WORKORDERS",
+      "description": "View work orders.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    }
+  ]
+}

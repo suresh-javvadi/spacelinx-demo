@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SpaceLinx Permission Catalog",
+  "type": "object",
+  "required": ["version", "permissions"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "description": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "permissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "category", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[A-Za-z]+(\\.[A-Za-z_]+)+$",
+            "description": "Permission string, UPPER.DOTTED (e.g. PARTS.MODIFY)."
+          },
+          "category": { "type": "string", "description": "Top-level grouping; matches the key prefix." },
+          "description": { "type": "string", "minLength": 1 },
+          "inFrontend": { "type": "boolean" },
+          "inDb": { "type": "boolean" },
+          "assigned": { "type": "boolean" },
+          "legacyAliases": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Old permission strings that should be migrated to this key."
+          }
+        }
+      }
+    }
+  }
+}

@@ -36,6 +36,7 @@ builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddSpaceLinxAuthentication(builder.Configuration);
+builder.Services.AddSpaceLinxAuthorization(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddControllers()
