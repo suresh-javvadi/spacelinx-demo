@@ -260,10 +260,25 @@ ON CONFLICT (name) DO NOTHING;
 
 -- 2) Fix legacy typo alias: VENDORS.DOC.DELETE -> VENDORS.DOCUMENTS.DELETE
 --    (canonical row inserted above; migrate any role grants, then retire the typo row)
-UPDATE application.role_permission
+--    Guarded against the UNIQUE (role_id, permission, deleted_at) constraint: only rename
+--    a grant where the canonical one does not already exist for that role; otherwise the
+--    redundant typo grant is soft-deleted by step 2b below.
+UPDATE application.role_permission rp
    SET permission = 'VENDORS.DOCUMENTS.DELETE', updated_at = now(), updated_by = 'system-seed'
+   WHERE rp.permission = 'VENDORS.DOC.DELETE' AND rp.deleted_at IS NULL
+     AND NOT EXISTS (
+       SELECT 1 FROM application.role_permission x
+        WHERE x.role_id = rp.role_id
+          AND x.permission = 'VENDORS.DOCUMENTS.DELETE'
+          AND x.deleted_at IS NULL
+     );
+
+-- 2b) Retire any leftover typo grants (those whose canonical grant already existed).
+UPDATE application.role_permission
+   SET deleted_at = now(), deleted_by = 'system-seed', is_active = false
    WHERE permission = 'VENDORS.DOC.DELETE' AND deleted_at IS NULL;
 
+-- 2c) Retire the typo permission definition row.
 UPDATE application.permission
    SET deleted_at = now(), deleted_by = 'system-seed', is_active = false
    WHERE name = 'VENDORS.DOC.DELETE' AND deleted_at IS NULL;
