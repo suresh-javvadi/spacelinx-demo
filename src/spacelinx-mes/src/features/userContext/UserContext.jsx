@@ -24,13 +24,26 @@ export const UserContextProvider = ({ children }) => {
   const [defaultRole, setDefaultRole] = useState(null);
   const [permissionSet, setPermissionSet] = useState(null);
 
+  // Active-role selection is persisted in localStorage (not sessionStorage) so the
+  // user's chosen role survives a browser/tab close — matching how MSAL persists the
+  // login (cacheLocation: "localStorage"). Previously it lived in sessionStorage, so
+  // closing the browser wiped it and the next load silently fell back to the default
+  // role (dropping a Super Admin to a low-privilege role). The key is scoped per user
+  // so a shared browser can't leak one account's active role into another's.
+  const activeRoleStorageKey = (email) =>
+    `slx.activeRole.${(email || "").toLowerCase()}`;
+
   const updateActiveRole = (role) => {
     const matchedRole = userRolesAndPermissions.find(
       (roleObj) => roleObj.role?.roleName === role.roleName
     );
     if (matchedRole) {
       setActiveRole(matchedRole);
-      sessionStorage.setItem("activeRole", matchedRole.role.roleName);
+      const email = accounts[0]?.username;
+      localStorage.setItem(
+        activeRoleStorageKey(email),
+        matchedRole.role.roleName
+      );
     }
   };
 
@@ -78,17 +91,40 @@ export const UserContextProvider = ({ children }) => {
 
         setUserRolesAndPermissions(rolesWithPermissions);
 
-        const matchedSavedRole = sortedRoles.find((item) => item.isDefault);
+        // Pick the org-assigned default. Exactly one user_role should be flagged
+        // default; if the data has more than one (a known inconsistency), choose
+        // deterministically (lowest roleNumber — sortedRoles is already sorted) and
+        // warn, rather than masking it by silently jumping to a higher-privilege role.
+        const defaultUserRoles = sortedRoles.filter((item) => item.isDefault);
+        if (defaultUserRoles.length > 1) {
+          console.warn(
+            `[UserContext] ${email} has ${defaultUserRoles.length} roles flagged default ` +
+              `(${defaultUserRoles
+                .map((r) => r.role.roleName)
+                .join(", ")}); defaulting to "${defaultUserRoles[0].role.roleName}". ` +
+              `Exactly one default is expected — fix the user_role data.`
+          );
+        }
+        const matchedSavedRole = defaultUserRoles[0] || null;
         const defaultRoleObj =
           rolesWithPermissions.find(
             (item) => item.role.id === matchedSavedRole?.role?.id
           ) || rolesWithPermissions[0];
 
-        const savedRoleName = sessionStorage.getItem("activeRole");
+        // Restore the user's last explicitly chosen role from the per-user
+        // localStorage key, falling back to the legacy sessionStorage key for
+        // sessions saved before this change. The auto-resolved default is NOT
+        // persisted here — only an explicit switch (updateActiveRole) writes it —
+        // otherwise the first fallback would lock the user to the default forever.
+        const savedRoleName =
+          localStorage.getItem(activeRoleStorageKey(email)) ||
+          sessionStorage.getItem("activeRole");
 
-        const savedRoleObj = rolesWithPermissions.find(
-          (item) => item.role.roleName === savedRoleName
-        );
+        const savedRoleObj = savedRoleName
+          ? rolesWithPermissions.find(
+              (item) => item.role.roleName === savedRoleName
+            )
+          : null;
 
         setDefaultRole(matchedSavedRole || null);
         setActiveRole(savedRoleObj || defaultRoleObj);
