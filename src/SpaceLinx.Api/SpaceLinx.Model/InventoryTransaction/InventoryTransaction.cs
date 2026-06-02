@@ -1,5 +1,7 @@
 ﻿namespace SpaceLinx.Model
 {
+    // Immutable inventory ledger — append-only by design; updates are not field-audited.
+    [AuditExclude(AuditOperations.Update)]
     public partial class InventoryTransaction : BaseModel
     {
         public Guid PartId { get; set; }

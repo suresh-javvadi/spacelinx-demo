@@ -87,6 +87,9 @@ if (app.Environment.IsProduction())
 
 app.UseHttpsRedirection();
 
+// Establish a correlation id per request (shared by audit rows and logs)
+app.UseMiddleware<CorrelationMiddleware>();
+
 // Add Serilog request logging for HTTP requests
 app.UseSerilogRequestLogging(options =>
 {

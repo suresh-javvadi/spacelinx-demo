@@ -1,5 +1,7 @@
 namespace SpaceLinx.Model;
 
+// High-volume stock movement ledger — append-heavy; updates are not field-audited.
+[AuditExclude(AuditOperations.Update)]
 public partial class StockMovement : BaseModel
 {
     public string MovementNumber { get; set; } = null!;

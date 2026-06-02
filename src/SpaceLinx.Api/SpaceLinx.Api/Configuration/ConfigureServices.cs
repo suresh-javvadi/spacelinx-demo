@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
+using SpaceLinx.Api.Audit;
 using SpaceLinx.Api.BackgroundServices;
 using SpaceLinx.Api.Interfaces;
 using SpaceLinx.Api.Services;
@@ -94,12 +95,18 @@ public static class ConfigureServices
         int poolSize = Convert.ToInt16(configuration["PostgreSql:PoolSize"]);
         services.AddHttpContextAccessor();
 
-        services.AddDbContextPool<SpaceLinxContext>(options =>
+        // Platform audit trail: a singleton interceptor that centralizes audit-field stamping and
+        // captures field-level change history into audit.change_log. Registered via the
+        // IServiceProvider overload because AddDbContextPool reuses context instances.
+        services.AddSingleton<SpaceLinxAuditInterceptor>();
+
+        services.AddDbContextPool<SpaceLinxContext>((serviceProvider, options) =>
         {
             options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
             //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             //options.EnableThreadSafetyChecks(enableChecks: false);
             options.UseNpgsql(postgreConnectionString);
+            options.AddInterceptors(serviceProvider.GetRequiredService<SpaceLinxAuditInterceptor>());
         }, poolSize
         );
 

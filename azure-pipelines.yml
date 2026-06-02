@@ -29,6 +29,10 @@ variables:
   apiProject: 'src/SpaceLinx.Api/SpaceLinx.Api/SpaceLinx.Api.csproj'
   frontendDir: 'src/spacelinx-mes'
   buildConfiguration: 'Release'
+  # Gate for the Flyway DB-migration jobs. Off by default so merging does not break
+  # deployments before the per-environment Key Vault secrets + migration role exist.
+  # Set to 'true' (pipeline variable) once each environment's KV is configured.
+  runDbMigrations: 'false'
 
 stages:
   # ──────────────────────────────────────────────────────────
@@ -112,6 +116,60 @@ stages:
             workingDirectory: '$(frontendDir)'
 
   # ──────────────────────────────────────────────────────────
+  # VALIDATE DB MIGRATIONS (PR only) — apply the Flyway scripts to a
+  # throwaway PostgreSQL so a broken/out-of-order migration fails the
+  # PR before merge. No environment credentials are used.
+  # ──────────────────────────────────────────────────────────
+  - stage: ValidateDb
+    displayName: 'Validate DB migrations (PR)'
+    dependsOn: []
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      - job: FlywayDryRun
+        displayName: 'Flyway migrate on ephemeral PostgreSQL'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+
+          - script: |
+              set -euo pipefail
+              docker network create flyway-net
+              docker run -d --name pg --network flyway-net \
+                -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=spacelinx \
+                postgres:16-alpine
+              echo "Waiting for PostgreSQL..."
+              for i in $(seq 1 30); do
+                if docker exec pg pg_isready -U postgres -d spacelinx >/dev/null 2>&1; then
+                  echo "PostgreSQL ready"; break
+                fi
+                sleep 2
+                if [ "$i" = "30" ]; then echo "PostgreSQL did not become ready"; exit 1; fi
+              done
+              # Create the roles referenced by V002's ${app_role}/${read_role} placeholders
+              # so the GRANT/REVOKE statements apply on the throwaway DB.
+              docker exec pg psql -U postgres -d spacelinx -v ON_ERROR_STOP=1 \
+                -c "CREATE ROLE flyway_app; CREATE ROLE flyway_read;"
+            displayName: 'Start ephemeral PostgreSQL + roles'
+
+          - script: |
+              set -euo pipefail
+              docker run --rm --network flyway-net \
+                -v "$(Build.SourcesDirectory)/database/migrations/versioned:/flyway/sql:ro" \
+                -v "$(Build.SourcesDirectory)/database/flyway.conf:/flyway/conf/flyway.conf:ro" \
+                -e FLYWAY_URL="jdbc:postgresql://pg:5432/spacelinx" \
+                -e FLYWAY_USER="postgres" -e FLYWAY_PASSWORD="postgres" \
+                -e FLYWAY_PLACEHOLDERS_APP_ROLE="flyway_app" \
+                -e FLYWAY_PLACEHOLDERS_READ_ROLE="flyway_read" \
+                flyway/flyway:11-alpine migrate
+              echo "All migrations applied cleanly."
+            displayName: 'Flyway migrate (validation)'
+
+          - script: docker rm -f pg >/dev/null 2>&1 || true; docker network rm flyway-net >/dev/null 2>&1 || true
+            displayName: 'Cleanup'
+            condition: always()
+
+  # ──────────────────────────────────────────────────────────
   # DEPLOY DEV (auto on main branch)
   # ──────────────────────────────────────────────────────────
   - stage: DeployDev
@@ -166,9 +224,18 @@ stages:
             displayName: 'Upload frontend artifact'
 
       # Deploy API to Dev (Linux App Service)
+      # Apply DB migrations (Flyway) before the API deploys
+      - template: azure-pipelines.db-migrate.yml
+        parameters:
+          suffix: Dev
+          environment: 'spacelinx-mes-dev'
+          azureSubscription: 'SpaceLinxDev'
+          keyVaultName: 'spacelinx-dev-kv'
+
       - deployment: DeployApiDev
         displayName: 'Deploy API'
-        dependsOn: []
+        dependsOn: DeployDbDev
+        condition: in(dependencies.DeployDbDev.result, 'Succeeded', 'Skipped')
         pool:
           vmImage: 'ubuntu-latest'
         environment: 'spacelinx-mes-dev'
@@ -257,9 +324,18 @@ stages:
             artifact: frontend-uat
             displayName: 'Upload frontend artifact'
 
+      # Apply DB migrations (Flyway) before the API deploys
+      - template: azure-pipelines.db-migrate.yml
+        parameters:
+          suffix: UAT
+          environment: 'spacelinx-mes-uat'
+          azureSubscription: 'SpaceLinxUAT'
+          keyVaultName: 'spacelinx-uat-kv'
+
       - deployment: DeployApiUAT
         displayName: 'Deploy API'
-        dependsOn: []
+        dependsOn: DeployDbUAT
+        condition: in(dependencies.DeployDbUAT.result, 'Succeeded', 'Skipped')
         pool:
           vmImage: 'ubuntu-latest'
         environment: 'spacelinx-mes-uat'
@@ -387,9 +463,18 @@ stages:
             displayName: 'Upload frontend artifact'
 
       # Deploy API to Prod
+      # Apply DB migrations (Flyway) before the API deploys — gated by the prod environment approval
+      - template: azure-pipelines.db-migrate.yml
+        parameters:
+          suffix: Prod
+          environment: 'spacelinx-mes-prod'
+          azureSubscription: 'SpaceLinxProd'
+          keyVaultName: 'spacelinx-prod-kv'
+
       - deployment: DeployApiProd
         displayName: 'Deploy API (Prod)'
-        dependsOn: []
+        dependsOn: DeployDbProd
+        condition: in(dependencies.DeployDbProd.result, 'Succeeded', 'Skipped')
         pool:
           vmImage: 'ubuntu-latest'
         environment: 'spacelinx-mes-prod'

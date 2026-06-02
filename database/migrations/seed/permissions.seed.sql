@@ -17,6 +17,8 @@ VALUES
   ('ASSEMBLYLOCATIONS.DELETE', 'Delete assembly locations.', 'system-seed'),
   ('ASSEMBLYLOCATIONS.MODIFY', 'Modify assembly locations.', 'system-seed'),
   ('ASSEMBLYLOCATIONS.VIEW', 'View assembly locations.', 'system-seed'),
+  ('AUDIT.VIEW', 'View the platform audit trail (change history).', 'system-seed'),
+  ('AUDIT.VIEW.REGULATED', 'View audit records for regulated/controlled records (export-control gated).', 'system-seed'),
   ('BINMANAGEMENT.DELETE', 'Delete bin management.', 'system-seed'),
   ('BINMANAGEMENT.MODIFY', 'Modify bin management.', 'system-seed'),
   ('BINMANAGEMENT.VIEW', 'View bin management.', 'system-seed'),

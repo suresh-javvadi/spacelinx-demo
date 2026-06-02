@@ -20,6 +20,14 @@ public static class Permissions
         public const string Modify = "ASSEMBLYLOCATIONS.MODIFY";
         public const string View = "ASSEMBLYLOCATIONS.VIEW";
     }
+    public static class Audit
+    {
+        public static class View
+        {
+            public const string _Self = "AUDIT.VIEW";
+            public const string Regulated = "AUDIT.VIEW.REGULATED";
+        }
+    }
     public static class ApprovalsConfig
     {
         public const string Create = "ApprovalsConfig.CREATE";
@@ -526,6 +534,8 @@ public static class Permissions
         "ASSEMBLYLOCATIONS.DELETE",
         "ASSEMBLYLOCATIONS.MODIFY",
         "ASSEMBLYLOCATIONS.VIEW",
+        "AUDIT.VIEW",
+        "AUDIT.VIEW.REGULATED",
         "BINMANAGEMENT.DELETE",
         "BINMANAGEMENT.MODIFY",
         "BINMANAGEMENT.VIEW",

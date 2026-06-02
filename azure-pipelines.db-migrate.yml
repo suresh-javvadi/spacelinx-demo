@@ -1,0 +1,61 @@
+# ============================================================
+# Reusable DB migration job (Flyway) — applied per environment
+# before the API deploys. Inherits the target environment's
+# approval checks (e.g. manual approval on Prod) via `environment:`.
+#
+# Required Key Vault secrets (per environment):
+#   PgMigrationUrl       jdbc:postgresql://<host>:5432/<db>?sslmode=require
+#   PgMigrationUser      a DDL-capable MIGRATION login (NOT the app runtime login)
+#   PgMigrationPassword  password for the migration login
+#   PgAppRole            the app's least-privilege runtime role (INSERT-only on audit)
+#   PgAuditReadRole      a forensic read-only role for the audit schema
+# ============================================================
+parameters:
+  - name: suffix
+    type: string
+  - name: environment
+    type: string
+  - name: azureSubscription
+    type: string
+  - name: keyVaultName
+    type: string
+
+jobs:
+  - deployment: DeployDb${{ parameters.suffix }}
+    displayName: 'Apply DB migrations (Flyway)'
+    # Opt-in: only runs when runDbMigrations is set to 'true' (after the env's Key Vault
+    # secrets + migration role are configured). Otherwise it is skipped, and the API deploy
+    # proceeds (see the API job's condition).
+    condition: eq(variables['runDbMigrations'], 'true')
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - task: AzureKeyVault@2
+              displayName: 'Fetch DB migration secrets'
+              inputs:
+                azureSubscription: ${{ parameters.azureSubscription }}
+                KeyVaultName: ${{ parameters.keyVaultName }}
+                SecretsFilter: 'PgMigrationUrl,PgMigrationUser,PgMigrationPassword,PgAppRole,PgAuditReadRole'
+
+            - script: |
+                set -euo pipefail
+                docker run --rm \
+                  -v "$(Build.SourcesDirectory)/database/migrations/versioned:/flyway/sql:ro" \
+                  -v "$(Build.SourcesDirectory)/database/flyway.conf:/flyway/conf/flyway.conf:ro" \
+                  -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_PASSWORD \
+                  -e FLYWAY_PLACEHOLDERS_APP_ROLE -e FLYWAY_PLACEHOLDERS_READ_ROLE \
+                  flyway/flyway:11-alpine info validate migrate
+              displayName: 'Flyway validate + migrate'
+              env:
+                # Secret pipeline variables must be mapped explicitly to env.
+                FLYWAY_URL: $(PgMigrationUrl)
+                FLYWAY_USER: $(PgMigrationUser)
+                FLYWAY_PASSWORD: $(PgMigrationPassword)
+                FLYWAY_PLACEHOLDERS_APP_ROLE: $(PgAppRole)
+                FLYWAY_PLACEHOLDERS_READ_ROLE: $(PgAuditReadRole)

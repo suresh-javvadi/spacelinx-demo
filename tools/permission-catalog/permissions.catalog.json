@@ -4,6 +4,22 @@
   "version": 1,
   "permissions": [
     {
+      "key": "AUDIT.VIEW",
+      "category": "AUDIT",
+      "description": "View the platform audit trail (change history).",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
+      "key": "AUDIT.VIEW.REGULATED",
+      "category": "AUDIT",
+      "description": "View audit records for regulated/controlled records (export-control gated).",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
       "key": "ADDITIONALRECIPIENTS.DELETE",
       "category": "ADDITIONALRECIPIENTS",
       "description": "Delete additional notification recipients.",

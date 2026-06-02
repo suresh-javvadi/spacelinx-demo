@@ -1,5 +1,7 @@
 namespace SpaceLinx.Model;
 
+// Email send log — its own record of truth; excluded from the change-history audit trail.
+[AuditExclude]
 public partial class EmailLog : BaseModel
 {
     public string TemplateCode { get; set; } = null!;
