@@ -12,6 +12,7 @@ import {
   Dashboard,
   Hub as HubIcon,
   Assessment as AssessmentIcon,
+  ManageSearch as ManageSearchIcon,
 } from "@mui/icons-material";
 import { PERMISSIONS } from "../../constants/PagePermissions";
 import { Tooltip } from "@mui/material";
@@ -28,6 +29,19 @@ const NavBarItems = [
       </Tooltip>
     ),
     path: "/",
+  },
+  {
+    label: "Audit",
+    icon: (
+      <Tooltip
+        title={<span className="tooltipTitle">Audit Trail</span>}
+        placement="right"
+      >
+        <ManageSearchIcon />
+      </Tooltip>
+    ),
+    path: "/audit",
+    permission: PERMISSIONS.AUDIT.VIEW._SELF,
   },
   {
     label: "PgM",

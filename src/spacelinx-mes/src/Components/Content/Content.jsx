@@ -39,6 +39,7 @@ const GuideDetails = lazy(() => import("../../features/Guides/GuidesDetails"));
 const QualityReports = lazy(() => import("../Pages/Reports/QualityReports"));
 const Issues = lazy(() => import("../../features/issues/Issues"));
 const IssuesList = lazy(() => import("../Pages/Reports/IssueLists"));
+const AuditTrail = lazy(() => import("../../features/Audit/AuditTrail"));
 const WorkOrderDetails = lazy(
   () => import("../../features/workOrder/workOrderdetails"),
 );
@@ -222,6 +223,13 @@ const Content = ({ status }) => {
           <Route path="/" element={<PlatformDashboard />} />
           <Route path="/home" element={<PlatformDashboard />} />
           <Route path="/unauthorized" element={<UnAuthorizedUser />} />
+          <Route
+            path="/audit"
+            element={renderProtectedComponent(
+              PERMISSIONS.AUDIT.VIEW._SELF,
+              AuditTrail,
+            )}
+          />
           <Route
             path="/programmanagement/programs"
             element={renderProtectedComponent(
