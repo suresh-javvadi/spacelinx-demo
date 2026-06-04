@@ -223,7 +223,7 @@ public class EcoNotificationService : IEcoNotificationService
                 .AsNoTracking()
                 .Where(r => r.TemplateCode.ToUpper() == templateCode.ToUpper() &&
                            r.DeletedBy == null &&
-                           r.IsActive)
+                           r.IsActive == true)
                 .ToListAsync();
 
             foreach (var global in globalRecipients)

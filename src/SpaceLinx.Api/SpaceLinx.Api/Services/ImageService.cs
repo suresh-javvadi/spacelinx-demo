@@ -39,7 +39,10 @@ public class ImageService(BlobServiceClient _blobServiceClient, SpaceLinxContext
             FileRelativePath = blobPath,
             FileExtension = Path.GetExtension(newImage.ImageFile.FileName),
             FilePath = blob.Uri.ToString(),
-            FileSize = blobProperties.Value.ContentLength,
+            FileSize = blobProperties.Value.ContentLength <= int.MaxValue
+                ? (int)blobProperties.Value.ContentLength
+                : throw new InvalidOperationException(
+                    $"Image is {blobProperties.Value.ContentLength} bytes, exceeding the {int.MaxValue}-byte limit for the stored file size."),
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = UserEmail

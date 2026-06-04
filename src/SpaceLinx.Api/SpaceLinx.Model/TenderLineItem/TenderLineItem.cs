@@ -3,7 +3,7 @@ namespace SpaceLinx.Model;
 public partial class TenderLineItem : BaseModel
 {
     public Guid TenderId { get; set; }
-    public Guid PartId { get; set; }
+    public Guid? PartId { get; set; }
     public int Quantity { get; set; }
     public Guid? UnitOfMeasureId { get; set; }
     public string? Description { get; set; }

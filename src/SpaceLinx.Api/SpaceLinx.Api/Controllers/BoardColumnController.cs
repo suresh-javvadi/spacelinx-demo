@@ -67,7 +67,7 @@ GenericRestController<BoardColumn, BoardColumnWriteModel, BoardColumnUpdateModel
 
         // Remove default flag from other columns in the same project
         var otherColumns = await _context.BoardColumns
-            .Where(c => c.ProjectId == column.ProjectId && c.Id != id && c.IsDefault && c.DeletedAt == null)
+            .Where(c => c.ProjectId == column.ProjectId && c.Id != id && c.IsDefault == true && c.DeletedAt == null)
             .ToListAsync();
 
         foreach (var other in otherColumns)

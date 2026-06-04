@@ -16,7 +16,7 @@
         public int QtyQcPending { get; set; }
         public int QtyScrapped { get; set; }
         public int QtyQcFailed { get; set; }
-        public int QtyReturned { get; set; }
+        public int? QtyReturned { get; set; }
         public string? TrackingType { get; set; }
         public virtual Part Part { get; set; } = null!;
         public virtual Location? Location { get; set; }

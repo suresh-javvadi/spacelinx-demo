@@ -11,7 +11,7 @@ public partial class CompanyPart : BaseModel
     public int? LeadTimeDays { get; set; }
     public int? MinOrderQuantity { get; set; }
     public int? OrderMultiple { get; set; }
-    public bool IsPreferred { get; set; }
+    public bool? IsPreferred { get; set; }
     public DateOnly? ValidFrom { get; set; }
     public DateOnly? ValidTo { get; set; }
     public string? VendorPartNumber { get; set; }

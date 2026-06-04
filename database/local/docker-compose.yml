@@ -1,0 +1,32 @@
+# Local development PostgreSQL for SpaceLinx — mirrors the managed Postgres 16 used in
+# Dev/UAT/Prod. NOT for production. `setup-local-db.sh` brings this up and applies the EF
+# migrations + procedures + views + seed in the SAME order as the CI pipeline.
+name: spacelinx-local-db
+
+services:
+  db:
+    image: postgres:16            # match the managed Postgres 16.x in Dev/UAT/Prod
+    container_name: spacelinx-local-db
+    environment:
+      POSTGRES_USER: spacelinx
+      POSTGRES_PASSWORD: spacelinx
+      POSTGRES_DB: spacelinx
+      TZ: UTC                      # keep server time UTC, like the managed instances
+      PGTZ: UTC
+    ports:
+      # Host port defaults to 5433 (avoids a system Postgres on 5432). Override with
+      # SPACELINX_DB_PORT if 5433 is taken by another project's container.
+      - "${SPACELINX_DB_PORT:-5433}:5432"
+    volumes:
+      - spacelinx_local_pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro   # group roles created once on first init
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spacelinx -d spacelinx"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  spacelinx_local_pgdata:
+    name: spacelinx_local_pgdata

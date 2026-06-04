@@ -578,6 +578,8 @@ public class TenderService : BaseService, ITenderService
         var awardedQuotation = tender.TenderQuotations.FirstOrDefault(q => q.IsSelected);
         if (awardedQuotation == null)
             throw new InvalidOperationException("No awarded quotation found");
+        if (awardedQuotation.CompanyId is null)
+            throw new InvalidOperationException("The awarded quotation has no company; cannot create a Purchase Order");
 
         // Generate PO number - following existing pattern
         var poNumber = await GeneratePoNumberAsync();
@@ -585,7 +587,7 @@ public class TenderService : BaseService, ITenderService
         var purchaseOrder = new PurchaseOrder
         {
             Number = poNumber,
-            CompanyId = awardedQuotation.CompanyId,
+            CompanyId = awardedQuotation.CompanyId.Value,
             Status = PoStatus.Draft,
             DeliveryStatus = "Pending",
             OrderDate = DateOnly.FromDateTime(DateTime.UtcNow),
@@ -665,6 +667,9 @@ public class TenderService : BaseService, ITenderService
         {
             var partId = qli.TenderLineItem.PartId;
             var companyId = quotation.CompanyId;
+            if (companyId is null || partId is null)
+                throw new InvalidOperationException(
+                    "Cannot create a CompanyPart from a quotation line item missing a company or part reference");
 
             // Find or create CompanyPart
             var companyPart = await _context.CompanyParts
@@ -674,8 +679,8 @@ public class TenderService : BaseService, ITenderService
             {
                 companyPart = new CompanyPart
                 {
-                    CompanyId = companyId,
-                    PartId = partId,
+                    CompanyId = companyId.Value,
+                    PartId = partId.Value,
                     UnitPrice = qli.UnitPrice,
                     CurrencyId = quotation.CurrencyId,
                     LeadTimeDays = qli.LeadTimeDays ?? quotation.LeadTimeDays,

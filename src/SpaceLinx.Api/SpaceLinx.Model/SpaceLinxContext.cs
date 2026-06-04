@@ -249,6 +249,8 @@ public partial class SpaceLinxContext : DbContext
 
     public virtual DbSet<VendorReturnRequestWithUserVw> VendorReturnRequestWithUserVws { get; set; }
 
+    public virtual DbSet<FcmToken> FcmTokens { get; set; }
+
     public virtual DbSet<Video> Videos { get; set; }
 
     public virtual DbSet<WorkOrder> WorkOrders { get; set; }
@@ -5363,7 +5365,7 @@ public partial class SpaceLinxContext : DbContext
 
             entity.HasOne(d => d.Role).WithMany(p => p.RolePermissions)
                 .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.SetNull) // R7: UAT FK is ON DELETE SET NULL
                 .HasConstraintName("role_permission_role_id_fkey");
         });
 
@@ -7082,7 +7084,7 @@ public partial class SpaceLinxContext : DbContext
 
             entity.HasOne(d => d.WorkOrderStep).WithMany(p => p.WorkOrderTasks)
                 .HasForeignKey(d => d.WorkOrderStepId)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.NoAction) // R7: UAT FK has NO ON DELETE action (drop the spurious SET NULL)
                 .HasConstraintName("work_order_task_work_order_step_id_fkey");
         });
 

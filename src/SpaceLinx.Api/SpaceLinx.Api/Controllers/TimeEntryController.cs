@@ -54,8 +54,8 @@ GenericRestController<TimeEntry, TimeEntryWriteModel, TimeEntryUpdateModel, Time
             TaskName = task.Name,
             EstimatedHours = task.EstimatedHours,
             TotalHoursLogged = entries.Sum(e => e.HoursWorked),
-            BillableHours = entries.Where(e => e.Billable).Sum(e => e.HoursWorked),
-            NonBillableHours = entries.Where(e => !e.Billable).Sum(e => e.HoursWorked),
+            BillableHours = entries.Where(e => e.Billable == true).Sum(e => e.HoursWorked),
+            NonBillableHours = entries.Where(e => e.Billable != true).Sum(e => e.HoursWorked),
             EntryCount = entries.Count,
             HoursByWorkType = entries
                 .GroupBy(e => e.WorkType)
@@ -180,8 +180,8 @@ GenericRestController<TimeEntry, TimeEntryWriteModel, TimeEntryUpdateModel, Time
             ProjectId = projectId,
             ProjectName = project.Name,
             TotalHoursLogged = entries.Sum(e => e.HoursWorked),
-            BillableHours = entries.Where(e => e.Billable).Sum(e => e.HoursWorked),
-            NonBillableHours = entries.Where(e => !e.Billable).Sum(e => e.HoursWorked),
+            BillableHours = entries.Where(e => e.Billable == true).Sum(e => e.HoursWorked),
+            NonBillableHours = entries.Where(e => e.Billable != true).Sum(e => e.HoursWorked),
             EntryCount = entries.Count,
             HoursByTask = entries
                 .GroupBy(e => new { e.TaskId, TaskName = e.Task?.Name ?? "Unknown" })
@@ -327,8 +327,8 @@ GenericRestController<TimeEntry, TimeEntryWriteModel, TimeEntryUpdateModel, Time
             Summary = new
             {
                 TotalHours = entries.Sum(e => e.HoursWorked),
-                BillableHours = entries.Where(e => e.Billable).Sum(e => e.HoursWorked),
-                NonBillableHours = entries.Where(e => !e.Billable).Sum(e => e.HoursWorked),
+                BillableHours = entries.Where(e => e.Billable == true).Sum(e => e.HoursWorked),
+                NonBillableHours = entries.Where(e => e.Billable != true).Sum(e => e.HoursWorked),
                 EntryCount = entries.Count
             },
             ByDate = entries

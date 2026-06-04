@@ -203,7 +203,9 @@ public class GenericRestController<T, T1, T2, T3, T4>(SpaceLinxContext spaceLinx
 
         record.DeletedAt = DateTime.UtcNow;
         record.DeletedBy = UserEmail;
-        record.IsActive = false;
+        // Write via the EF entry's mapped property so entities that shadow IsActive as nullable
+        // (the UAT-nullable reference tables) persist the value, not the hidden BaseModel property.
+        spaceLinxContext.Entry(record).Property(nameof(BaseModel.IsActive)).CurrentValue = false;
 
         await spaceLinxContext.SaveChangesAsync();
     }
@@ -228,7 +230,7 @@ public class GenericRestController<T, T1, T2, T3, T4>(SpaceLinxContext spaceLinx
             throw new ApplicationException("Not Found");
         }
 
-        record.IsActive = false;
+        spaceLinxContext.Entry(record).Property(nameof(BaseModel.IsActive)).CurrentValue = false;
         await spaceLinxContext.SaveChangesAsync();
     }
 
@@ -240,7 +242,7 @@ public class GenericRestController<T, T1, T2, T3, T4>(SpaceLinxContext spaceLinx
             throw new ApplicationException("Not Found");
         }
 
-        record.IsActive = true;
+        spaceLinxContext.Entry(record).Property(nameof(BaseModel.IsActive)).CurrentValue = true;
         await spaceLinxContext.SaveChangesAsync();
     }
 }

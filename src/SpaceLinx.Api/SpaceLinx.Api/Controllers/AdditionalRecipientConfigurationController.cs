@@ -19,7 +19,7 @@ public class AdditionalRecipientConfigurationController(SpaceLinxContext spaceLi
     {
         var recipients = await spaceLinxContext.AdditionalRecipientConfigurations
             .AsNoTracking()
-            .Where(r => r.TemplateCode.ToUpper() == templateCode.ToUpper() && r.DeletedBy == null && r.IsActive)
+            .Where(r => r.TemplateCode.ToUpper() == templateCode.ToUpper() && r.DeletedBy == null && r.IsActive == true)
             .ToListAsync();
 
         return Ok(mapper.Map<List<AdditionalRecipientConfigurationReadModel>>(recipients));

@@ -40,7 +40,7 @@ public class ProjectDashboardController(SpaceLinxContext spaceLinxContext, IMapp
             LoggedTasks = tasks.Count(t => t.Status == "Logged"),
             OverdueTasks = tasks.Count(t => t.DueDate < DateTime.UtcNow && t.Status != "Completed"),
             HighPriorityTasks = tasks.Count(t => t.Priority == "High" && t.Status != "Completed"),
-            AverageProgress = tasks.Count > 0 ? Math.Round(tasks.Average(t => t.ProgressPercent), 1) : 0
+            AverageProgress = tasks.Count > 0 ? Math.Round(tasks.Average(t => t.ProgressPercent ?? 0), 1) : 0
         };
 
         return Ok(summary);
@@ -69,7 +69,7 @@ public class ProjectDashboardController(SpaceLinxContext spaceLinxContext, IMapp
             var totalTasks = tasks.Count;
             var completedTasks = tasks.Count(t => t.Status == "Completed");
             var progress = totalTasks > 0 ? Math.Round((double)completedTasks / totalTasks * 100, 1) : 0;
-            var avgProgress = tasks.Count > 0 ? Math.Round(tasks.Average(t => t.ProgressPercent), 1) : 0;
+            var avgProgress = tasks.Count > 0 ? Math.Round(tasks.Average(t => t.ProgressPercent ?? 0), 1) : 0;
 
             progressList.Add(new ProjectProgressModel
             {

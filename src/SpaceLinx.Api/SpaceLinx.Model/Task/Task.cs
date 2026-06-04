@@ -17,9 +17,9 @@ namespace SpaceLinx.Model
         public DateTime? StartDate { get; set; }
         public decimal? EstimatedHours { get; set; }
         public decimal? ActualHours { get; set; }
-        public int ProgressPercent { get; set; } = 0;
-        public string TaskType { get; set; } = "Task";
-        public int SortOrder { get; set; } = 0;
+        public int? ProgressPercent { get; set; } = 0;
+        public string? TaskType { get; set; } = "Task";
+        public int? SortOrder { get; set; } = 0;
         public Guid? BoardColumnId { get; set; }
 
         // Navigation properties

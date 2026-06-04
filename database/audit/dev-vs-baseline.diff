@@ -1,0 +1,266 @@
+# Dev DB vs EF Baseline — Structural Diff (Pre-Stamp Gate)
+
+Date: 2026-06-04
+Branch: feature/code-first-migrations
+Question: Does the **Dev** database schema match what the EF Core baseline + migrations
+produce, so Dev can be "stamped" (adopt code-first) as-is — or must it be reconciled first?
+
+Method (read-only):
+  1. Built the EF schema FROM SCRATCH on a throwaway PG16 container (`slx-devcheck`, port 55436):
+       - `dotnet ef database update` → migrations `20260603164745_Baseline` + `20260603172408_AddAuditChangeLog` (BOTH applied cleanly, no errors)
+       - applied `database/procedures/*` (40 files, manifest order) + `database/repeatable/views/*` (23 files)
+       - `pg_dump --schema-only --no-owner --no-privileges -n mes -n sc -n common -n application -n pm`
+         → `database/audit/ef-built.schema.sql`  (107 base tables in the 5 schemas; audit schema EXCLUDED by the -n allow-list, same as the Dev dump)
+  2. Loaded `dev.schema.sql` (cmp_dev), `ef-built.schema.sql` (cmp_ef), and `uat.schema.sql` (cmp_uat, ground truth) into separate DBs on the same container.
+  3. Compared by SETS of structural facts via information_schema / pg_catalog (name-independent),
+     NOT raw text diff. Restricted to the 107 baseline-managed tables; EXCLUDED the 3 unmanaged
+     tables Dev carries (`application.employee_department`, `sc.item`, `common.fcm_token`) and the
+     `audit` schema (AddAuditChangeLog creates it idempotently; Dev legitimately lacks it).
+
+Legend per delta: EXPECTED (deliberate baseline choice / exclusion-list / cosmetic) | BLOCKING (real
+mismatch that makes the EF model disagree with Dev's reality once stamped).
+
+================================================================================
+0. HEADLINE — premise reversal
+================================================================================
+The task brief assumed "the baseline was proven to MATCH UAT" and that Dev might lag the baseline.
+The live rebuild shows the OPPOSITE: **Dev faithfully matches UAT; it is the current EF baseline
+(`20260603164745_Baseline`) that diverges from UAT** on a large, systematic surface:
+
+  - 92 columns differ between EF-built and Dev — and Dev == UAT on ALL 92.
+  - 19 FK edges differ in ON DELETE action / NOT VALID flag — and Dev == UAT on all sampled.
+  - 1 CHECK constraint differs — here Dev is the outlier vs UAT (see §4).
+
+The prior `baseline-vs-uat.diff` "MATCH" verdict (which only spot-checked mes.part + common.document
+nullability) did NOT surface this full surface. The pattern is classic EF-convention drift: the C#
+model maps DateTime→timestamptz, non-nullable CLR props→NOT NULL, int→integer, long→bigint, and
+omits DB-side sequence/literal DEFAULTs — none of which round-trips the actual UAT/Dev shape.
+
+================================================================================
+1. TABLES (107 baseline-managed)
+================================================================================
+  cmp_dev base tables (5 schemas): 109   cmp_ef: 107   shared: 107   PKs: 106 == 106 (0 diff)
+  - In DEV not in EF (2): application.employee_department, sc.item
+        → EXPECTED. Both are on the EF exclusion list (ef-exclusion-list.md §F, "intentionally NOT
+          EF-managed", zero FK edges in/out). Grep confirms ZERO references in any migration. EF
+          neither creates nor drops them → stamping is safe wrt these.
+  - common.fcm_token: present in Dev, not EF-managed (exclusion-list §F) → EXPECTED.
+  - In EF not in DEV: 0.
+  - The 5 UAT staging tables Dev lacks (part_duplicate_analysis, temp_parttype_import,
+    po_requisition_mapping, temp_inventory_import, temp_tracking) are EF-excluded → irrelevant (EXPECTED).
+
+================================================================================
+2. COLUMNS — 92 mismatches on managed tables (ALL: Dev == UAT, EF diverges)
+================================================================================
+Column universe on the 107 shared tables: 1690 == 1690. 92 differ. Every one has Dev == UAT.
+
+2a. timestamp/date (Dev,UAT) → timestamptz (EF)  — 22 cols  [BLOCKING — type drift]
+  common.additional_recipient_configuration.{created_at,deleted_at,updated_at}
+  common.department.{created_at,deleted_at,updated_at}
+  mes.email_log.{created_at,deleted_at,sent_at,updated_at}
+  mes.email_template.{created_at,deleted_at,updated_at}
+  mes.part_level.{created_at,deleted_at,updated_at}
+  mes.subsystem.{created_at,deleted_at,updated_at}
+  pm.resource_allocation.{start_date,end_date}        (Dev/UAT = date  → EF = timestamptz)
+  pm.time_entry.entry_date                            (Dev/UAT = date  → EF = timestamptz)
+  (the *_at cols are Dev/UAT `timestamp without time zone` → EF `timestamp with time zone`)
+
+2b. NULLABLE (Dev,UAT) → NOT NULL (EF)  — 49 cols  [BLOCKING — EF stricter than the data allows]
+  common.additional_recipient_configuration.{created_by,is_active}
+  common.department.{created_by,is_active}
+  common.image.{entity_id,entity_type,file_extension,image_type}
+  common.video.{entity_id,entity_type,video_type}
+  mes.email_log.{is_active,retry_count}
+  mes.email_template.{is_active,is_html}
+  mes.part_level.is_active
+  mes.subsystem.is_active
+  pm.board_column.{color,is_default}
+  pm.task.{progress_percent,sort_order,task_type}
+  pm.task_dependency.lag_days
+  pm.time_entry.{billable,created_at,created_by,is_active,work_type}
+  sc.company_part.is_preferred
+  sc.inventory_part.qty_returned
+  sc.inventory_stock.{qty_consumed,qty_qc_failed,qty_qc_pending,qty_reserved,qty_returned,qty_scrapped}
+  sc.scrap_line_item.created_by
+  sc.scrap_request.created_by
+  sc.tender.created_by
+  sc.tender_line_item.{created_by,part_id}
+  sc.tender_quotation.{company_id,created_by}
+  sc.tender_quotation_line_item.{created_by,tender_line_item_id}
+  sc.tender_vendor.{company_id,created_by}
+  sc.vendor_return_line_item.created_by
+  sc.vendor_return_request.created_by
+
+2c. Other TYPE changes  — 3 cols  [BLOCKING]
+  common.image.file_size   Dev/UAT integer → EF bigint
+  common.video.file_size   Dev/UAT integer → EF bigint
+  sc.inventory_stock.qty_available   Dev/UAT GENERATED numeric(18,4) NULLABLE → EF GENERATED integer NOT NULL
+       ^ EF's declared column type (integer) even contradicts its own generation expression
+         `(...)::numeric(18,4)`. Real type narrowing on a generated column.
+
+2d. Lost nextval() sequence DEFAULT in EF  — 7 cols  [BLOCKING — runtime auto-numbering breaks]
+  application.app.app_number      Dev/UAT DEFAULT nextval('application.app_app_number_seq')  → EF none
+  application.role.role_number    Dev/UAT DEFAULT nextval('application.role_role_number_seq') → EF none
+  application.user.user_number    Dev/UAT DEFAULT nextval('application.user_user_number_seq') → EF none
+  mes.guide.sequence              Dev/UAT DEFAULT nextval('mes.guide_sequence_seq')          → EF none
+  mes.material_kit.sequence       Dev/UAT DEFAULT nextval('mes.material_kit_sequence_seq')   → EF none
+  mes.product.sequence            Dev/UAT DEFAULT nextval('mes.product_sequence_seq')        → EF none
+  mes.work_package.sequence       Dev/UAT DEFAULT nextval('mes.work_package_sequence_seq')   → EF none
+  NOTE: the 7 sequences themselves EXIST in EF (19==19 sequences, §6) but the EF model does not
+  attach them as column DEFAULTs (no HasDefaultValueSql("nextval(...)")). The model presumably
+  expects EF to assign the value, but Dev/UAT rely on the DB default — a real behavioural divergence.
+
+2e. Lost literal DEFAULT in EF  — 6 cols  [BLOCKING (5) + COSMETIC (1)]
+  mes.guide.calculated_weight          Dev/UAT DEFAULT 0   → EF none      [BLOCKING]
+  mes.guide_mbom.weight                Dev/UAT DEFAULT 0   → EF none      [BLOCKING]
+  sc.tender_quotation.total_amount     Dev/UAT DEFAULT 0   → EF none      [BLOCKING]
+  sc.tender_quotation_line_item.total_price  Dev/UAT DEFAULT 0 → EF none  [BLOCKING]
+  sc.tender_quotation_line_item.unit_price   Dev/UAT DEFAULT 0 → EF none  [BLOCKING]
+  mes.part.weight                      Dev/UAT DEFAULT 0   → EF DEFAULT 0.0  [COSMETIC — 0 vs 0.0, both NOT NULL]
+
+2f. EF *relaxed* NOT NULL → NULLABLE (EF looser than Dev/UAT)  — 5 cols  [BLOCKING]
+  mes.guide_step_task.sequence         Dev/UAT NOT NULL → EF NULLABLE
+  mes.kit_serial.status                Dev/UAT NOT NULL → EF NULLABLE
+  mes.work_order_task.work_order_step_id  Dev/UAT NOT NULL → EF NULLABLE  (also drops the FK, see §3)
+  sc.inventory_stock.qty_issued        Dev/UAT NOT NULL → EF NULLABLE
+  sc.po_line_item.part_id              Dev/UAT NOT NULL → EF NULLABLE
+
+KNOWN/DOCUMENTED columns called out in the brief — VERIFIED, these MATCH Dev (S4 fixes applied):
+  mes.part.part_number / part_number_suffix  : NOT NULL in Dev, EF, UAT  ✓ (match)
+  mes.part.weight                            : NOT NULL DEFAULT 0(.0) — match modulo 0/0.0 cosmetic
+  common.document.file_name/file_path/file_size : NULLABLE in Dev, EF, AND UAT ✓ (match)
+
+================================================================================
+3. FOREIGN KEYS — 211 == 211 edges; 19 differ in ON DELETE / NOT VALID (Dev == UAT)
+================================================================================
+Same edge (table.col → target) present on both sides, but the RULE differs. All sampled match UAT
+(Dev side). [BLOCKING — EF's model carries different cascade semantics than Dev's reality.]
+
+  EF DROPPED `ON DELETE SET NULL` (EF defaults to NO ACTION):
+    application.role_permission.role_id → application.role(id)
+    mes.part.country_of_origin_id → common.country(id)
+    mes.work_order_step.manager_id → application."user"(id)
+    mes.work_order_step.technician_id → application."user"(id)
+    sc.purchase_order.quotation_reference_id → common.document(id)
+  EF CHANGED action to ON DELETE CASCADE (Dev/UAT = SET NULL):
+    common.address.country_id → common.country(id)
+    common.approval.approver_id → application."user"(id)
+  EF ADDED `ON DELETE SET NULL` where Dev/UAT had NO ACTION:
+    mes.work_order_task.work_order_step_id → mes.work_order_step(id)
+  EF dropped the `NOT VALID` flag (Dev/UAT FK is NOT VALID; rule otherwise same — LOW risk):
+    mes.part.eco_id; pm.program.{buyer_id,program_manager_id,supply_chain_manager_id};
+    pm.project.project_manager_id; pm.resource_allocation.user_id; pm.task.assigned_to_id;
+    pm.time_entry.user_id; sc.purchase_order.buyer_id; sc.scrap_request.raised_by_id;
+    sc.vendor_return_request.raised_by_id   (11 edges — NOT VALID only)
+
+THE "5 DROPPED FKs" FROM THE BRIEF (work_order/work_package manager_id+technician_id → user;
+goods_receipt_note.vendor_reference_id → document):
+  → VERIFIED ABSENT from Dev, EF, AND UAT (checked pg_constraint directly). Dev does NOT have them.
+    So there is NOTHING for EF to drop and no conflict. The brief's "if Dev HAS them" condition is
+    FALSE for this dump → completely moot / non-issue. (EF won't generate a drop; they're not in
+    Dev or in EF's model.)
+
+================================================================================
+4. CHECK CONSTRAINTS — 43 == 43; 1 differs
+================================================================================
+  sc.goods_receipt_note status CHECK:
+    Dev  allows {In Process, Completed, Partially Completed, Rejected, Closed}            (5 values)
+    EF   allows {In Process, Completed, Partially Completed, Rejected, Quality Checked, Closed} (6)
+    UAT  == EF (also has 'Quality Checked').
+  → Here DEV is the OUTLIER vs UAT/EF (Dev's GRN check predates 'Quality Checked'). EF is the SUPERSET.
+  → For stamping: EF's looser check would accept rows Dev's stricter check rejects. Since EF will not
+    re-create existing constraints on a stamped DB, Dev keeps its stricter check. CLASSIFY: BLOCKING-LITE
+    — a documented intentional widening could make it EXPECTED, but as-is Dev != UAT here and the EF
+    model believes 'Quality Checked' is legal while Dev's DB will reject it. Reconcile by altering Dev's
+    check to add 'Quality Checked' (forward, non-destructive).
+  All other 42 CHECKs match exactly.
+
+================================================================================
+5. UNIQUE / PK / GENERATED — MATCH
+================================================================================
+  - PRIMARY KEYs: 106 == 106, columns identical, 0 diff.
+  - UNIQUE enforcement (unique CONSTRAINTS in Dev unified with unique INDEXES in EF): 158 == 158,
+    0 diff (table + columns + predicate). The 50 "constraint vs index" representational differences
+    are the documented EXPECTED equivalence (diff-allowlist.md).
+  - GENERATED-ALWAYS expression columns: identical across Dev/EF/UAT (7 cols: mes.part.part_number,
+    sc.inventory_part.qty_available, sc.inventory_stock.{available_price,issued_price,qty_available,
+    reserved_price,total_price}). NOTE: sc.inventory_stock.qty_available expression matches but its
+    DECLARED TYPE differs — counted under §2c, not here.
+
+================================================================================
+6. INDEXES & SEQUENCES
+================================================================================
+  - Partial (soft-delete) indexes: 47 == 47, 0 diff (S5 fix present; WHERE deleted_at IS NULL etc.).
+  - Sequences (5 schemas): 19 == 19, 0 diff (S1 fix present: 12 function-owned + 7 default-backing).
+  - All indexes: Dev 233 vs EF 402.
+      • 170 EF-only indexes → EXPECTED (EF auto btree-per-FK; purely additive perf, documented cosmetic).
+      • 1 Dev-only index: sc.company_part (vendor_part_number) → additive on Dev; EF won't drop it on a
+        stamp. COSMETIC / tolerable.
+
+================================================================================
+7. AUDIT SCHEMA (AddAuditChangeLog)
+================================================================================
+  Dev has NO audit schema (confirmed: 0 references in dev.schema.sql). AddAuditChangeLog's Up() is
+  fully idempotent raw SQL (CREATE SCHEMA IF NOT EXISTS audit; CREATE TABLE IF NOT EXISTS
+  audit.change_log range-partitioned; existence-guarded grants/trigger).
+  → EXPECTED, but a stamping NUANCE: AddAuditChangeLog must be **applied** to Dev (it will create the
+    schema), NOT merely stamped-as-applied. If Dev is stamped at BOTH migrations, the audit schema
+    will be missing. Recommended: stamp Baseline, then RUN `dotnet ef database update` so
+    AddAuditChangeLog actually executes against Dev.
+
+================================================================================
+8. CLASSIFICATION SUMMARY
+================================================================================
+  EXPECTED (non-blocking):
+    - 2 unmanaged Dev tables (employee_department, sc.item) + fcm_token (exclusion-list)
+    - audit schema absent (idempotent migration creates it) — apply, don't stamp-only (§7)
+    - 50 unique constraint-vs-index representational diffs; 170 additive EF FK indexes; 1 additive
+      Dev index; mes.part.weight 0 vs 0.0; 11 FK NOT-VALID-only flags (low risk)
+    - mes.part / common.document documented columns — verified MATCH
+
+  BLOCKING (EF model disagrees with Dev/UAT reality):
+    - 22 timestamp/date → timestamptz column-type drifts (§2a)
+    - 49 NULLABLE → NOT NULL tightenings EF would impose (§2b)
+    - 3 other type drifts incl. generated qty_available numeric→integer (§2c)
+    - 7 lost nextval() sequence DEFAULTs — auto-numbering would break (§2d)
+    - 5 lost literal DEFAULT 0 (§2e)
+    - 5 EF-relaxed NOT NULL→NULLABLE (§2f)
+    - 8 FK ON DELETE action changes (5 dropped SET NULL, 2 → CASCADE, 1 added SET NULL) (§3)
+    - 1 GRN CHECK widening (Dev stricter than UAT/EF) (§4)
+
+================================================================================
+9. VERDICT
+================================================================================
+  *** NEEDS RECONCILIATION — but the object that must be reconciled is the EF BASELINE, not Dev. ***
+
+  Dev is internally faithful to UAT (the proven-good shape) on 92 columns, 19 FK rules, generated
+  columns, PKs, unique keys, partial indexes, sequences, and 42/43 CHECKs. The current baseline
+  `20260603164745_Baseline` has REGRESSED from UAT on the surface listed in §8 (BLOCKING). Stamping
+  Dev as-is would make the EF model authoritatively WRONG about Dev: the next model-diff migration EF
+  generates would emit ALTER COLUMN ... TYPE timestamptz / SET NOT NULL / TYPE integer, DROP DEFAULT,
+  and ALTER FK statements that contradict UAT — risking insert failures (lost auto-numbering),
+  data-narrowing on a generated column, and timezone re-interpretation.
+
+  DO NOT stamp Dev against this baseline yet.
+
+  Required fixes BEFORE stamping (fix the MODEL/baseline so EF-built == UAT == Dev), then re-run this
+  gate:
+    R1. Map the 22 timestamp/date columns to `timestamp without time zone` / `date` (Npgsql:
+        .HasColumnType("timestamp without time zone") / "date"), NOT timestamptz. (§2a)
+    R2. Make the 49 §2b columns OPTIONAL (.IsRequired(false)) to match UAT nullability. (§2b)
+    R3. common.image/video.file_size → int (integer), not long. sc.inventory_stock.qty_available →
+        keep generated numeric(18,4) nullable (do not declare integer). (§2c)
+    R4. Attach the 7 nextval() defaults via HasDefaultValueSql("nextval('...'::regclass)") (or model
+        the columns as DB-generated). (§2d)
+    R5. Add HasDefaultValue(0) on the 5 §2e weight/amount/price columns. (§2e)
+    R6. Make the 5 §2f columns REQUIRED (sequence, status, work_order_step_id, qty_issued, part_id). (§2f)
+    R7. Restore FK delete behaviours to match UAT: SET NULL on the 5 edges EF dropped it from; revert
+        common.address.country_id and common.approval.approver_id from CASCADE to SET NULL; drop the
+        spurious SET NULL EF added on work_order_task.work_order_step_id. (§3)
+    R8. (Dev-side, separate) Widen Dev's sc.goods_receipt_note status CHECK to add 'Quality Checked'
+        so Dev == UAT == model. Forward, non-destructive. (§4)
+    R9. Stamp policy: after R1–R8 make EF-built==UAT==Dev, stamp Dev at Baseline ONLY, then APPLY
+        AddAuditChangeLog (it creates the audit schema Dev lacks). (§7)
+
+  Re-run the build-and-diff in this file after R1–R7; expected result then: 0 BLOCKING column/FK
+  deltas → STAMP-SAFE.

@@ -5,10 +5,10 @@
         public string DocumentType { get; set; } = null!;
         public string EntityType { get; set; } = null!;
         public Guid EntityId { get; set; }
-        public string FileName { get; set; } = null!;
+        public string? FileName { get; set; }
         public string? FileExtension { get; set; }
-        public long FileSize { get; set; }
-        public string FilePath { get; set; } = null!;
+        public long? FileSize { get; set; }
+        public string? FilePath { get; set; }
         public string FileRelativePath { get; set; } = null!;
         public string? Title { get; set; }
         public string? Description { get; set; }

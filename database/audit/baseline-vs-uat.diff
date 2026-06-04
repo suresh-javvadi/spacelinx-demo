@@ -1,0 +1,248 @@
+# Baseline (code-first EF migration) vs UAT — Structural Diff (Task 8)
+
+Date: 2026-06-03
+Branch: feature/code-first-migrations
+Method: Built the schema FROM SCRATCH on a throwaway local Postgres 16.14 container
+(`slx-baseline-check`, localhost:55432, db `spacelinx_baseline`) by:
+  1. `dotnet ef database update` (Baseline migration `20260603153927_Baseline`)
+  2. applying `database/procedures/*` in manifest order
+  3. applying `database/repeatable/views/*` in manifest order
+Then `pg_dump --schema-only --no-owner --no-privileges -n mes -n sc -n common -n application -n pm`
+(SAME flags/client used for `uat.schema.sql`) -> `baseline.schema.sql`.
+Comparison is by SETS of structural facts (not raw text diff). Live-DB introspection
+was used to confirm dump-level findings.
+
+Legend: each delta is classified in `diff-allowlist.md` as STRUCTURAL / COSMETIC / EXPECTED.
+
+================================================================================
+1. APPLY RESULTS
+================================================================================
+- Baseline migration applied CLEANLY from scratch (schemas, 7 sequences, 15 baseline
+  functions, 107 tables, PKs, FKs, indexes). No errors.
+- Procedures (38 files / manifest): applied with zero errors.
+  Live routine count after apply: 53 (15 embedded in migration + 38 from manifest).
+- Views (23 files / manifest): applied with zero errors. 23 views present.
+  NOTE: the connection string MUST be quoted when passed to psql; an unquoted
+  `host=... port=...` string splits on spaces and silently creates nothing.
+
+================================================================================
+2. TABLES  (CREATE TABLE <schema>.<name>)
+================================================================================
+UAT tables: 114   Baseline tables: 107
+
+UAT-not-baseline (7) — ALL on the allow-list (EXPECTED, intentionally excluded):
+  application.employee_department
+  mes.part_duplicate_analysis
+  mes.temp_parttype_import
+  sc.item
+  sc.po_requisition_mapping
+  sc.temp_inventory_import
+  sc.temp_tracking
+
+baseline-not-UAT: (none)
+
+common.fcm_token: PRESENT IN BOTH  ✓
+
+VERDICT (tables): MATCH — exactly the 7 allow-listed tables differ, nothing else.
+
+================================================================================
+3. COLUMNS (sampled important tables)
+================================================================================
+application."user"        : IDENTICAL column set ✓
+common.fcm_token          : identical except `id` nullability (see below; COSMETIC-ish)
+mes.part                  : 3 nullability/default deltas (STRUCTURAL) + CHECK consts (see #6)
+sc.purchase_order         : only CHECK const delta (see #6)
+common.document           : 3 nullability deltas (STRUCTURAL) + CHECK const (see #6)
+
+Column-level nullability / default deltas (STRUCTURAL):
+  mes.part.part_number_suffix : UAT = NOT NULL  | baseline = NULLABLE      [drift]
+  mes.part.part_number (GEN)  : UAT = NOT NULL  | baseline = NULLABLE      [drift]
+  mes.part.weight             : UAT = DEFAULT 0 NOT NULL | baseline = NOT NULL (no default) [drift]
+  common.document.file_name   : UAT = NULLABLE  | baseline = NOT NULL      [drift, baseline stricter]
+  common.document.file_path   : UAT = NULLABLE  | baseline = NOT NULL      [drift, baseline stricter]
+  common.document.file_size   : UAT = NULLABLE  | baseline = NOT NULL      [drift, baseline stricter]
+  common.fcm_token.id         : UAT = NULLABLE  | baseline = NOT NULL      [COSMETIC: id is not in PK
+                                  (PK = email,device_id) in either; minor, low-risk]
+
+================================================================================
+4. SEQUENCES
+================================================================================
+The 7 column-owned (serial-backed) sequences MATCH exactly:
+  application.app_app_number_seq, application.role_role_number_seq,
+  application.user_user_number_seq, mes.guide_sequence_seq,
+  mes.material_kit_sequence_seq, mes.product_sequence_seq,
+  mes.work_package_sequence_seq
+
+12 STANDALONE sequences exist in UAT but are MISSING in baseline (STRUCTURAL, runtime-breaking):
+  pm.program_code_seq, pm.project_code_seq, pm.task_code_seq,
+  sc.company_code_seq, sc.customer_code_seq, sc.grn_seq, sc.partner_code_seq,
+  sc.purchase_order_seq, sc.req_seq, sc.scrap_number_seq, sc.vendor_code_seq,
+  sc.vendor_return_number_seq
+
+  IMPACT (PROVEN): the `generate_*` functions embedded in the Baseline migration call
+  `nextval('sc.company_code_seq')`, `nextval('sc.purchase_order_seq')`, etc. With the
+  sequences absent these functions FAIL at runtime:
+    SELECT sc.generate_company_code();
+      ERROR:  relation "sc.company_code_seq" does not exist
+    SELECT sc.generate_purchase_order_number();
+      ERROR:  relation "sc.purchase_order_seq" does not exist
+  These sequences are not created by the migration OR by any procedure/view script.
+
+================================================================================
+5. INDEXES — focus on PARTIAL indexes (#1 suspected drift)
+================================================================================
+Partial indexes (WHERE ...):  UAT = 47   baseline = 30   -> 17 MISSING in baseline.
+By predicate:
+  WHERE (deleted_at IS NULL)     : UAT 41 | baseline 25   (16 missing)
+  WHERE (is_preferred = true)    : UAT  1 | baseline  0   ( 1 missing)
+  WHERE (deleted_by IS NULL)     : UAT  4 | baseline  4   (match)
+  WHERE ((item_type IS NULL) AND (deleted_by IS NULL)) : UAT 1 | baseline 1 (match)
+
+The 17 missing partial indexes (table (cols) WHERE pred) — all NON-UNIQUE (performance):
+  application."user" (department_id)                         WHERE (deleted_at IS NULL) *
+  mes.part_level (code)                                      WHERE (deleted_at IS NULL)
+  mes.part_level (is_active)                                 WHERE (deleted_at IS NULL)
+  mes.part_level (sort_order)                                WHERE (deleted_at IS NULL)
+  mes.subsystem (code)                                       WHERE (deleted_at IS NULL)
+  mes.subsystem (is_active)                                  WHERE (deleted_at IS NULL)
+  pm.resource_allocation (project_id)                        WHERE (deleted_at IS NULL)
+  pm.resource_allocation (start_date, end_date)              WHERE (deleted_at IS NULL)
+  pm.resource_allocation (user_id)                           WHERE (deleted_at IS NULL)
+  pm.resource_allocation (user_id, start_date, end_date)     WHERE (deleted_at IS NULL)
+  pm.task_dependency (predecessor_task_id)                   WHERE (deleted_at IS NULL)
+  pm.task_dependency (successor_task_id)                     WHERE (deleted_at IS NULL)
+  sc.company_part (is_preferred)                             WHERE (is_preferred = true)
+  sc.purchase_order (department_id)                          WHERE (deleted_at IS NULL) *
+  sc.requisition (department_id)                             WHERE (deleted_at IS NULL) *
+  sc.stock_movement_line_item (part_id)                      WHERE (deleted_at IS NULL)
+  sc.stock_movement_line_item (stock_movement_id)            WHERE (deleted_at IS NULL)
+
+  (*) baseline DOES create a plain (non-partial) FK-backing btree index on these
+      `department_id` columns, but it lacks the `WHERE deleted_at IS NULL` predicate,
+      so it is structurally different from UAT's partial index.
+
+UNIQUE partial indexes: UAT 2 | baseline 2 — MATCH (no uniqueness/correctness drift).
+
+Other index notes:
+- baseline emits 287 CREATE INDEX vs UAT 77 — baseline auto-creates an index for every
+  FK (EF convention). This is ADDITIVE and COSMETIC (extra perf indexes, no semantic loss).
+- 4 UAT indexes carry `WITH (fillfactor='100', deduplicate_items='true')` storage params
+  that baseline omits — COSMETIC (storage tuning, not schema shape).
+
+================================================================================
+6. CHECK CONSTRAINTS
+================================================================================
+UAT: 43 named CHECK constraints.   Baseline: 0   (live container pg_constraint contype='c' = 0)
+
+ALL 43 CHECK constraints are MISSING from baseline (STRUCTURAL). Full list:
+  approval_stage_number_check, approval_status_check, chk_date_range,
+  chk_document_storage_type, chk_manufacturer_details_required, chk_no_self_dependency,
+  chk_number_of_levels_positive, chk_progress_percent, chk_purchase_order_status,
+  chk_recipient_type, chk_requisition_status, chk_stage_number_positive, chk_task_type,
+  company_pan_check, dashboard_widget_widget_type_check, eco_part_status_check,
+  eco_status_check, goods_receipt_note_status_check, grn_line_item_disposition_check,
+  grn_line_item_qc_status_check, grn_line_item_tracking_method_check,
+  inventory_transaction_tracking_type_check, inventory_transaction_transaction_type_check,
+  part_status_check, part_version_check, payment_term_discount_days_check,
+  payment_term_discount_percent_check, payment_term_due_days_check,
+  resource_allocation_allocated_hours_per_day_check, resource_allocation_allocation_percent_check,
+  resource_allocation_allocation_type_check, scrap_line_item_tracking_type_check,
+  scrap_request_status_check, stock_movement_line_item_adjustment_type_check,
+  stock_movement_line_item_quantity_check, task_activity_activity_type_check,
+  task_assignee_assignee_role_check, task_dependency_dependency_type_check,
+  task_priority_check, task_status_check, time_entry_hours_worked_check,
+  vendor_return_line_item_tracking_type_check, vendor_return_request_status_check
+
+================================================================================
+7. PK / FK / UNIQUE CONSTRAINTS
+================================================================================
+PRIMARY KEYS: counts align with table counts (UAT 108 vs baseline 107 — the 1 extra in
+  UAT is a PK on an excluded table). Names differ by EF convention (`PK_x` vs `x_pkey`) —
+  COSMETIC.
+
+UNIQUE enforcement (constraints + unique indexes, table+cols+predicate, excluding PKs):
+  UAT 53 vs baseline 52. Set comparison:
+    - All 51 UAT UNIQUE constraints + 2 UNIQUE indexes are PRESENT in baseline
+      (EF implements them as UNIQUE INDEXES rather than table constraints — equivalent).
+    - Only delta: application.employee_department (employee_id) — on an EXCLUDED table (EXPECTED).
+    - `application."user"` vs `application.user` quoting only — COSMETIC.
+  VERDICT (unique): MATCH (no uniqueness drift on retained tables).
+
+FOREIGN KEYS: UAT 211 vs baseline 216. Set comparison (table+refs+cols, name-agnostic):
+  UAT-not-baseline: (none)
+  baseline-not-UAT (5 EXTRA FKs the model added that UAT lacks) — STRUCTURAL:
+    mes.work_order (manager_id)         REFERENCES application."user"(id)
+    mes.work_order (technician_id)      REFERENCES application."user"(id)
+    mes.work_package (manager_id)       REFERENCES application."user"(id)
+    mes.work_package (technician_id)    REFERENCES application."user"(id)
+    sc.goods_receipt_note (vendor_reference_id) REFERENCES common.document(id)
+  (baseline is stricter — adds referential integrity not present in live UAT.)
+
+================================================================================
+8. GENERATED ... STORED COLUMNS
+================================================================================
+7 generated-stored columns in each; the generation EXPRESSIONS are IDENTICAL.
+Only delta: mes.part.part_number lost its NOT NULL in baseline (already listed in #3).
+
+================================================================================
+9. VIEWS / FUNCTIONS / PROCEDURES
+================================================================================
+Views: 23 in both (created cleanly from manifest).
+Routines: generate_* function set IDENTICAL (17 generate_* funcs match by name).
+  (But see #4 — generate_* funcs are non-functional in baseline due to missing sequences.)
+
+================================================================================
+VERDICT  (UPDATED — Task 9 reconciliation, 2026-06-03)
+================================================================================
+MATCH — the Baseline migration now faithfully reproduces the UAT schema (modulo the
+allow-listed cosmetics and the intentional, documented exclusions below).
+
+All five STRUCTURAL deltas (S1–S5) from the original DRIFT verdict have been ELIMINATED.
+Re-validated by rebuilding the schema from scratch on the local container
+(slx-baseline-check, localhost:55432, db spacelinx_baseline) with the new Baseline
+migration 20260603164745_Baseline, then re-applying procedures + views and re-dumping
+baseline.schema.sql with the identical pg_dump flags, and comparing structural fact-sets.
+
+  RESOLVED structural deltas:
+  S1. [CRITICAL] 12 standalone (function-owned, bigint) sequences ADDED via HasSequence<long>
+      in SpaceLinxContext.Audit.cs. Sequence set is now 19 == 19 (zero diff).
+      PROVEN FIXED: `SELECT sc.generate_company_code();` -> 'COM-000001' (was: ERROR
+      relation "sc.company_code_seq" does not exist). generate_purchase_order_number() and
+      pm.generate_program_code() also verified working.
+  S2. 43 CHECK constraints ADDED via ToTable(t => t.HasCheckConstraint(...)) with EXACT
+      names+expressions. Live count 43 == 43; all 43 expressions byte-compare equal to the
+      UAT dump after pg_get_constraintdef normalization (0 mismatches).
+  S3. The 5 Dev-only FKs (work_order/work_package manager_id+technician_id,
+      goods_receipt_note.vendor_reference_id) are NO LONGER created. FK count 211 == 211.
+      Navigations (Manager/Technician/VendorReference) are KEPT in the EF model so app
+      .Include(...) queries still work; only the database FK constraint blocks were removed
+      from the migration. Documented as a future forward migration in
+      database/migrations/PLANNED_AddIntegrityConstraints.md.
+  S4. Column nullability/defaults reconciled to UAT and verified on the live DB:
+        - mes.part.part_number_suffix : NOT NULL  ✓
+        - mes.part.part_number (GEN)  : NOT NULL  ✓
+        - mes.part.weight             : NOT NULL DEFAULT 0.0  ✓
+        - common.document.file_name/file_path/file_size : NULLABLE  ✓ (relaxed to match UAT;
+          re-tightening deferred to PLANNED_AddIntegrityConstraints.md)
+  S5. 17 partial indexes ADDED via HasIndex(...).HasDatabaseName(...).HasFilter(...).
+      Partial-index set is now 47 == 47 (table+cols+predicate), zero diff in either direction,
+      including the 3 department_id cases (now carry WHERE deleted_at IS NULL) and the one
+      WHERE is_preferred = true.
+
+  Round-trip: `migrations add _Probe` produced an EMPTY Up()/Down() -> model still
+  round-trips cleanly; probe removed.
+
+  RESIDUAL differences (ALL allow-listed / intentional — see diff-allowlist.md):
+  (a) the 7 intentionally-excluded tables (employee_department, part_duplicate_analysis,
+      temp_parttype_import, sc.item, po_requisition_mapping, temp_inventory_import,
+      temp_tracking) + their dependent unique key/indexes — EXPECTED.
+  (b) the 5 removed FKs + the common.document.file_* NOT-NULL tightenings — INTENTIONAL,
+      captured in PLANNED_AddIntegrityConstraints.md as a future forward migration.
+  (c) genuine COSMETICS: EF PK/index naming conventions (PK_x vs x_pkey, IX_* vs idx_*),
+      additive FK-backing btree indexes, WITH(fillfactor='100', deduplicate_items='true')
+      storage params on 4 UAT indexes, application."user" reserved-word quoting,
+      fcm_token.id explicit NOT NULL.
+
+  TABLE set: 7 allow-listed exclusions only (fcm_token in both). SEQUENCES 19==19.
+  CHECKS 43==43 (names+expressions). PARTIAL INDEXES 47==47. FKs 211==211.
+  S4 columns: all 6 match. No other structural delta.

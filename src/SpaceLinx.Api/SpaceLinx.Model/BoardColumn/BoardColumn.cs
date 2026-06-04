@@ -8,7 +8,7 @@ namespace SpaceLinx.Model
         public int Position { get; set; } = 0;
         public string Color { get; set; } = "#1976d2";
         public int? WipLimit { get; set; }
-        public bool IsDefault { get; set; } = false;
+        public bool? IsDefault { get; set; } = false;
         public string? MapsToStatus { get; set; }
 
         // Navigation properties

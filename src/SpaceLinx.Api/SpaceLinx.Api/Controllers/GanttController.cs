@@ -71,7 +71,7 @@ public class GanttController(SpaceLinxContext spaceLinxContext, IMapper mapper, 
                 TaskCode = t.TaskCode,
                 StartDate = t.StartDate,
                 DueDate = t.DueDate,
-                Progress = t.ProgressPercent,
+                Progress = t.ProgressPercent ?? 0,
                 Status = t.Status,
                 Priority = t.Priority,
                 TaskType = t.TaskType,
@@ -80,7 +80,7 @@ public class GanttController(SpaceLinxContext spaceLinxContext, IMapper mapper, 
                 AssignedToName = t.AssignedTo != null ? $"{t.AssignedTo.FirstName} {t.AssignedTo.LastName}" : null,
                 EstimatedHours = t.EstimatedHours,
                 ActualHours = t.ActualHours,
-                SortOrder = t.SortOrder,
+                SortOrder = t.SortOrder ?? 0,
                 Dependencies = t.PredecessorDependencies
                     .Select(d => new GanttDependencyModel
                     {
@@ -88,7 +88,7 @@ public class GanttController(SpaceLinxContext spaceLinxContext, IMapper mapper, 
                         PredecessorTaskId = d.PredecessorTaskId,
                         SuccessorTaskId = d.SuccessorTaskId,
                         DependencyType = d.DependencyType,
-                        LagDays = d.LagDays
+                        LagDays = d.LagDays ?? 0
                     }).ToList(),
                 Assignees = t.Assignees
                     .Select(a => new GanttAssigneeModel
@@ -269,7 +269,7 @@ public class GanttController(SpaceLinxContext spaceLinxContext, IMapper mapper, 
             TaskCode = task.TaskCode,
             StartDate = task.StartDate,
             DueDate = task.DueDate,
-            Progress = task.ProgressPercent,
+            Progress = task.ProgressPercent ?? 0,
             Status = task.Status,
             Priority = task.Priority,
             TaskType = task.TaskType,
@@ -278,7 +278,7 @@ public class GanttController(SpaceLinxContext spaceLinxContext, IMapper mapper, 
             AssignedToName = task.AssignedTo != null ? $"{task.AssignedTo.FirstName} {task.AssignedTo.LastName}" : null,
             EstimatedHours = task.EstimatedHours,
             ActualHours = task.ActualHours,
-            SortOrder = task.SortOrder,
+            SortOrder = task.SortOrder ?? 0,
             Dependencies = task.PredecessorDependencies?
                 .Select(d => new GanttDependencyModel
                 {
@@ -286,7 +286,7 @@ public class GanttController(SpaceLinxContext spaceLinxContext, IMapper mapper, 
                     PredecessorTaskId = d.PredecessorTaskId,
                     SuccessorTaskId = d.SuccessorTaskId,
                     DependencyType = d.DependencyType,
-                    LagDays = d.LagDays
+                    LagDays = d.LagDays ?? 0
                 }).ToList() ?? new List<GanttDependencyModel>(),
             Assignees = task.Assignees?
                 .Select(a => new GanttAssigneeModel

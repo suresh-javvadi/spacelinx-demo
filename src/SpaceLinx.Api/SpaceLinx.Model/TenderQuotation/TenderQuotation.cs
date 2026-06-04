@@ -3,7 +3,7 @@ namespace SpaceLinx.Model;
 public partial class TenderQuotation : BaseModel
 {
     public Guid TenderId { get; set; }
-    public Guid CompanyId { get; set; }
+    public Guid? CompanyId { get; set; }
     public string? QuotationNumber { get; set; }
     public DateOnly QuotationDate { get; set; }
     public DateOnly? ValidUntil { get; set; }

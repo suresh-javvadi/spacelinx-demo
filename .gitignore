@@ -70,3 +70,5 @@ PublishScripts/
 
 # Claude Code
 .claude/
+.venv-dbtools/
+.db-connections.env

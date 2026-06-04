@@ -1,110 +1,88 @@
-# Database migrations — Flyway (automated per environment)
+# Database migrations — EF Core code-first (automated per environment)
 
-Schema/DDL changes are applied automatically by **Flyway** as part of the Azure DevOps pipeline.
-A developer adds a versioned SQL script; the pipeline applies it — in order, once each, tracked in
-`flyway_schema_history` — to **Dev → UAT → Prod** (Prod gated by the environment approval check).
+Schema is **code-first**: C# entities in `SpaceLinx.Model` are the source of truth. A developer
+edits an entity and runs `dotnet ef migrations add <Name>`; CI builds a reviewed **idempotent SQL
+script** (`migrate.sql`) once, publishes it as the `dbscript` artifact, and applies the *same
+artifact* to **Dev → UAT → Prod** (Prod gated by the environment approval check).
 
 ```
-src/** or database/** change ──► pipeline
-   main            ──► Deploy Dev   ──► Flyway migrate (Dev)  ──► deploy API
-   release/v*      ──► Deploy UAT   ──► Flyway migrate (UAT)  ──► deploy API
-   tag v*          ──► Deploy Prod  ──► [approval] ──► Flyway migrate (Prod) ──► deploy API
+src/** or database/** change ──► pipeline (azure-pipelines.yml)
+   BuildAPI        ──► dotnet ef migrations script --idempotent ──► publish `dbscript` artifact
+   ValidateDb      ──► has-pending-model-changes + build-from-scratch on ephemeral postgres:16
+   main            ──► Deploy Dev   ──► DeployDb (psql 3-phase apply) ──► deploy API
+   release/v*      ──► Deploy UAT   ──► DeployDb (psql 3-phase apply) ──► deploy API
+   tag v*          ──► Deploy Prod  ──► [approval] ──► DeployDb ──► deploy API
 ```
+
+> **Flyway has been retired.** The pipeline no longer runs Flyway; the migration apply is the EF
+> idempotent script applied via `psql` (`azure-pipelines.db-migrate.yml`). See the code-first design
+> spec and plan under `docs/superpowers/`.
 
 ## Layout
 
 | Path | Purpose |
 |------|---------|
-| `database/migrations/versioned/` | **Flyway-managed** schema migrations: `V<n>__<desc>.sql`, applied once in order. |
-| `database/flyway.conf` | Non-secret Flyway settings (baseline, safety). Connection + role placeholders are injected per environment from Key Vault. |
-| `database/SpaceLinx/**` | SSDT schema-of-record (canonical table definitions). |
-| `database/migrations/migration_*.sql` | **Legacy** pre-Flyway scripts — already applied everywhere; part of the implicit baseline (Flyway ignores them). |
+| `src/SpaceLinx.Api/SpaceLinx.Model/Migrations/` | **EF Core migrations** (source of truth for tables/columns/indexes/constraints) + model snapshot. |
+| `database/repeatable/views/` | The 23 views as dependency-ordered, idempotent SQL — re-applied every deploy (Phase 3 of the apply). |
+| `database/procedures/` | Business-logic functions/stored procedures + triggers — versioned SQL applied after the migration. |
+| `database/seed/` | Idempotent reference/privilege seed applied after schema (e.g. `00_default_privileges.sql`). |
+| `database/audit/` | Schema reconciliation artifacts (baseline-vs-UAT proof, exclusion list). |
+| `database/SpaceLinx/**` | Legacy SSDT schema (historical; being retired as EF takes over). |
+| `database/migrations/migration_*.sql`, `EFMigrations/` | **Legacy** pre-adoption scripts — folded into the baseline; historical only. |
 
-> **Baseline:** everything that existed before Flyway adoption (the SSDT schema + the legacy
-> `migration_*.sql`) is the baseline. Flyway manages **forward** changes only, starting at `V001`.
-> Provision a brand-new database from the SSDT schema first, then let Flyway apply `V001+`.
+## Adding a schema change
 
-## Adding a migration
-
-1. Create `database/migrations/versioned/V<next>__<short_description>.sql` (e.g.
-   `V003__add_widget_table.sql`). Keep numbers strictly increasing; never edit a script that has
-   already been applied to any environment (Flyway validates checksums — add a new `V` instead).
-2. Per-environment values use Flyway placeholders, e.g. `${app_role}` (see `V002` for an example).
-3. Merge → the pipeline applies it automatically (Dev on `main`, UAT on `release/v*`, Prod on a
-   `v*` tag after approval).
+1. Edit the C# entity in `SpaceLinx.Model`.
+2. `dotnet ef migrations add <Name> --project SpaceLinx.Model --startup-project SpaceLinx.Api --output-dir Migrations` (run from `src/SpaceLinx.Api/`).
+3. Review the generated migration; for unsafe DDL (volatile-default columns, `SET NOT NULL`, FK validation, `CREATE INDEX CONCURRENTLY`) hand-author the safe pattern (see design spec §6).
+4. Commit. CI fails on model/migration drift (`has-pending-model-changes`) and applies the change Dev→UAT→Prod.
 
 ## Required Key Vault secrets (per environment)
 
-The pipeline's `DeployDb*` job (`azure-pipelines.db-migrate.yml`) reads these from each
-environment's Key Vault (`spacelinx-<env>-kv`):
+`DeployDb*` (`azure-pipelines.db-migrate.yml`) reads these from each env's Key Vault:
 
 | Secret | Value |
 |--------|-------|
-| `PgMigrationUrl` | `jdbc:postgresql://<host>:5432/<db>?sslmode=require` |
-| `PgMigrationUser` / `PgMigrationPassword` | a **DDL-capable migration login** — separate from the app's runtime login |
-| `PgAppRole` | the app's least-privilege runtime role (INSERT-only on `audit`) |
+| `PgMigrationUrl` | **libpq conninfo / URI** for `psql`, e.g. `host=<h> port=5432 dbname=<db> user=<u> sslmode=require` |
+| `PgMigrationUser` / `PgMigrationPassword` | a **DDL-capable migration login** (member of / `SET ROLE spacelinxadmin`), separate from the app runtime login |
+| `PgAppRole` | the app's least-privilege runtime role |
 | `PgAuditReadRole` | a forensic read-only role for the `audit` schema |
 
-> **Least privilege:** Flyway connects as the migration login (has DDL). The application's runtime
-> login never has DDL and is INSERT-only on `audit` — enforced by `V002`. Keep them distinct.
+> The apply runs `SET ROLE spacelinxadmin` so new objects inherit the existing owner, sets
+> `lock_timeout`, passes the password via `PGPASSWORD` env (never argv), and uses `ON_ERROR_STOP=1`.
 
-> **Enabling the automated jobs:** the `DeployDb*` jobs are gated by the pipeline variable
-> `runDbMigrations` (default `false`) so merging never breaks a deployment before Key Vault is
-> ready. Once the secrets + migration role exist for an environment, set `runDbMigrations=true`
-> (and confirm the `keyVaultName` values in `azure-pipelines.yml` match your vaults). Until then the
-> jobs are skipped and the API still deploys. The PR-validation stage needs no setup — it uses a
-> throwaway database.
+> **Enabling the jobs:** gated by pipeline variable `applyEfMigrations` (default `false`). Per
+> environment, **stamp the baseline into `__EFMigrationsHistory` first** (no-DDL), then set
+> `applyEfMigrations=true`. The `ValidateDb` stage needs no setup (throwaway DB).
 
-## Manual / local run (fallback)
+## Audit table (`audit.change_log`)
 
-Same scripts, run Flyway locally against an environment (e.g. for a hotfix or a fresh dev box):
+`audit.change_log` is created by the **`AddAuditChangeLog` EF migration** via raw SQL
+(`migrationBuilder.Sql(...)`): the table is **range-partitioned by month** and **tamper-resistant**
+(append-only — an immutability trigger plus revoked `UPDATE/DELETE/TRUNCATE` on the app role). The
+`ChangeLog` EF entity is `ExcludeFromMigrations` and is mapped for **read/insert only**, so EF does
+not try to also create or alter the table. It is applied through the **standard pipeline** (the same
+idempotent `migrate.sql` promoted Dev → UAT → Prod) — the audit feature lives **on top of** the
+baseline, not in it. The DDL was ported verbatim from the retired Flyway scripts (`V001`/`V002`).
 
-```bash
-docker run --rm \
-  -v "$PWD/database/migrations/versioned:/flyway/sql:ro" \
-  -v "$PWD/database/flyway.conf:/flyway/conf/flyway.conf:ro" \
-  -e FLYWAY_URL="jdbc:postgresql://<host>:5432/<db>?sslmode=require" \
-  -e FLYWAY_USER="<migration_user>" -e FLYWAY_PASSWORD="<pwd>" \
-  -e FLYWAY_PLACEHOLDERS_APP_ROLE="<app_role>" \
-  -e FLYWAY_PLACEHOLDERS_READ_ROLE="<audit_read_role>" \
-  flyway/flyway:11-alpine info validate migrate
-```
+Partition automation (`pg_partman`/`pg_cron`) beyond the pre-created range (2026-01 .. 2028-01)
+remains a separate **operational concern**. The forensic read role (`spacelinx_audit_ro`) grants are
+**existence-guarded** in the migration (a `pg_roles` check), so they are a clean **no-op until the
+role is provisioned** per environment.
 
-## Data seeding is a separate track
+## Data seeding (`database/seed/`, applied after schema in the pipeline seed phase)
 
-Reference/data seeding (e.g. `seed/permissions.seed.sql`, generated from the permission catalog)
-is **not** managed by Flyway — it follows the seed-runner track (see `TASKS.md` T1.15 and
-`tools/permission-catalog/README.md`). Note: the audit feature needs `AUDIT.VIEW` /
-`AUDIT.VIEW.REGULATED` seeded and granted before the read API enforces them.
+Idempotent SQL seed — **provably a no-op on populated environments**, so it only ever *adds*
+missing rows on fresh databases (Demo, new provisioning, CI build-from-scratch). It never updates
+or deletes existing data (INSERT-only).
 
-## Audit-trail specifics & partition automation
+| File | Contents |
+|------|----------|
+| `00_default_privileges.sql` | `ALTER DEFAULT PRIVILEGES` so new objects are reachable by the app role (`-v app_role`). |
+| `10_reference_data.sql` | 10 reference tables (app, feature_bit, option_set, permission, role, role_permission, approval_configuration, country, email_template, platform). `ON CONFLICT DO NOTHING` — caught by each table's natural-key UNIQUE constraint, so a no-op even if UUIDs differ across envs. Generated with `--column-inserts` (explicit columns → correct on EF's column order). |
+| `12_currency_payment_department.sql` | The 3 tables with only a PK (currency, payment_term, department) — guarded on their **natural key** (`WHERE NOT EXISTS`) since `ON CONFLICT` on `id` alone could otherwise duplicate. |
+| `20_bootstrap_admin.sql` | One **parameterized** Super Admin per environment (`-v admin_email=…`) — no PII in git. Skips if not provided; idempotent. App auth is Azure AD, so the email must match a real Entra ID identity. |
 
-The audit trail deploys via `V001__audit_change_log.sql` (table, indexes, monthly partitions
-through 2028-01) and `V002__audit_change_log_hardening.sql` (INSERT-only grant, forensic read role,
-append-only immutability trigger — parameterized by `${app_role}` / `${read_role}`).
-
-To automate partition creation/retention beyond 2028-01, enable `pg_partman` + `pg_cron` once per
-environment (allow-listed on Azure Database for PostgreSQL Flexible Server):
-
-```sql
-SELECT partman.create_parent('audit.change_log', 'occurred_at', '1 month', p_premake := 3);
-UPDATE partman.part_config SET retention = '18 months', retention_keep_table = false
- WHERE parent_table = 'audit.change_log';
-SELECT cron.schedule('audit_partman', '0 1 * * *', $$CALL partman.run_maintenance_proc()$$);
-```
-
-## Verify after a run
-
-```sql
--- Flyway history
-SELECT installed_rank, version, description, success, installed_on
-FROM flyway_schema_history ORDER BY installed_rank;
-
--- audit table + partitions present
-SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-WHERE n.nspname='audit' ORDER BY relname;
-
--- after exercising a create/update/delete via the API:
-SELECT occurred_at, entity_type, operation, actor_email, changed_cols, correlation_id
-FROM audit.change_log ORDER BY id DESC LIMIT 20;
-```
+**No PII in the repo:** `application.user` (424 real employees) and `user_role` are **not** seeded; audit
+columns (`created_by`/`updated_by`) on reference rows are scrubbed to a generic `system` marker. Real
+user provisioning is a per-environment concern (Azure AD), outside this repo.

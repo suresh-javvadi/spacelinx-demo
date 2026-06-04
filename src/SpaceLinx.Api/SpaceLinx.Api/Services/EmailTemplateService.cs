@@ -22,7 +22,7 @@ public class EmailTemplateService : IEmailTemplateService
         return await _context.EmailTemplates
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.TemplateCode == templateCode &&
-                                      t.IsActive &&
+                                      t.IsActive == true &&
                                       t.DeletedBy == null);
     }
 
@@ -40,14 +40,14 @@ public class EmailTemplateService : IEmailTemplateService
         var subject = ReplacePlaceholders(template.Subject, placeholders);
         var body = ReplacePlaceholders(template.Body, placeholders);
 
-        return new RenderedEmail(subject, body, template.IsHtml);
+        return new RenderedEmail(subject, body, template.IsHtml ?? true);
     }
 
     public async Task<List<EmailTemplate>> GetAllTemplatesAsync()
     {
         return await _context.EmailTemplates
             .AsNoTracking()
-            .Where(t => t.IsActive && t.DeletedBy == null)
+            .Where(t => t.IsActive == true && t.DeletedBy == null)
             .ToListAsync();
     }
 

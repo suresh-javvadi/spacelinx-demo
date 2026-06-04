@@ -1,10 +1,11 @@
 # ============================================================
-# Reusable DB migration job (Flyway) — applied per environment
-# before the API deploys. Inherits the target environment's
-# approval checks (e.g. manual approval on Prod) via `environment:`.
+# Reusable DB migration job (EF idempotent script + psql) — applied
+# per environment before the API deploys. Inherits the target
+# environment's approval checks (e.g. manual approval on Prod) via
+# `environment:`. Consumes the `dbscript` artifact built in BuildAPI.
 #
 # Required Key Vault secrets (per environment):
-#   PgMigrationUrl       jdbc:postgresql://<host>:5432/<db>?sslmode=require
+#   PgMigrationUrl       postgresql://<host>:5432/<db>?sslmode=require (psql conninfo)
 #   PgMigrationUser      a DDL-capable MIGRATION login (NOT the app runtime login)
 #   PgMigrationPassword  password for the migration login
 #   PgAppRole            the app's least-privilege runtime role (INSERT-only on audit)
@@ -22,11 +23,11 @@ parameters:
 
 jobs:
   - deployment: DeployDb${{ parameters.suffix }}
-    displayName: 'Apply DB migrations (Flyway)'
-    # Opt-in: only runs when runDbMigrations is set to 'true' (after the env's Key Vault
+    displayName: 'Apply DB migrations (EF + psql)'
+    # Opt-in: only runs when applyEfMigrations is set to 'true' (after the env's Key Vault
     # secrets + migration role are configured). Otherwise it is skipped, and the API deploy
     # proceeds (see the API job's condition).
-    condition: eq(variables['runDbMigrations'], 'true')
+    condition: eq(variables['applyEfMigrations'], 'true')
     pool:
       vmImage: 'ubuntu-latest'
     environment: ${{ parameters.environment }}
@@ -34,7 +35,8 @@ jobs:
       runOnce:
         deploy:
           steps:
-            - checkout: self
+            - download: current
+              artifact: dbscript
 
             - task: AzureKeyVault@2
               displayName: 'Fetch DB migration secrets'
@@ -44,18 +46,25 @@ jobs:
                 SecretsFilter: 'PgMigrationUrl,PgMigrationUser,PgMigrationPassword,PgAppRole,PgAuditReadRole'
 
             - script: |
-                set -euo pipefail
-                docker run --rm \
-                  -v "$(Build.SourcesDirectory)/database/migrations/versioned:/flyway/sql:ro" \
-                  -v "$(Build.SourcesDirectory)/database/flyway.conf:/flyway/conf/flyway.conf:ro" \
-                  -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_PASSWORD \
-                  -e FLYWAY_PLACEHOLDERS_APP_ROLE -e FLYWAY_PLACEHOLDERS_READ_ROLE \
-                  flyway/flyway:11-alpine info validate migrate
-              displayName: 'Flyway validate + migrate'
+                set -euo pipefail   # NOTE: never `set -x` — would leak secrets
+                export PGPASSWORD="$PG_PASS"
+                PSQL="psql $PG_URL -v ON_ERROR_STOP=1 -v app_role=$PG_APP_ROLE -v read_role=$PG_READ_ROLE"
+                # Session safety + ownership:
+                $PSQL -c "SET lock_timeout='2s'; SET statement_timeout='15min'; SET ROLE spacelinxadmin;"
+                # Phase 1: drop dependent views (reverse manifest order). Names derived from
+                # the NN_<schema>_<name>.sql filenames (schema = text before the first '_').
+                tac "$(Pipeline.Workspace)/dbscript/repeatable/views/00_manifest.md" | awk '/^- [0-9]/{print $2}' | while read f; do \
+                  v=$(echo "$f" | sed -E 's/^[0-9]+_//; s/\.sql$//; s/_/./'); $PSQL -c "DROP VIEW IF EXISTS $v CASCADE;" || true; done
+                # Phase 2: tables (idempotent EF script)
+                $PSQL -f "$(Pipeline.Workspace)/dbscript/migrate.sql"
+                # Phase 3: procedures, then recreate views, then seed
+                for f in $(awk '/^- [0-9]/{print $2}' "$(Pipeline.Workspace)/dbscript/procedures/00_manifest.md"); do $PSQL -f "$(Pipeline.Workspace)/dbscript/procedures/$f"; done
+                for f in $(awk '/^- [0-9]/{print $2}' "$(Pipeline.Workspace)/dbscript/repeatable/views/00_manifest.md"); do $PSQL -f "$(Pipeline.Workspace)/dbscript/repeatable/views/$f"; done
+                if [ -d "$(Pipeline.Workspace)/dbscript/seed" ]; then for f in "$(Pipeline.Workspace)/dbscript/seed/"*.sql; do [ -e "$f" ] && $PSQL -f "$f"; done; fi
+              displayName: 'Apply EF migrations + procedures + views + seed (3-phase)'
               env:
                 # Secret pipeline variables must be mapped explicitly to env.
-                FLYWAY_URL: $(PgMigrationUrl)
-                FLYWAY_USER: $(PgMigrationUser)
-                FLYWAY_PASSWORD: $(PgMigrationPassword)
-                FLYWAY_PLACEHOLDERS_APP_ROLE: $(PgAppRole)
-                FLYWAY_PLACEHOLDERS_READ_ROLE: $(PgAuditReadRole)
+                PG_URL: $(PgMigrationUrl)
+                PG_PASS: $(PgMigrationPassword)
+                PG_APP_ROLE: $(PgAppRole)
+                PG_READ_ROLE: $(PgAuditReadRole)

@@ -108,7 +108,7 @@ public class InventoryPartController(SpaceLinxContext spaceLinxContext, IMapper 
                 QtyQcPending = p.QtyQcPending,
                 QtyScrapped = p.QtyScrapped,
                 QtyQcFailed = p.QtyQcFailed,
-                QtyReturned = p.QtyReturned,
+                QtyReturned = p.QtyReturned ?? 0,
                 TrackingType = p.TrackingType,
                 Part = new PartRefModel
                 {

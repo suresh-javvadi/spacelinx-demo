@@ -10,7 +10,7 @@ SpaceLinx is an Enterprise Manufacturing Execution System (MES) and Product Life
 |-------|------|------|
 | **API** | `src/SpaceLinx.Api/` | ASP.NET Core 10, EF Core 10, PostgreSQL |
 | **Frontend** | `src/spacelinx-mes/` | React 18, Vite 5, MUI v5, Ant Design |
-| **Database** | `database/` | PostgreSQL (SSDT project + SQL migrations) |
+| **Database** | `database/` | PostgreSQL — **EF Core code-first migrations** (+ repeatable views/procedures, seed) |
 
 Each layer has its own `CLAUDE.md` with detailed documentation.
 
@@ -81,8 +81,11 @@ Defined in `azure-pipelines.yml`:
 - Headers: `SPACELINX-TENANT-ID` and `SPACELINX-APP-NAME` on all API requests
 
 ### Database
-- Migrations handled offline via SQL scripts, NOT EF Core migration tooling
-- SSDT project in `database/SpaceLinx/` for schema definitions
+- **Code-first**: C# entities in `SpaceLinx.Model` are the source of truth; `dotnet ef migrations add`
+  then CI applies the idempotent script Dev→UAT→Prod (see `database/migrations/README.md`)
+- **Local dev DB**: `database/local/setup-local-db.sh` spins up Postgres 16 in Docker and applies
+  migrations + procedures + views + seed (same order as CI) — see `database/local/README.md`
+- Legacy SSDT project in `database/SpaceLinx/` is being retired as EF becomes the sole source of truth
 
 ## Environment Variables
 

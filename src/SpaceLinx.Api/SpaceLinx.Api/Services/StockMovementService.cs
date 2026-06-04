@@ -303,7 +303,7 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
         }
 
         int originalQtyIssued = sourceStock.QtyIssued ?? 0;
-        int originalQtyReserved = sourceStock.QtyReserved;
+        int originalQtyReserved = sourceStock.QtyReserved ?? 0;
 
         sourceStock.QtyIssued = originalQtyIssued - item.Quantity;
         if (sourceStock.QtyIssued < 0)
@@ -316,7 +316,7 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             sourceStock.QtyReserved = 0;
 
         int issuedStockDeducted = originalQtyIssued - (sourceStock.QtyIssued ?? 0);
-        int reservedStockDeducted = originalQtyReserved - sourceStock.QtyReserved;
+        int reservedStockDeducted = originalQtyReserved - (sourceStock.QtyReserved ?? 0);
 
         sourceStock.QtyOnhand -= item.Quantity;
         sourceStock.QtyConsumed += item.Quantity;

@@ -29,10 +29,10 @@ variables:
   apiProject: 'src/SpaceLinx.Api/SpaceLinx.Api/SpaceLinx.Api.csproj'
   frontendDir: 'src/spacelinx-mes'
   buildConfiguration: 'Release'
-  # Gate for the Flyway DB-migration jobs. Off by default so merging does not break
+  # Gate for the EF DB-migration jobs. Off by default so merging does not break
   # deployments before the per-environment Key Vault secrets + migration role exist.
   # Set to 'true' (pipeline variable) once each environment's KV is configured.
-  runDbMigrations: 'false'
+  applyEfMigrations: 'false'
 
 stages:
   # ──────────────────────────────────────────────────────────
@@ -78,6 +78,23 @@ stages:
             artifact: api
             displayName: 'Upload API artifact'
 
+          # Build the promotable DB artifact (no DB connection — uses the design-time factory).
+          - script: |
+              cd src/SpaceLinx.Api
+              dotnet tool restore
+              dotnet ef migrations script --idempotent \
+                --project SpaceLinx.Model --startup-project SpaceLinx.Api \
+                -o $(Build.ArtifactStagingDirectory)/dbscript/migrate.sql
+              cp -r ../../database/repeatable  $(Build.ArtifactStagingDirectory)/dbscript/repeatable
+              cp -r ../../database/procedures  $(Build.ArtifactStagingDirectory)/dbscript/procedures
+              mkdir -p $(Build.ArtifactStagingDirectory)/dbscript/seed
+              cp -r ../../database/seed/* $(Build.ArtifactStagingDirectory)/dbscript/seed/ 2>/dev/null || true
+            displayName: 'Generate idempotent migrate.sql + bundle repeatable/procedures/seed'
+
+          - publish: $(Build.ArtifactStagingDirectory)/dbscript
+            artifact: dbscript
+            displayName: 'Publish dbscript artifact'
+
   # ──────────────────────────────────────────────────────────
   # BUILD FRONTEND (lint + build) — runs on every trigger
   # ──────────────────────────────────────────────────────────
@@ -116,65 +133,102 @@ stages:
             workingDirectory: '$(frontendDir)'
 
   # ──────────────────────────────────────────────────────────
-  # VALIDATE DB MIGRATIONS (PR only) — apply the Flyway scripts to a
-  # throwaway PostgreSQL so a broken/out-of-order migration fails the
-  # PR before merge. No environment credentials are used.
+  # VALIDATE DB MIGRATIONS — EF drift gate + build-from-scratch on an
+  # ephemeral PostgreSQL service container. Runs on every trigger
+  # (PR, release/v*, and v* tags) so it gates promotion to all envs.
+  # No environment credentials are used.
   # ──────────────────────────────────────────────────────────
   - stage: ValidateDb
-    displayName: 'Validate DB migrations (PR)'
+    displayName: 'Validate DB migrations'
     dependsOn: []
-    condition: eq(variables['Build.Reason'], 'PullRequest')
     jobs:
-      - job: FlywayDryRun
-        displayName: 'Flyway migrate on ephemeral PostgreSQL'
-        pool:
-          vmImage: 'ubuntu-latest'
+      - job: Drift
+        displayName: 'EF drift + build-from-scratch'
+        pool: { vmImage: 'ubuntu-latest' }
+        services:
+          postgres: { image: 'postgres:16', ports: ['5432:5432'], env: { POSTGRES_PASSWORD: postgres } }
         steps:
-          - checkout: self
+          - task: UseDotNet@2
+            displayName: 'Install .NET $(dotnetVersion)'
+            inputs:
+              packageType: 'sdk'
+              version: '$(dotnetVersion)'
 
           - script: |
               set -euo pipefail
-              docker network create flyway-net
-              docker run -d --name pg --network flyway-net \
-                -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=spacelinx \
-                postgres:16-alpine
-              echo "Waiting for PostgreSQL..."
-              for i in $(seq 1 30); do
-                if docker exec pg pg_isready -U postgres -d spacelinx >/dev/null 2>&1; then
-                  echo "PostgreSQL ready"; break
-                fi
-                sleep 2
-                if [ "$i" = "30" ]; then echo "PostgreSQL did not become ready"; exit 1; fi
+              cd src/SpaceLinx.Api
+              dotnet tool restore
+              # This is a fresh agent (separate job from BuildAPI), so restore the projects
+              # before invoking dotnet ef — otherwise project.assets.json is missing and ef
+              # can't load metadata (NETSDK1004). ef then does its own implicit build.
+              dotnet restore SpaceLinx.Api.sln
+              dotnet ef migrations has-pending-model-changes --project SpaceLinx.Model --startup-project SpaceLinx.Api
+            displayName: 'Fail on model/migration drift'
+
+          - script: |
+              cd src/SpaceLinx.Api
+              psql "host=localhost port=5432 user=postgres password=postgres dbname=postgres" -c "CREATE ROLE spacelinxadmin; CREATE ROLE spacelinxuser; CREATE DATABASE spacelinx_ci;" || true
+              dotnet ef database update --project SpaceLinx.Model --startup-project SpaceLinx.Api \
+                --connection "Host=localhost;Port=5432;Database=spacelinx_ci;Username=postgres;Password=postgres"
+            displayName: 'Build schema from scratch (baseline validity)'
+
+          # Catalog-level schema-fidelity gate: compare the EF-built schema (full
+          # catalog incl. views/functions) against the UAT ground truth. This
+          # closes the "false MATCH from sampling" class of bug — every column,
+          # constraint, index, sequence over the 107 managed tables is diffed.
+          # The postgres:16 service is reachable at localhost:5432; dblink is
+          # created by the gate using superuser `postgres`.
+          - script: |
+              set -euo pipefail
+              # Runs from the repo root ($(Build.SourcesDirectory)); the EF schema
+              # was built into spacelinx_ci by the previous step on the same server.
+              # 1. Ensure the postgres client (psql) is on PATH for the gate driver.
+              if ! command -v psql >/dev/null 2>&1; then
+                sudo apt-get update && sudo apt-get install -y postgresql-client
+              fi
+              export PGPASSWORD=postgres
+              CONN="host=localhost port=5432 user=postgres password=postgres dbname=spacelinx_ci"
+              # Roles the procedures/views may GRANT to (created on the service in
+              # the build-from-scratch step, but guard here too in case of reorder).
+              psql "host=localhost port=5432 user=postgres password=postgres dbname=postgres" \
+                -c "CREATE ROLE spacelinxadmin;" -c "CREATE ROLE spacelinxuser;" || true
+              # 2. Apply procedures then views (manifest order) so the comparison
+              #    is over the FULL schema. ON_ERROR_STOP=0 (lenient) — the gate
+              #    asserts fidelity, not that every routine compiled.
+              for f in $(awk '/^- [0-9]/{print $2}' database/procedures/00_manifest.md); do
+                echo "  proc: $f"
+                psql "$CONN" -v ON_ERROR_STOP=0 -f "database/procedures/$f" || true
               done
-              # Create the roles referenced by V002's ${app_role}/${read_role} placeholders
-              # so the GRANT/REVOKE statements apply on the throwaway DB.
-              docker exec pg psql -U postgres -d spacelinx -v ON_ERROR_STOP=1 \
-                -c "CREATE ROLE flyway_app; CREATE ROLE flyway_read;"
-            displayName: 'Start ephemeral PostgreSQL + roles'
-
-          - script: |
-              set -euo pipefail
-              docker run --rm --network flyway-net \
-                -v "$(Build.SourcesDirectory)/database/migrations/versioned:/flyway/sql:ro" \
-                -v "$(Build.SourcesDirectory)/database/flyway.conf:/flyway/conf/flyway.conf:ro" \
-                -e FLYWAY_URL="jdbc:postgresql://pg:5432/spacelinx" \
-                -e FLYWAY_USER="postgres" -e FLYWAY_PASSWORD="postgres" \
-                -e FLYWAY_PLACEHOLDERS_APP_ROLE="flyway_app" \
-                -e FLYWAY_PLACEHOLDERS_READ_ROLE="flyway_read" \
-                flyway/flyway:11-alpine migrate
-              echo "All migrations applied cleanly."
-            displayName: 'Flyway migrate (validation)'
-
-          - script: docker rm -f pg >/dev/null 2>&1 || true; docker network rm flyway-net >/dev/null 2>&1 || true
-            displayName: 'Cleanup'
-            condition: always()
+              for f in $(awk '/^- [0-9]/{print $2}' database/repeatable/views/00_manifest.md); do
+                echo "  view: $f"
+                psql "$CONN" -v ON_ERROR_STOP=0 -f "database/repeatable/views/$f" || true
+              done
+              # 3. Run the gate against UAT ground truth. The driver builds
+              #    cmp_ground from the dump and diffs spacelinx_ci against it,
+              #    printing per-category counts + TOTAL_BLOCKING. It exits non-zero
+              #    on scope mismatch / load failure but NOT on TOTAL_BLOCKING>0, so
+              #    we assert that explicitly below and hard-fail on any drift.
+              OUT=$(bash database/audit/run-catalog-diff.sh database/audit/uat.schema.sql \
+                --host localhost --port 5432 --user postgres --password postgres \
+                --ef-db spacelinx_ci 2>&1) || { echo "$OUT"; echo "##[error]catalog-diff driver failed (scope mismatch / load error)"; exit 1; }
+              echo "$OUT"
+              TOTAL=$(echo "$OUT" | awk '/TOTAL_BLOCKING/{f=1;next} f&&/^[[:space:]]*[0-9]+[[:space:]]*$/{gsub(/[[:space:]]/,"");print;exit}')
+              if [ -z "$TOTAL" ]; then
+                echo "##[error]Could not parse TOTAL_BLOCKING from catalog-diff output"; exit 1
+              fi
+              if [ "$TOTAL" -ne 0 ]; then
+                echo "##[error]Catalog schema drift detected: TOTAL_BLOCKING=$TOTAL (EF baseline no longer matches UAT ground truth)"
+                exit 1
+              fi
+              echo "Catalog diff clean: TOTAL_BLOCKING=0"
+            displayName: 'Catalog schema-fidelity gate (EF vs UAT ground truth)'
 
   # ──────────────────────────────────────────────────────────
   # DEPLOY DEV (auto on main branch)
   # ──────────────────────────────────────────────────────────
   - stage: DeployDev
     displayName: 'Deploy to Dev'
-    dependsOn: [BuildAPI, BuildFrontend]
+    dependsOn: [BuildAPI, BuildFrontend, ValidateDb]
     # Auto-deploys on main. From feature/*, bugfix/*, users/* branches: only when
     # the run is manually queued (Pipelines → Run pipeline → pick branch). Dev is
     # a shared env — coordinate before deploying a branch and revert to main after.
@@ -224,7 +278,7 @@ stages:
             displayName: 'Upload frontend artifact'
 
       # Deploy API to Dev (Linux App Service)
-      # Apply DB migrations (Flyway) before the API deploys
+      # Apply DB migrations (EF idempotent script + psql) before the API deploys
       - template: azure-pipelines.db-migrate.yml
         parameters:
           suffix: Dev
@@ -284,7 +338,7 @@ stages:
   # ──────────────────────────────────────────────────────────
   - stage: DeployUAT
     displayName: 'Deploy to UAT'
-    dependsOn: [BuildAPI, BuildFrontend]
+    dependsOn: [BuildAPI, BuildFrontend, ValidateDb]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/v'))
     jobs:
       - job: BuildFrontendUAT
@@ -324,7 +378,7 @@ stages:
             artifact: frontend-uat
             displayName: 'Upload frontend artifact'
 
-      # Apply DB migrations (Flyway) before the API deploys
+      # Apply DB migrations (EF idempotent script + psql) before the API deploys
       - template: azure-pipelines.db-migrate.yml
         parameters:
           suffix: UAT
@@ -335,6 +389,9 @@ stages:
       - deployment: DeployApiUAT
         displayName: 'Deploy API'
         dependsOn: DeployDbUAT
+        # Deploy the API when the DB job Succeeded OR was Skipped (Skipped = applyEfMigrations
+        # is still 'false' for this env, the pre-stamping default). A genuine migration
+        # *failure* yields 'Failed' — not in this set — and correctly blocks the API deploy.
         condition: in(dependencies.DeployDbUAT.result, 'Succeeded', 'Skipped')
         pool:
           vmImage: 'ubuntu-latest'
@@ -383,7 +440,7 @@ stages:
   # ──────────────────────────────────────────────────────────
   - stage: DeployProd
     displayName: 'Deploy to Production + Demo'
-    dependsOn: [BuildAPI, BuildFrontend]
+    dependsOn: [BuildAPI, BuildFrontend, ValidateDb]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
     jobs:
       # Build frontend for Prod
@@ -463,7 +520,7 @@ stages:
             displayName: 'Upload frontend artifact'
 
       # Deploy API to Prod
-      # Apply DB migrations (Flyway) before the API deploys — gated by the prod environment approval
+      # Apply DB migrations (EF idempotent script + psql) before the API deploys — gated by the prod environment approval
       - template: azure-pipelines.db-migrate.yml
         parameters:
           suffix: Prod
@@ -474,6 +531,9 @@ stages:
       - deployment: DeployApiProd
         displayName: 'Deploy API (Prod)'
         dependsOn: DeployDbProd
+        # Deploy the API when the DB job Succeeded OR was Skipped (Skipped = applyEfMigrations
+        # is still 'false' for this env, the pre-stamping default). A genuine migration
+        # *failure* yields 'Failed' — not in this set — and correctly blocks the API deploy.
         condition: in(dependencies.DeployDbProd.result, 'Succeeded', 'Skipped')
         pool:
           vmImage: 'ubuntu-latest'
