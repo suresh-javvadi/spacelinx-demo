@@ -286,6 +286,7 @@ const PrintPurchaseOrder = ({
 
   const isPercentageTax = (item) => {
     return (
+      item?.taxOperator === "%" ||
       item?.taxType === "Percentage" ||
       (typeof item?.taxType === "string" && item.taxType.includes("%"))
     );

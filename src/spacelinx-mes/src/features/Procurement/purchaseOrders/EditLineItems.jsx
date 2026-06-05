@@ -147,6 +147,7 @@ const LineItems = React.forwardRef(
             total: calculatedValues.grandTotal,
           };
         }),
+      getTaxOptions: () => taxOptions,
       setValidationErrors: (errs) => {
         setFieldErrors(errs || {});
       },

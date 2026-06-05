@@ -193,15 +193,29 @@ const PurchaseOrderDetails = () => {
           : editPoData.expectedDeliveryDate,
     };
 
-    const lineItemsForPdf = lineItems.map((item) => ({
-      ...item,
-      expectedDeliveryDate:
-        item.expectedDeliveryDate &&
-        typeof item.expectedDeliveryDate === "object" &&
-        item.expectedDeliveryDate.$isDayjsObject
-          ? item.expectedDeliveryDate.format("YYYY-MM-DD")
-          : item.expectedDeliveryDate,
-    }));
+    const poTaxOptions = lineItemsRef.current?.getTaxOptions?.() || [];
+
+    const lineItemsForPdf = lineItems.map((item) => {
+      const taxOption = poTaxOptions.find((opt) => opt.name === item.taxType);
+      let taxOperator = "";
+      if (taxOption) {
+        taxOperator = taxOption.operator;
+      } else if (item.taxType === "Percentage") {
+        taxOperator = "%";
+      } else if (item.taxType === "Fixed") {
+        taxOperator = "+";
+      }
+      return {
+        ...item,
+        taxOperator,
+        expectedDeliveryDate:
+          item.expectedDeliveryDate &&
+          typeof item.expectedDeliveryDate === "object" &&
+          item.expectedDeliveryDate.$isDayjsObject
+            ? item.expectedDeliveryDate.format("YYYY-MM-DD")
+            : item.expectedDeliveryDate,
+      };
+    });
 
     const doc = (
       <PrintPurchaseOrder
