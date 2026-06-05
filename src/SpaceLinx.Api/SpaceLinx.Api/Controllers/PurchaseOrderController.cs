@@ -489,10 +489,7 @@ public class PurchaseOrderController(
                 }
             }
 
-            if (purchaseOrderDetails.Approvals != null && purchaseOrderDetails.Approvals.Any())
-            {
-                await purchaseOrderApprovalService.UpdateApproversAsync(id, purchaseOrderDetails.Approvals);
-            }
+            await purchaseOrderApprovalService.UpdateApproversAsync(id, purchaseOrderDetails.Approvals ?? new List<ApprovalWriteModel>());
 
             if (documents != null && documents.Any())
             {

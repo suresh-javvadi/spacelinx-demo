@@ -1,4 +1,4 @@
-﻿using SpaceLinx.Model;
+using SpaceLinx.Model;
 using System.Linq.Expressions;
 using Task = System.Threading.Tasks.Task;
 
@@ -521,6 +521,7 @@ public static class ApprovalAction
     public const string FullyApproved = "FullyApproved";
     public const string Rejected = "Rejected";
     public const string ResetToDraft = "ResetToDraft";
+    public const string Removed = "Removed";
 }
 
 public static class NotificationRecipientType

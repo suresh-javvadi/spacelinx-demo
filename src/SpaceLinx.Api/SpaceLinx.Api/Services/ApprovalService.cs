@@ -63,18 +63,30 @@ public class ApprovalService(SpaceLinxContext spaceLinxContext, IMapper mapper, 
 
     public async Task<IActionResult> UpdateApproversAsync(string entityType, Guid entityId, List<ApprovalWriteModel> updatedApprovals, string userEmail)
     {
+        updatedApprovals ??= new List<ApprovalWriteModel>();
+
         var currentApprovals = await spaceLinxContext.Approvals
             .Where(a => a.EntityType == entityType &&
                         a.EntityId == entityId &&
                         a.DeletedBy == null)
             .ToListAsync();
 
-        var currentApproverIds = currentApprovals.Select(a => a.ApproverId).ToHashSet();
-        var updatedApproverIds = updatedApprovals.Select(a => a.ApproverId).ToHashSet();
+        var incomingApprovals = updatedApprovals
+            .Select(a => new { 
+                a.ApproverId, 
+                StageNumber = a.StageNumber > 0 ? a.StageNumber : 1, 
+                a.Comment 
+            })
+            .GroupBy(a => new { a.ApproverId, a.StageNumber })
+            .Select(g => g.First())
+            .ToList();
+
+        var incomingKeys = incomingApprovals.Select(a => (a.ApproverId, a.StageNumber)).ToHashSet();
+        var currentKeys = currentApprovals.Select(a => (a.ApproverId, a.StageNumber)).ToHashSet();
 
         // Soft delete removed approvers
         var approvalsToSoftDelete = currentApprovals
-            .Where(existing => !updatedApproverIds.Contains(existing.ApproverId))
+            .Where(existing => !incomingKeys.Contains((existing.ApproverId, existing.StageNumber)))
             .Select(existing =>
             {
                 existing.DeletedAt = DateTime.UtcNow;
@@ -86,15 +98,32 @@ public class ApprovalService(SpaceLinxContext spaceLinxContext, IMapper mapper, 
             })
             .ToList();
 
+        if (approvalsToSoftDelete.Any())
+        {
+            spaceLinxContext.Approvals.UpdateRange(approvalsToSoftDelete);
+            foreach (var removed in approvalsToSoftDelete)
+            {
+                await LogApprovalActionAsync(
+                    entityType: entityType,
+                    entityId: entityId,
+                    action: ApprovalAction.Removed,
+                    userEmail: userEmail,
+                    stageNumber: removed.StageNumber,
+                    notes: "Approver removed",
+                    newStatus: ApprovalStatus.Removed
+                );
+            }
+        }
+
         // Add new approvers
-        var approvalsToAdd = updatedApprovals
-            .Where(newApproval => !currentApproverIds.Contains(newApproval.ApproverId))
+        var approvalsToAdd = incomingApprovals
+            .Where(newApproval => !currentKeys.Contains((newApproval.ApproverId, newApproval.StageNumber)))
             .Select(newApproval => new Approval
             {
                 EntityType = entityType,
                 EntityId = entityId,
                 ApproverId = newApproval.ApproverId,
-                StageNumber = newApproval.StageNumber > 0 ? newApproval.StageNumber : 1,
+                StageNumber = newApproval.StageNumber,
                 Status = ApprovalStatus.Pending,
                 Comment = newApproval.Comment,
                 IsActive = true,
@@ -103,27 +132,13 @@ public class ApprovalService(SpaceLinxContext spaceLinxContext, IMapper mapper, 
             })
             .ToList();
 
-        // Update existing approvers (stage number changes)
-        foreach (var updated in updatedApprovals.Where(u => currentApproverIds.Contains(u.ApproverId)))
-        {
-            var existing = currentApprovals.First(c => c.ApproverId == updated.ApproverId);
-            if (existing.StageNumber != updated.StageNumber)
-            {
-                existing.StageNumber = updated.StageNumber;
-                existing.UpdatedAt = DateTime.UtcNow;
-                existing.UpdatedBy = userEmail;
-            }
-        }
-
-        if (approvalsToSoftDelete.Any())
-            spaceLinxContext.Approvals.UpdateRange(approvalsToSoftDelete);
-
         if (approvalsToAdd.Any())
             await spaceLinxContext.Approvals.AddRangeAsync(approvalsToAdd);
 
         await spaceLinxContext.SaveChangesAsync();
 
-        return new NoContentResult();
+        var updatedList = await GetApproversAsync(entityType, entityId);
+        return new OkObjectResult(updatedList);
     }
 
     public async Task<List<ApprovalReadModel>> GetApproversAsync(string entityType, Guid entityId)

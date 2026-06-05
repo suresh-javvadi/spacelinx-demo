@@ -282,10 +282,7 @@ public class RequisitionController(
                 }
             }
 
-            if (requisitionDetails.Approvals?.Any() == true)
-            {
-                await requisitionApprovalService.UpdateApproversAsync(id, requisitionDetails.Approvals);
-            }
+            await requisitionApprovalService.UpdateApproversAsync(id, requisitionDetails.Approvals ?? new List<ApprovalWriteModel>());
 
             await spaceLinxContext.SaveChangesAsync();
             await transaction.CommitAsync();
