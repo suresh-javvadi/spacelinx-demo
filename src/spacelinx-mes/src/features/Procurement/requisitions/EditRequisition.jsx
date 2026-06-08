@@ -9,12 +9,7 @@ import {
   rejectRequisition,
   approveRequisition,
 } from "../../../services/requisitionService";
-import {
-  createPartItem,
-  fetchPartsWithGoodsAndServices,
-  fetchUniqueParts,
-} from "../../../services/partService";
-import { fetchUserLookup } from "../../../services/userService";
+import { createPartItem } from "../../../services/partService";
 
 import "./requisition.css";
 import {
@@ -38,7 +33,8 @@ const EditRequisition = ({
   handleRefresh,
   projectsData,
   selectedRequisition,
-  userData,
+  userData = [],
+  partsData = [],
 }) => {
   const normalizeApproverUser = (user) => ({
     id: user?.id || "",
@@ -105,8 +101,8 @@ const EditRequisition = ({
   });
 
   const [lineItems, setLineItems] = useState([]);
-  const [partsOptions, setPartsOptions] = useState([]);
-  const [userOptions, setUserOptions] = useState([]);
+  const [partsOptions, setPartsOptions] = useState(partsData || []);
+  const [userOptions, setUserOptions] = useState(userData || []);
   const [readOnlyMode, setReadOnlyMode] = useState(true);
   const [loadingData, setLoadingData] = useState(true);
   const [originalData, setOriginalData] = useState(null);
@@ -167,13 +163,36 @@ const EditRequisition = ({
     fetchApprovalConfig();
   }, []);
 
-  const currentUserId = userData?.id || null;
+  useEffect(() => {
+    if (Array.isArray(userData)) {
+      setUserOptions(userData);
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (Array.isArray(partsData)) {
+      setPartsOptions(partsData);
+    }
+  }, [partsData]);
+
+  const currentUserId = currentUser?.id || null;
+
+  const getApprovalStatus = (approval) => {
+    const status = approval?.status || approval?.approver?.status;
+    return status ? status.toString() : "Pending";
+  };
+
   const activeStage = useMemo(() => {
     if (!approvals?.length) return null;
 
     const pendingStages = approvals
-      .filter((a) => a.status === "Pending")
-      .map((a) => a.stageNumber);
+      .map((a) => {
+        const status = getApprovalStatus(a);
+        return status.toLowerCase() === "pending"
+          ? Number(a.stageNumber)
+          : null;
+      })
+      .filter((stage) => stage !== null && !Number.isNaN(stage));
 
     return pendingStages.length ? Math.min(...pendingStages) : null;
   }, [approvals]);
@@ -181,12 +200,15 @@ const EditRequisition = ({
   const canCurrentUserApprove = useMemo(() => {
     if (!activeStage || !currentUserId) return false;
 
-    return approvals.some(
-      (a) =>
-        a.stageNumber === activeStage &&
-        a.approverId === currentUserId &&
-        a.status === "Pending",
-    );
+    return approvals.some((a) => {
+      const status = getApprovalStatus(a);
+      const approverId = a.approverId || a.approver?.id;
+      return (
+        Number(a.stageNumber) === activeStage &&
+        String(approverId) === String(currentUserId) &&
+        status.toLowerCase() === "pending"
+      );
+    });
   }, [approvals, activeStage, currentUserId]);
 
   const newFlyoutTabChange = (event, newValue) =>
@@ -232,12 +254,6 @@ const EditRequisition = ({
   const fetchData = async () => {
     try {
       setLoadingData(true);
-      const [user, parts, goodsServices] = await Promise.all([
-        fetchUserLookup(),
-        fetchUniqueParts(),
-        fetchPartsWithGoodsAndServices(),
-      ]);
-
       const response = await fetchRequisitionById(requisitionId);
       setApprovals(response.approvals || []);
       const approvals = response.approvals || [];
@@ -269,24 +285,17 @@ const EditRequisition = ({
       setApprovers(Object.values(groupedApprovers));
       setLineItems(req?.requisitionLineItems || []);
       setOriginalLineItems(req?.requisitionLineItems || []);
-      setUserOptions(user);
+      const resolvedUserOptions = userData || [];
+      setUserOptions(resolvedUserOptions);
+
       const existingParts = (req?.requisitionLineItems || [])
         .map((item) => item.part)
         .filter(Boolean);
-      const releasedParts = parts.filter((part) => part.status === "Release");
-      const onlyGoodsServices = (goodsServices || []).filter(
-        (item) => item.itemType === "Goods" || item.itemType === "Services",
-      );
-      let mergedParts = [
-        ...releasedParts,
-        ...onlyGoodsServices.filter(
-          (gs) => !releasedParts.some((p) => p.id === gs.id),
-        ),
-      ];
-      mergedParts = [
-        ...mergedParts,
+      const parentParts = Array.isArray(partsData) ? partsData : [];
+      const mergedParts = [
+        ...parentParts,
         ...existingParts.filter(
-          (ep) => !mergedParts.some((mp) => mp.id === ep.id),
+          (ep) => !parentParts.some((p) => p.id === ep.id),
         ),
       ];
 
@@ -1265,8 +1274,7 @@ const EditRequisition = ({
               </div>
             )}
             {selectedRequisition?.status === "Submitted" &&
-              (isSuperAdmin ||
-                hasPermission(PERMISSIONS.REQUISITIONS.APPROVER)) && (
+              canCurrentUserApprove && (
                 <div className="EditFlyoutFooter RequisitionEditFlyoutFooter">
                   <Button
                     onClick={() => {

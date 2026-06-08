@@ -15,6 +15,10 @@ import NewRequisition from "./NewRequisition";
 import ResizableDrawer from "../../../Components/ResizableDrawer/ResizableDrawer";
 import EditRequisition from "./EditRequisition";
 import { fetchProjectsLookup } from "../../../services/projectService";
+import {
+  fetchPartsWithGoodsAndServices,
+  fetchUniqueParts,
+} from "../../../services/partService";
 import dayjs from "dayjs";
 import { useUserContext } from "../../userContext/UserContext";
 import { PERMISSIONS } from "../../../constants/PagePermissions";
@@ -36,6 +40,7 @@ const Requisitions = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [projectsData, setProjectsData] = useState([]);
   const [userData, setUserData] = useState([]);
+  const [partsData, setPartsData] = useState([]);
   const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
@@ -54,6 +59,7 @@ const Requisitions = () => {
 
   useEffect(() => {
     fetchUserData();
+    fetchPartsData();
   }, []);
 
   const fetchUserData = async () => {
@@ -66,6 +72,32 @@ const Requisitions = () => {
       console.error("Error fetching user data:", error);
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  const fetchPartsData = async () => {
+    try {
+      const [parts, goodsServices] = await Promise.all([
+        fetchUniqueParts(),
+        fetchPartsWithGoodsAndServices(),
+      ]);
+
+      const releasedParts = (parts || []).filter(
+        (part) => part.status === "Release",
+      );
+      const onlyGoodsServices = (goodsServices || []).filter(
+        (item) => item.itemType === "Goods" || item.itemType === "Services",
+      );
+      const merged = [
+        ...releasedParts,
+        ...onlyGoodsServices.filter(
+          (gs) => !releasedParts.some((p) => p.id === gs.id),
+        ),
+      ];
+      setPartsData(merged);
+    } catch (error) {
+      console.error("Failed to fetch parts data:", error);
+      Alert("Failed to load parts data", "error");
     }
   };
 
@@ -402,6 +434,7 @@ const Requisitions = () => {
               projectsData={projectsData}
               selectedRequisition={selectedRequisition}
               userData={userData}
+              partsData={partsData}
             />
           ) : (
             <NewRequisition

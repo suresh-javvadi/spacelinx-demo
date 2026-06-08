@@ -20,7 +20,14 @@ import { createFilterOptions } from "@mui/material/Autocomplete";
 const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
   const { Alert } = useContext(AlertsContext);
   const { openPartDetailsDrawer } = usePartDetailsDrawer();
-  const filter = createFilterOptions();
+  const filter = createFilterOptions({
+    stringify: (option) =>
+      option?.partNumber
+        ? `${option.partNumber} ${option.name}`
+        : option?.name || "",
+    limit: 50,
+    matchFrom: "any",
+  });
 
   const today = new Date().toISOString().split("T")[0];
   const [formData, setFormData] = useState({
@@ -649,42 +656,41 @@ const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
                     const filtered = filter(options, state);
                     const { inputValue } = state;
 
-                    if (inputValue) {
-                      const customOptions = [];
-
-                      const isGoodsExist = filtered.some(
-                        (opt) =>
-                          opt.name === inputValue && opt.itemType === "Goods",
-                      );
-
-                      if (!isGoodsExist) {
-                        customOptions.push({
-                          name: inputValue,
-                          type: "Goods",
-                          itemType: "Goods",
-                          isCustom: true,
-                        });
-                      }
-
-                      const isServiceExist = filtered.some(
-                        (opt) =>
-                          opt.name === inputValue &&
-                          opt.itemType === "Services",
-                      );
-
-                      if (!isServiceExist) {
-                        customOptions.push({
-                          name: inputValue,
-                          type: "Services",
-                          itemType: "Services",
-                          isCustom: true,
-                        });
-                      }
-
-                      return [...customOptions, ...filtered];
+                    if (!inputValue) {
+                      return filtered;
                     }
 
-                    return filtered;
+                    const customOptions = [];
+
+                    const isGoodsExist = filtered.some(
+                      (opt) =>
+                        opt.name === inputValue && opt.itemType === "Goods",
+                    );
+
+                    if (!isGoodsExist) {
+                      customOptions.push({
+                        name: inputValue,
+                        type: "Goods",
+                        itemType: "Goods",
+                        isCustom: true,
+                      });
+                    }
+
+                    const isServiceExist = filtered.some(
+                      (opt) =>
+                        opt.name === inputValue && opt.itemType === "Services",
+                    );
+
+                    if (!isServiceExist) {
+                      customOptions.push({
+                        name: inputValue,
+                        type: "Services",
+                        itemType: "Services",
+                        isCustom: true,
+                      });
+                    }
+
+                    return [...customOptions, ...filtered];
                   }}
                   renderOption={(props, option) => {
                     if (option.isCustom) {
