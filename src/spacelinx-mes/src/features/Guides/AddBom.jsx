@@ -48,7 +48,7 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
       if (data) {
         const updatedMbomData = data.map((part) => {
           const guideInfo = partsHavingGuide.find(
-            (item) => item.partId === part.ebomPartId
+            (item) => item.partId === part.ebomPartId,
           );
           if (guideInfo) {
             return {
@@ -99,10 +99,10 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
         const filteredData = data.filter(
           (part) =>
             part.id !== guidePartId &&
-            !mbomData.some((mbomPart) => mbomPart.ebomPartId === part.id)
+            !mbomData.some((mbomPart) => mbomPart.ebomPartId === part.id),
         );
         const sortedData = filteredData.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         );
 
         setPartsData(sortedData);
@@ -113,8 +113,6 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
       setLoadingData(false);
     }
   };
-
-  const getRowId = (row) => row.ebomPartId;
 
   const getRowClassName = (params) => {
     const { quantityM, quantityE } = params.row;
@@ -134,7 +132,7 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
           latestGuideVersion = data.reduce(
             (latest, item) =>
               item.version > (latest?.version || 0) ? item : latest,
-            null
+            null,
           );
         }
         navigateTo(`/guides/${latestGuideVersion?.id}`);
@@ -151,6 +149,7 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
       field: "number",
       headerName: "Number",
       flex: 1,
+      valueGetter: (_value, row) => row.partNumber,
       renderCell: ({ row }) => {
         const { guideId, partNumberSuffix, partNumber, guideNumber } = row;
 
@@ -180,7 +179,7 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
                   } else {
                     Alert(
                       "You do not have permission to view guides.",
-                      "error"
+                      "error",
                     );
                   }
                 }}
@@ -218,7 +217,7 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
             (step) =>
               `Step: ${step.guideStep.sequence}, Quantity: ${
                 step.quantity || "No quantity"
-              }`
+              }`,
           )
           .join("\n");
 
@@ -258,7 +257,7 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
   useEffect(() => {
     if (selectedPart) {
       const findExistence = mbomData.find(
-        (item) => item.ebomPartId === selectedPart.id
+        (item) => item.ebomPartId === selectedPart.id,
       );
       if (findExistence) {
         setEBOMQuantity(findExistence.quantityE);
@@ -333,7 +332,7 @@ const AddBom = ({ guideId, guidePartId, setAllDataIsFetched, isReadOnly }) => {
           <StyledDataGrid
             rows={mbomData}
             columns={columns}
-            getRowId={getRowId}
+            getRowId={(row) => row.ebomPartId}
             initialState={initialGridState}
             className="DataGrid"
             getRowClassName={getRowClassName}
