@@ -127,8 +127,8 @@ const SortableItem = ({
                   ? step.image?.filePath
                   : step.image?.filePath
                 : theme.palette.mode === "dark"
-                ? noImageSmallDark
-                : noImageSmallLight
+                  ? noImageSmallDark
+                  : noImageSmallLight
             }
             className="guide-image"
             alt={step.title}
@@ -272,7 +272,7 @@ const GuideDetails = () => {
     if (accounts.length > 0) {
       const msalCurrentUser = accounts[0];
       const matchedUser = users.find(
-        (user) => user.email === msalCurrentUser.username
+        (user) => user.email === msalCurrentUser.username,
       );
       setCurrentUser(matchedUser);
     }
@@ -317,7 +317,7 @@ const GuideDetails = () => {
       activationConstraint: {
         distance: 10,
       },
-    })
+    }),
   );
 
   useEffect(() => {
@@ -370,22 +370,22 @@ const GuideDetails = () => {
         setStepData(filteredSteps);
         if (!selectedStepId) {
           const firstStepId = filteredSteps.find(
-            (item) => item.sequence === 1
+            (item) => item.sequence === 1,
           )?.id;
           setSelectedStepId(firstStepId);
           setSelectedStepData(
-            filteredSteps.find((item) => item.id === firstStepId)
+            filteredSteps.find((item) => item.id === firstStepId),
           );
           setEditStepTitle(
-            filteredSteps.find((item) => item.id === firstStepId)?.title
+            filteredSteps.find((item) => item.id === firstStepId)?.title,
           );
         } else {
           const currentSelectedStep = filteredSteps.find(
-            (step) => step.id === selectedStepId
+            (step) => step.id === selectedStepId,
           );
           if (!currentSelectedStep) {
             setSelectedStepId(
-              filteredSteps.find((item) => item.sequence === 1)?.id
+              filteredSteps.find((item) => item.sequence === 1)?.id,
             );
           } else {
             setSelectedStepData(currentSelectedStep);
@@ -479,14 +479,14 @@ const GuideDetails = () => {
       showAlert(
         "error",
         "Cannot Delete",
-        "Cannot delete the last step available..!"
+        "Cannot delete the last step available..!",
       );
       return;
     }
 
     const confirmed = await showConfirmation(
       "Delete Step?",
-      "Are you sure you want to delete this step?"
+      "Are you sure you want to delete this step?",
     );
 
     if (!confirmed) return;
@@ -495,11 +495,11 @@ const GuideDetails = () => {
     const assignNextStep = stepData.find((item) => item?.id === selectedStepId);
     let nextStepId = null;
     const nextStep = stepData.find(
-      (item) => item?.sequence === assignNextStep.sequence + 1
+      (item) => item?.sequence === assignNextStep.sequence + 1,
     );
     if (!nextStep) {
       const previousStep = stepData.find(
-        (item) => item?.sequence === assignNextStep?.sequence - 1
+        (item) => item?.sequence === assignNextStep?.sequence - 1,
       );
       nextStepId = previousStep ? previousStep?.id : null;
     } else {
@@ -521,7 +521,7 @@ const GuideDetails = () => {
   useEffect(() => {
     setSelectedStepData(stepData.find((step) => step?.id === selectedStepId));
     setEditStepTitle(
-      stepData.find((step) => step?.id === selectedStepId)?.title
+      stepData.find((step) => step?.id === selectedStepId)?.title,
     );
   }, [selectedStepId]);
   const stepDetails = (id) => {
@@ -553,7 +553,7 @@ const GuideDetails = () => {
       "Publish Guide?",
       "Are you sure you want to publish this guide?",
       "Yes, publish it!",
-      true
+      true,
     );
 
     if (!confirmed) return;
@@ -565,7 +565,7 @@ const GuideDetails = () => {
           "Step Required",
           "Add at least one step before publishing.",
           "OK",
-          false
+          false,
         );
         return;
       }
@@ -575,7 +575,7 @@ const GuideDetails = () => {
           "Platform Not Assigned",
           "Assign the guide to a platform before publishing.",
           "OK",
-          false
+          false,
         );
         return;
       }
@@ -592,7 +592,7 @@ const GuideDetails = () => {
           "Publish Error",
           "Cannot publish guide with non-released parts.",
           "OK",
-          false
+          false,
         );
       } else {
         handleFetchError(error, "Couldn't Publish this Guide...!");
@@ -642,7 +642,7 @@ const GuideDetails = () => {
     try {
       const data = await createGuideStepBetweenSteps(
         presentGuideId,
-        newStepSequence
+        newStepSequence,
       );
       await fetchStepsData();
       setSelectedStepId(data.id);
@@ -672,12 +672,12 @@ const GuideDetails = () => {
       const confirmed = await showConfirmation(
         "Reorder Step?",
         "Are you sure you want to reorder this step?",
-        "Yes, reorder it!"
+        "Yes, reorder it!",
       );
       if (!confirmed) return;
 
       const originalIndex = stepData.findIndex(
-        (step) => step?.id === active?.id
+        (step) => step?.id === active?.id,
       );
       const newIndex = stepData.findIndex((step) => step?.id === over?.id);
 
@@ -776,7 +776,40 @@ const GuideDetails = () => {
   useEffect(() => {
     localStorage.setItem("selectedStepId", selectedStepId);
   }, [selectedStepId]);
+  useEffect(() => {
+    const handleArrowKeys = (event) => {
+      const target = event.target;
 
+      // Ignore arrow keys while typing
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT")
+      ) {
+        return;
+      }
+
+      const currentIndex = stepData.findIndex(
+        (step) => step.id === selectedStepId,
+      );
+
+      if (event.key === "ArrowLeft" && currentIndex > 0) {
+        stepDetails(stepData[currentIndex - 1].id);
+      }
+
+      if (event.key === "ArrowRight" && currentIndex < stepData.length - 1) {
+        stepDetails(stepData[currentIndex + 1].id);
+      }
+    };
+
+    window.addEventListener("keydown", handleArrowKeys);
+
+    return () => {
+      window.removeEventListener("keydown", handleArrowKeys);
+    };
+  }, [selectedStepId, stepData]);
   const handleGuideCheckOut = async (guideId) => {
     try {
       const result = await guideCheckOut(guideId);
@@ -906,18 +939,18 @@ const GuideDetails = () => {
                             if (!hasPermission(PERMISSIONS.GUIDES.MODIFY)) {
                               Alert(
                                 "You do not have permission to edit guides.",
-                                "error"
+                                "error",
                               );
                               return;
                             }
 
                             const latestVersion = guideVersions.find(
-                              (item) => item?.status === "Draft"
+                              (item) => item?.status === "Draft",
                             );
                             if (latestVersion) {
                               Alert(
                                 `Draft Already Available in Version ${latestVersion?.version}...!`,
-                                "error"
+                                "error",
                               );
                               setPresentGuideId(latestVersion?.id);
                             } else {
@@ -1046,7 +1079,7 @@ const GuideDetails = () => {
                       e.stopPropagation();
                       Alert(
                         "You don’t have permission to view Part details.",
-                        "error"
+                        "error",
                       );
                       return;
                     }
@@ -1147,8 +1180,13 @@ const GuideDetails = () => {
           <button
             className="StepsInfoSideButtons"
             onClick={() => {
-              const container = document.querySelector(".StepsScrollContainer");
-              container.scrollLeft -= 100;
+              const currentIndex = stepData.findIndex(
+                (step) => step.id === selectedStepId,
+              );
+
+              if (currentIndex > 0) {
+                stepDetails(stepData[currentIndex - 1].id);
+              }
             }}
           >
             <ion-icon name="chevron-back-outline"></ion-icon>
@@ -1185,8 +1223,13 @@ const GuideDetails = () => {
           <button
             className="StepsInfoSideButtons"
             onClick={() => {
-              const container = document.querySelector(".StepsScrollContainer");
-              container.scrollLeft += 100;
+              const currentIndex = stepData.findIndex(
+                (step) => step.id === selectedStepId,
+              );
+
+              if (currentIndex < stepData.length - 1) {
+                stepDetails(stepData[currentIndex + 1].id);
+              }
             }}
           >
             <ion-icon name="chevron-forward-outline"></ion-icon>
@@ -1317,8 +1360,8 @@ const GuideDetails = () => {
                       selectedStepData?.image?.filePath
                         ? selectedStepData?.image?.filePath
                         : theme.palette.mode === "dark"
-                        ? noImageLargeDark
-                        : noImageLargeLight
+                          ? noImageLargeDark
+                          : noImageLargeLight
                     }
                     alt={selectedStepData?.title || "Step Image Preview"}
                     onClick={
