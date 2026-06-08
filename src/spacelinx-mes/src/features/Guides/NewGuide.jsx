@@ -37,7 +37,7 @@ const NewGuide = ({
     Type: "",
     Category: "",
   });
-  const [loadingData, setLoadingData] = useState(true);
+  const [loadingData, setLoadingData] = useState(false);
   const [GuideTypes, setGuideTypes] = useState([]);
   const [platformTypes, setplatformTypes] = useState([]);
   const [partsWithoutGuide, setPartsWithoutGuide] = useState([]);
@@ -184,14 +184,14 @@ const NewGuide = ({
 
   useEffect(() => {
     const fetchParts = async () => {
-      setLoadingData(true);
+      setLoadingPartData(true);
       try {
         const parts = await fetchParentPartsWithoutGuide();
         setPartsWithoutGuide(parts);
       } catch (error) {
         console.error(error);
       } finally {
-        setLoadingData(false);
+        setLoadingPartData(false);
       }
     };
     fetchParts();
