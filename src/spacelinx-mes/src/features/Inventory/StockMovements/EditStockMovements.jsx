@@ -17,7 +17,9 @@ import {
   approveStockMovement,
   rejectStockMovement,
 } from "../../../services/stockMovementService";
+import { fetchFullBOMConsolidated } from "../../../services/childPartService";
 import { fetchInventoryStockByLocation } from "../../../services/inventoryStockService";
+import { fetchInventoryPartPurchaseHistory } from "../../../services/inventoryPartService";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import { fetchUserLookup } from "../../../services/userService";
 import Popover from "@mui/material/Popover";
@@ -65,6 +67,30 @@ const EditStockMovements = ({
   const [items, setItems] = useState([]);
   const [selectedStockItems, setSelectedStockItems] = useState([]);
   const [lineItemErrors, setLineItemErrors] = useState({});
+  const [purchaseHistoryCache, setPurchaseHistoryCache] = useState({});
+  // In-flight request map to avoid redundant concurrent fetches for the same partId
+  const purchaseHistoryInFlight = React.useRef({});
+
+  const getPurchaseHistoryForPart = async (partId) => {
+    if (purchaseHistoryCache[partId]) return purchaseHistoryCache[partId];
+    // Deduplicate concurrent requests for the same partId
+    if (purchaseHistoryInFlight.current[partId]) {
+      return purchaseHistoryInFlight.current[partId];
+    }
+    const request = fetchInventoryPartPurchaseHistory(partId)
+      .then((history) => {
+        setPurchaseHistoryCache((prev) => ({ ...prev, [partId]: history }));
+        delete purchaseHistoryInFlight.current[partId];
+        return history;
+      })
+      .catch((err) => {
+        console.error("Failed to fetch purchase history:", err);
+        delete purchaseHistoryInFlight.current[partId];
+        return [];
+      });
+    purchaseHistoryInFlight.current[partId] = request;
+    return request;
+  };
   const [value, setValue] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
@@ -134,7 +160,7 @@ const EditStockMovements = ({
         description: data.notes || "",
         reason: data.movementReason || "",
         department: data.department ? { name: data.department } : "",
-        project: data.project ? { id: data.project } : null,
+        project: data.projectId ? { id: data.projectId } : null,
       });
 
       // Load stock data for the location
@@ -160,6 +186,44 @@ const EditStockMovements = ({
       );
 
       setSelectedStockItems(lineItems);
+
+      // Resolve PO/GRN for all loaded line items
+      const uniquePartIds = [
+        ...new Set((data.stockMovementLineItems || []).map((x) => x.partId)),
+      ];
+      await Promise.all(
+        uniquePartIds.map(async (partId) => {
+          const history = await getPurchaseHistoryForPart(partId);
+          setSelectedStockItems((prev) =>
+            prev.map((item) => {
+              if (item.partId !== partId) return item;
+
+              let match = null;
+              if (item.trackingNumber) {
+                match = history.find(
+                  (x) => x.trackingId === item.trackingNumber,
+                );
+              }
+
+              if (match) {
+                return {
+                  ...item,
+                  poNumber: match.poNumber || "---",
+                  poQty: match.receivedQuantity ?? null,
+                  grnNumber: match.grnNumber || "---",
+                };
+              } else {
+                return {
+                  ...item,
+                  poNumber: "---",
+                  poQty: null,
+                  grnNumber: "---",
+                };
+              }
+            }),
+          );
+        }),
+      );
     } catch (error) {
       Alert("Failed to load stock movement details", "error");
       console.error("Error fetching stock movement:", error);
@@ -380,17 +444,116 @@ const EditStockMovements = ({
     });
   };
 
-  const handleSelectItem = (part) => {
+  const handleSelectItem = async (part) => {
     if (!part) return;
+
+    // Fetch purchase history for parent part
+    const parentHistory = await getPurchaseHistoryForPart(part.partId);
+
+    // Resolve PO/GRN for parent part — check trackingNumber or trackingId
+    const trackingNo = part.trackingNumber || part.trackingId;
+    const parentMatch = trackingNo
+      ? parentHistory.find((x) => x.trackingId === trackingNo) ?? null
+      : null;
+
     const newEntry = {
       ...part,
       uniqueId: `${part.partId}-${Date.now()}`,
       trackingType: "",
       issueQuantity: "",
-      trackingNumber: "",
+      trackingNumber: parentMatch?.trackingId || trackingNo || "",
+      poNumber: parentMatch?.poNumber || "---",
+      poQty: parentMatch?.receivedQuantity ?? null,
+      grnNumber: parentMatch?.grnNumber || "---",
       remarks: "",
     };
-    setSelectedStockItems((prev) => [...prev, newEntry]);
+
+    let allNewItems = [newEntry];
+
+    // Fetch and append BOM parts if any
+    try {
+      const bomData = await fetchFullBOMConsolidated(part.partId);
+      if (bomData && bomData.length > 0) {
+        // Filter out parent part if it is returned in the consolidated list
+        const filteredBomData = bomData.filter((item) => item.id !== part.partId);
+
+        // Fetch histories for all child parts in parallel
+        const childHistories = await Promise.all(
+          filteredBomData.map((childPart) =>
+            getPurchaseHistoryForPart(childPart.id),
+          ),
+        );
+
+        const childEntries = filteredBomData.map((childPart, idx) => {
+          const childHistory = childHistories[idx] || [];
+
+          const stockMatch = stockData.find(
+            (item) => item.partId === childPart.id,
+          );
+
+          // Only match by actual tracking ID — no arbitrary history[0] fallback
+          const childMatch = (stockMatch?.trackingId
+            ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
+            : null) ?? null;
+
+          const trackingTypeStr = childPart.isSerialNumberRequired ? "Serial" : "None";
+
+          if (stockMatch) {
+            const isChildSerial = stockMatch.trackingType?.toLowerCase() === "serial";
+            return {
+              ...stockMatch,
+              uniqueId: `${stockMatch.partId}-${Date.now()}-${Math.random()}`,
+              trackingType: stockMatch.trackingType || "",
+              issueQuantity: isChildSerial ? 1 : "",
+              trackingNumber: childMatch?.trackingId || stockMatch.trackingId || "",
+              poNumber: childMatch?.poNumber || "---",
+              poQty: childMatch?.receivedQuantity ?? null,
+              grnNumber: childMatch?.grnNumber || "---",
+              remarks: `BOM item of ${part.partName || part.name || ""}`,
+              partNumber:
+                stockMatch.part?.partNumber || stockMatch.partNumber || childPart.partNumber || "",
+              partName: stockMatch.part?.name || stockMatch.partName || childPart.name || "",
+              part: {
+                partNumber:
+                  stockMatch.part?.partNumber || stockMatch.partNumber || childPart.partNumber || "",
+                name: stockMatch.part?.name || stockMatch.partName || childPart.name || "",
+              },
+              quantity: stockMatch.qtyOnhand || stockMatch.quantity || 0,
+            };
+          } else {
+            return {
+              partId: childPart.id,
+              partNumber: childPart.partNumber || "",
+              partName: childPart.name || "",
+              part: {
+                partNumber: childPart.partNumber || "",
+                name: childPart.name || "",
+              },
+              quantity: 0,
+              trackingType: trackingTypeStr,
+              uniqueId: `${childPart.id}-${Date.now()}-${Math.random()}`,
+              issueQuantity: trackingTypeStr?.toLowerCase() === "serial" ? 1 : "",
+              trackingNumber: childMatch?.trackingId || "",
+              poNumber: childMatch?.poNumber || "---",
+              poQty: childMatch?.receivedQuantity ?? null,
+              grnNumber: childMatch?.grnNumber || "---",
+              remarks: `BOM item of ${part.partName || part.name || ""} (Out of Stock)`,
+            };
+          }
+        });
+
+        allNewItems = [...allNewItems, ...childEntries];
+      }
+    } catch (error) {
+      console.error("Failed to fetch BOM parts:", error);
+    }
+
+    // Deduplicate: skip parts whose partId is already in selectedStockItems
+    setSelectedStockItems((prev) => {
+      const existingPartIds = new Set(prev.map((i) => i.partId));
+      const deduped = allNewItems.filter((i) => !existingPartIds.has(i.partId));
+      return [...prev, ...deduped];
+    });
   };
 
   const handleIssueQuantityChange = (uniqueId, value) => {
@@ -406,7 +569,7 @@ const EditStockMovements = ({
     updateLineItemError(uniqueId, "issueQuantity", error);
   };
 
-  const handleTrackingNumberChange = (uniqueId, value) => {
+  const handleTrackingNumberChange = async (uniqueId, value) => {
     setSelectedStockItems((prev) =>
       prev.map((item) =>
         item.uniqueId === uniqueId ? { ...item, trackingNumber: value } : item,
@@ -414,6 +577,23 @@ const EditStockMovements = ({
     );
     const item = selectedStockItems.find((i) => i.uniqueId === uniqueId);
     if (!item) return;
+
+    // Resolve PO/GRN for the new tracking number
+    const history = await getPurchaseHistoryForPart(item.partId);
+    const match = history.find((x) => x.trackingId === value);
+    setSelectedStockItems((prev) =>
+      prev.map((i) =>
+        i.uniqueId === uniqueId
+          ? {
+              ...i,
+              poNumber: match?.poNumber || "---",
+              poQty: match?.receivedQuantity ?? null,
+              grnNumber: match?.grnNumber || "---",
+            }
+          : i,
+      ),
+    );
+
     const error = validateTrackingNumber(
       { ...item, trackingNumber: value },
       selectedStockItems,
@@ -710,11 +890,33 @@ const EditStockMovements = ({
       field: "partNumber",
       headerName: "Part Number",
       flex: 1,
+      valueGetter: (_, row) => row.part?.partNumber || row.partNumber || "",
     },
     {
       field: "partName",
       headerName: "Part Name",
       flex: 1,
+      valueGetter: (_, row) => row.part?.name || row.partName || "",
+    },
+    {
+      field: "poNumber",
+      headerName: "PO Number",
+      flex: 1,
+      valueGetter: (_, row) => row.poNumber || "---",
+    },
+    {
+      field: "poQty",
+      headerName: "PO Qty",
+      flex: 0.5,
+      type: "number",
+      valueGetter: (_, row) =>
+        row.poQty !== undefined && row.poQty !== null ? row.poQty : null,
+    },
+    {
+      field: "grnNumber",
+      headerName: "GRN Number",
+      flex: 1,
+      valueGetter: (_, row) => row.grnNumber || "---",
     },
     // {
     //   field: "quantity",
