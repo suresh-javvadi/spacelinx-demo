@@ -68,7 +68,8 @@ desktop.ini
 *.publishproj
 PublishScripts/
 
-# Claude Code
-.claude/
+# Claude Code — ignore everything except shared project skills
+.claude/*
+!.claude/skills/
 .venv-dbtools/
 .db-connections.env
