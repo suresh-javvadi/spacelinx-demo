@@ -405,6 +405,7 @@ public class RequisitionStatus
 
 public class ScrapRequestStatus
 {
+    public const string Draft = "Draft";
     public const string Submitted = "Submitted";
     public const string Approved = "Approved";
     public const string Rejected = "Rejected";
@@ -448,11 +449,16 @@ public class TenderVendorStatus
 
 public class VendorReturnRequestStatus
 {
+    public const string Draft = "Draft";
     public const string Submitted = "Submitted";
     public const string Approved = "Approved";
     public const string Rejected = "Rejected";
 }
 
+public class GuideStatus
+{
+    public const string Draft = "Draft";
+}
 public class SpaceLinxEntities
 {
     public const string Part = "Part";
@@ -470,6 +476,8 @@ public class SpaceLinxEntities
     public const string Requisition = "Requisition";
     public const string Tender = "Tender";
     public const string InventoryPart = "InventoryPart";
+    public const string Guide = "Guide";
+    public const string StockMovement = "StockMovement";
 }
 
 public class BomDefaults

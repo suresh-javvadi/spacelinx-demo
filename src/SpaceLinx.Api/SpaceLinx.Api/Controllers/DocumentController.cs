@@ -1,10 +1,12 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpaceLinx.Api.Interfaces;
 using SpaceLinx.Api.Security;
 using SpaceLinx.Model;
+using SpaceLinx.Api.Security.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace SpaceLinx.Api.Controllers;
 
@@ -12,7 +14,7 @@ namespace SpaceLinx.Api.Controllers;
 [ApiController]
 [Authorize]
 [SpaceLinxAuthroize]
-public class DocumentController(SpaceLinxContext spaceLinxContext, IMapper mapper, IHttpContextAccessor httpContextAccessor, IDocumentService documentService) :
+public class DocumentController(SpaceLinxContext spaceLinxContext, IMapper mapper, IHttpContextAccessor httpContextAccessor, IDocumentService documentService, IOptions<SpaceLinxAuthorizationOptions> authOptions) :
     GenericRestController<Document, DocumentWriteModel, DocumentUpdateModel, DocumentReadModel, DocumentRefModel>(spaceLinxContext, mapper, httpContextAccessor)
 {
     [HttpGet("documents-with-users/{entityId}")]
@@ -269,5 +271,58 @@ public class DocumentController(SpaceLinxContext spaceLinxContext, IMapper mappe
         {
             return StatusCode(500, $"Error downloading documents: {ex.Message}");
         }
+    }
+
+    [HttpDelete("{id}")]
+    public override async Task<IActionResult> Delete(Guid id)
+    {
+        var document = await spaceLinxContext.Documents.FirstOrDefaultAsync(x => x.Id == id);
+        if (document == null || document.DeletedAt != null)
+        {
+            return NotFound();
+        }
+
+        bool isAdmin = await spaceLinxContext.UserRoles
+            .AnyAsync(ur => ur.User.Email == UserEmail 
+                         && ur.Role.RoleName == authOptions.Value.SuperAdminRoleName 
+                         && ur.DeletedAt == null 
+                         && ur.Role.DeletedAt == null);
+
+        if (!isAdmin)
+        {
+            bool isCreator = string.Equals(document.CreatedBy, UserEmail, StringComparison.OrdinalIgnoreCase);
+            bool isDraft = await IsEntityInDraftStatusAsync(document.EntityType, document.EntityId);
+
+            if (!isCreator || !isDraft)
+            {
+                return StatusCode((int)System.Net.HttpStatusCode.Forbidden, "Forbidden: Only the creator can delete documents when the entity is in Draft status.");
+            }
+        }
+
+        document.DeletedAt = DateTime.UtcNow;
+        document.DeletedBy = UserEmail;
+        spaceLinxContext.Entry(document).Property(nameof(BaseModel.IsActive)).CurrentValue = false;
+        
+        await spaceLinxContext.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    private async Task<bool> IsEntityInDraftStatusAsync(string entityType, Guid entityId)
+    {
+        return entityType switch
+        {
+            SpaceLinxEntities.Part => (await spaceLinxContext.Parts.FindAsync(entityId))?.Status == PartStatus.Draft,
+            SpaceLinxEntities.Eco => (await spaceLinxContext.Ecos.FindAsync(entityId))?.Status == EcoStatus.Draft,
+            SpaceLinxEntities.PurchaseOrder => (await spaceLinxContext.PurchaseOrders.FindAsync(entityId))?.Status == PoStatus.Draft,
+            SpaceLinxEntities.Requisition => (await spaceLinxContext.Requisitions.FindAsync(entityId))?.Status == RequisitionStatus.Draft,
+            SpaceLinxEntities.Tender => (await spaceLinxContext.Tenders.FindAsync(entityId))?.Status == TenderStatus.Draft,
+            SpaceLinxEntities.Guide => (await spaceLinxContext.Guides.FindAsync(entityId))?.Status == GuideStatus.Draft,
+            SpaceLinxEntities.StockMovement => (await spaceLinxContext.StockMovements.FindAsync(entityId))?.Status == StockMovementStatus.Draft,
+            SpaceLinxEntities.GoodsReceiptNote => (await spaceLinxContext.GoodsReceiptNotes.FindAsync(entityId))?.Status == GrnStatus.InProcess,
+            SpaceLinxEntities.ScrapRequest => (await spaceLinxContext.ScrapRequests.FindAsync(entityId))?.Status == ScrapRequestStatus.Draft,
+            SpaceLinxEntities.VendorReturnRequest => (await spaceLinxContext.VendorReturnRequests.FindAsync(entityId))?.Status == VendorReturnRequestStatus.Draft,
+            _ => true
+        };
     }
 }
