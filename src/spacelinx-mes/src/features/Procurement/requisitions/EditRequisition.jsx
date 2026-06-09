@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useMemo } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { Tab, TextField, Button, Autocomplete, Divider } from "@mui/material";
 import Cliploader from "../../../Components/Loaders/Cliploader";
 import { AlertsContext } from "../../AlertsContext/Context";
@@ -84,7 +84,6 @@ const EditRequisition = ({
   const filter = createFilterOptions();
 
   const {
-    activeRole,
     isSuperAdmin,
     hasPermission,
     userData: currentUser,
@@ -120,7 +119,7 @@ const EditRequisition = ({
   const [approvals, setApprovals] = useState([]);
   const [approvers, setApprovers] = useState([]);
   const [approvalConfig, setApprovalConfig] = useState(null);
-  const [loadingConfig, setLoadingConfig] = useState(false);
+  const [, setLoadingConfig] = useState(false);
   const [blockSubmit, setBlockSubmit] = useState(false);
   useEffect(() => {
     const isSame =
@@ -175,41 +174,27 @@ const EditRequisition = ({
     }
   }, [partsData]);
 
-  const currentUserId = currentUser?.id || null;
-
-  const getApprovalStatus = (approval) => {
-    const status = approval?.status || approval?.approver?.status;
-    return status ? status.toString() : "Pending";
-  };
-
   const activeStage = useMemo(() => {
     if (!approvals?.length) return null;
 
     const pendingStages = approvals
-      .map((a) => {
-        const status = getApprovalStatus(a);
-        return status.toLowerCase() === "pending"
-          ? Number(a.stageNumber)
-          : null;
-      })
-      .filter((stage) => stage !== null && !Number.isNaN(stage));
+      .filter((a) => (a.status || "").toLowerCase() === "pending")
+      .map((a) => Number(a.stageNumber));
 
     return pendingStages.length ? Math.min(...pendingStages) : null;
   }, [approvals]);
 
   const canCurrentUserApprove = useMemo(() => {
-    if (!activeStage || !currentUserId) return false;
+    if (!activeStage || !currentUser?.id) return false;
 
     return approvals.some((a) => {
-      const status = getApprovalStatus(a);
-      const approverId = a.approverId || a.approver?.id;
       return (
-        Number(a.stageNumber) === activeStage &&
-        String(approverId) === String(currentUserId) &&
-        status.toLowerCase() === "pending"
+        Number(a.stageNumber) === Number(activeStage) &&
+        String(a.approverId) === String(currentUser.id) &&
+        (a.status || "").toLowerCase() === "pending"
       );
     });
-  }, [approvals, activeStage, currentUserId]);
+  }, [approvals, activeStage, currentUser]);
 
   const newFlyoutTabChange = (event, newValue) =>
     setEditFlyOutTabsValue(newValue);
@@ -343,18 +328,6 @@ const EditRequisition = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  useEffect(() => {
-    if (!approvers?.length) return;
-    const mappedApprovals = approvers.flatMap((stage) =>
-      stage.users.map((user) => ({
-        stageNumber: stage.stage,
-        approverId: user.id,
-        approver: user,
-      })),
-    );
-    setApprovals(mappedApprovals);
-  }, [approvers]);
-
   const handleUpdate = async () => {
     if (!validate()) return;
 
@@ -385,14 +358,24 @@ const EditRequisition = ({
           };
         }),
 
-        approvals: approvals.map((a) => ({
-          id: a.id,
-          stageNumber: a.stageNumber,
-          approverId: a.approverId,
-          status: a.status,
-          actedAt: a.actedAt,
-          comment: a.comment,
-        })),
+        approvals: approvers.flatMap((stage) =>
+          stage.users.map((user) => {
+            const existing = approvals.find(
+              (a) =>
+                Number(a.stageNumber) === Number(stage.stage) &&
+                String(a.approverId) === String(user.id),
+            );
+
+            return {
+              id: existing?.id,
+              stageNumber: stage.stage,
+              approverId: user.id,
+              status: existing?.status,
+              actedAt: existing?.actedAt,
+              comment: existing?.comment,
+            };
+          }),
+        ),
       };
 
       await updateRequisition(requisitionId, payload);
