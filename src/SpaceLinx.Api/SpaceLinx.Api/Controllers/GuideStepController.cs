@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -109,6 +109,36 @@ public class GuideStepController(SpaceLinxContext spaceLinxContext, IMapper mapp
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    [HttpPost("bulk-delete-reorder")]
+    public async Task<IActionResult> BulkDeleteSteps([FromBody] List<Guid> guideStepIds)
+    {
+        try
+        {
+            await guideService.BulkDeleteGuideStepsAsync(guideStepIds);
+            return NoContent();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (ApplicationException ex) when (ex.Message == "No valid steps found to delete.")
+        {
+            return NotFound(ex.Message);
+        }
+        catch (ApplicationException ex) when (ex.Message == "Guide not found." || ex.Message.StartsWith("Guide is published"))
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (ApplicationException ex) when (ex.Message.StartsWith("Internal server error"))
+        {
+            return StatusCode(500, ex.Message);
+        }
+        catch (Exception ex)
+        {
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }

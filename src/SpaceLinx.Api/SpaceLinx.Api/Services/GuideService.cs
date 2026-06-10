@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpaceLinx.Api.Interfaces;
@@ -338,6 +338,71 @@ public class GuideService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IH
             checkOutRecord.IsActive = true;
             await _spaceLinxContext.GuideCheckOutHistories.AddAsync(checkOutRecord);
             await _spaceLinxContext.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw new ApplicationException($"Internal server error: {ex.Message}");
+        }
+    }
+
+    public async Task BulkDeleteGuideStepsAsync(List<Guid> guideStepIds)
+    {
+        if (guideStepIds == null || !guideStepIds.Any())
+        {
+            throw new ArgumentException("No step IDs provided.");
+        }
+
+        var nullableGuideStepIds = guideStepIds.Cast<Guid?>().ToList();
+
+        var stepsToDelete = await _spaceLinxContext.GuideSteps
+            .Where(g => nullableGuideStepIds.Contains(g.Id) && g.DeletedBy == null)
+            .ToListAsync();
+
+        if (!stepsToDelete.Any())
+        {
+            throw new ApplicationException("No valid steps found to delete.");
+        }
+
+        var guideId = stepsToDelete.First().GuideId;
+
+        if (stepsToDelete.Select(s => s.GuideId).Distinct().Count() > 1)
+        {
+            throw new ArgumentException("All steps must belong to the same guide.");
+        }
+
+        var totalStepsInGuide = await _spaceLinxContext.GuideSteps
+            .CountAsync(g => g.GuideId == guideId && g.DeletedBy == null);
+
+        if (totalStepsInGuide <= stepsToDelete.Count)
+        {
+            throw new ArgumentException("Cannot delete all steps in a guide. At least one step must remain.");
+        }
+
+        await ValidateGuideStatusAsync(guideId, "Guide is published, so steps cannot be deleted.");
+
+        var deletedSequences = stepsToDelete.Select(s => s.Sequence).OrderByDescending(s => s).ToList();
+
+        foreach (var step in stepsToDelete)
+        {
+            _spaceLinxContext.Entry(step).State = EntityState.Deleted;
+        }
+
+        using var transaction = await _spaceLinxContext.Database.BeginTransactionAsync();
+        try
+        {
+            await _spaceLinxContext.SaveChangesAsync();
+
+            foreach (var deletedSequence in deletedSequences)
+            {
+                await _spaceLinxContext.Database.ExecuteSqlRawAsync(
+                                "call mes.reorder_guide_steps_after_deletion({0}, {1})",
+                                guideId,
+                                deletedSequence
+                            );
+            }
 
             await transaction.CommitAsync();
         }

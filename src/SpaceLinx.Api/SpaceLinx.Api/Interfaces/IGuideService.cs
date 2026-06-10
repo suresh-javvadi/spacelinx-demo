@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SpaceLinx.Model;
 using Task = System.Threading.Tasks.Task;
 namespace SpaceLinx.Api.Interfaces
@@ -23,5 +23,6 @@ namespace SpaceLinx.Api.Interfaces
         Task ValidateGuideStatusAsync(Guid id, string error);
         Task<GuideStepReadModel?> CreateGuideFirstStepAsync(Guid guideId);
         Task GuideCheckOutAsync(Guid guideId);
+        Task BulkDeleteGuideStepsAsync(List<Guid> guideStepIds);
     }
 }
