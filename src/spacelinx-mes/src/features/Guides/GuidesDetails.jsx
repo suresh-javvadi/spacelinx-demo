@@ -73,7 +73,8 @@ import { useUserContext } from "../userContext/UserContext";
 import ResizableDrawer from "../../Components/ResizableDrawer/ResizableDrawer";
 import { usePartDetailsDrawer } from "../admin/parts/PartDetailsContext";
 import { PERMISSIONS } from "../../constants/PagePermissions";
-
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 const SortableItem = ({
   id,
   step,
@@ -194,6 +195,18 @@ const GuideDetails = () => {
   const [weight, setWeight] = useState();
   const [weightUnit, setWeightUnit] = useState("Grams");
   const [printData, setPrintData] = useState(null);
+  const [isStepsCollapsed, setIsStepsCollapsed] = useState(false);
+
+  useEffect(() => {
+    setIsStepsCollapsed(sessionStorage.getItem("stepsCollapsed") === "true");
+  }, []);
+
+  const handleToggleSteps = () => {
+    const newValue = !isStepsCollapsed;
+
+    setIsStepsCollapsed(newValue);
+    sessionStorage.setItem("stepsCollapsed", newValue);
+  };
   const { isDrawerOpen } = useDrawer();
 
   useEffect(() => {
@@ -1175,92 +1188,105 @@ const GuideDetails = () => {
           )}
         </div>
       </div>
-      <div className="StepsSection">
-        <div className={isReadOnly ? "PublishedStepsInfo" : "StepsInfo"}>
-          <button
-            className="StepsInfoSideButtons"
-            onClick={() => {
-              const currentIndex = stepData.findIndex(
-                (step) => step.id === selectedStepId,
-              );
+      <Accordion
+        expanded={!isStepsCollapsed}
+        onChange={handleToggleSteps}
+        className="StepsAccordion"
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <h3>Steps</h3>
+        </AccordionSummary>
 
-              if (currentIndex > 0) {
-                stepDetails(stepData[currentIndex - 1].id);
-              }
-            }}
-          >
-            <ion-icon name="chevron-back-outline"></ion-icon>
-          </button>
-          <div className="StepsScrollContainer">
-            {loadingData ? (
-              <div className="productLoader">
-                <ClipLoader color={"#009cbb"} loading={loadingData} />
-              </div>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCorners}
-                onDragEnd={handleDragEnd}
+        <AccordionDetails>
+          <div className="StepsSection">
+            <div className={isReadOnly ? "PublishedStepsInfo" : "StepsInfo"}>
+              <button
+                className="StepsInfoSideButtons"
+                onClick={() => {
+                  const currentIndex = stepData.findIndex(
+                    (step) => step.id === selectedStepId,
+                  );
+
+                  if (currentIndex > 0) {
+                    stepDetails(stepData[currentIndex - 1].id);
+                  }
+                }}
               >
-                <SortableContext
-                  items={stepData.map((step) => step.id)}
-                  strategy={horizontalListSortingStrategy}
+                <ion-icon name="chevron-back-outline"></ion-icon>
+              </button>
+              <div className="StepsScrollContainer">
+                {loadingData ? (
+                  <div className="productLoader">
+                    <ClipLoader color={"#009cbb"} loading={loadingData} />
+                  </div>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCorners}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={stepData.map((step) => step.id)}
+                      strategy={horizontalListSortingStrategy}
+                    >
+                      {stepData.map((step) => (
+                        <SortableItem
+                          key={step.id}
+                          id={step.id}
+                          step={step}
+                          selectedStepId={selectedStepId}
+                          stepDetails={stepDetails}
+                          isDraggable={!isReadOnly}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                )}
+              </div>
+              <button
+                className="StepsInfoSideButtons"
+                onClick={() => {
+                  const currentIndex = stepData.findIndex(
+                    (step) => step.id === selectedStepId,
+                  );
+
+                  if (currentIndex < stepData.length - 1) {
+                    stepDetails(stepData[currentIndex + 1].id);
+                  }
+                }}
+              >
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+              </button>
+            </div>
+            {!isReadOnly && (
+              <div className="StepControls">
+                <button
+                  className="AddStep guides-button"
+                  disabled={loadingData || allDataIsFetched}
+                  onClick={handleCreateGuideStepBetweenSteps}
                 >
-                  {stepData.map((step) => (
-                    <SortableItem
-                      key={step.id}
-                      id={step.id}
-                      step={step}
-                      selectedStepId={selectedStepId}
-                      stepDetails={stepDetails}
-                      isDraggable={!isReadOnly}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
+                  <ion-icon name="add-outline" title="Add Step"></ion-icon>
+                </button>
+                <button
+                  onClick={handleCopyStep}
+                  disabled={loadingData || allDataIsFetched}
+                  className="guides-button"
+                >
+                  <ion-icon name="copy-outline" title="Copy Step"></ion-icon>
+                </button>
+                <button
+                  className="DeleteStep guides-button"
+                  disabled={loadingData || allDataIsFetched}
+                  onClick={handleDeleteStep}
+                >
+                  <ion-icon name="trash-outline" title="Delete Step"></ion-icon>
+                </button>
+              </div>
             )}
           </div>
-          <button
-            className="StepsInfoSideButtons"
-            onClick={() => {
-              const currentIndex = stepData.findIndex(
-                (step) => step.id === selectedStepId,
-              );
+        </AccordionDetails>
+      </Accordion>
 
-              if (currentIndex < stepData.length - 1) {
-                stepDetails(stepData[currentIndex + 1].id);
-              }
-            }}
-          >
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </button>
-        </div>
-        {!isReadOnly && (
-          <div className="StepControls">
-            <button
-              className="AddStep guides-button"
-              disabled={loadingData || allDataIsFetched}
-              onClick={handleCreateGuideStepBetweenSteps}
-            >
-              <ion-icon name="add-outline" title="Add Step"></ion-icon>
-            </button>
-            <button
-              onClick={handleCopyStep}
-              disabled={loadingData || allDataIsFetched}
-              className="guides-button"
-            >
-              <ion-icon name="copy-outline" title="Copy Step"></ion-icon>
-            </button>
-            <button
-              className="DeleteStep guides-button"
-              disabled={loadingData || allDataIsFetched}
-              onClick={handleDeleteStep}
-            >
-              <ion-icon name="trash-outline" title="Delete Step"></ion-icon>
-            </button>
-          </div>
-        )}
-      </div>
       <div className="StepDetails">
         <div className="StepDetailsInfo">
           {loadingData ? (
