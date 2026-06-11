@@ -45,6 +45,11 @@ export const deleteGuideStep = async (id) => {
   const response = await api.delete(`${apiUrl}/${id}`);
   return response.data;
 };
+
+export const deleteGuideSteps = async (ids) => {
+  const response = await api.post(`${apiUrl}/bulk-delete-reorder`, ids);
+  return response.data;
+};
 export const guideStepReOrder = async (id, sequence) => {
   const response = await api.post(
     `${apiUrl}/reorder-step?guideStepId=${id}&newSequence=${sequence}`

@@ -3,6 +3,17 @@
   --stars-image: url("https://cdn.pixabay.com/photo/2020/03/30/13/29/space-4984262_1280.jpg");
 }
 
+.StepSelectCheckbox {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 10;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #009cbb;
+}
+
 .stepTitle {
   display: inline-block;
   font-size: 10px;

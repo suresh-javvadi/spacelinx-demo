@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Divider, Drawer, MenuItem, TextField } from "@mui/material";
-import { deleteReorderSteps } from "../../services/guideStepService";
+import { deleteGuideSteps } from "../../services/guideStepService";
 import {
   DndContext,
   useSensor,
@@ -81,6 +81,9 @@ const SortableItem = ({
   selectedStepId,
   stepDetails,
   isDraggable,
+  isSelectMode,
+  isSelected,
+  onToggleSelect,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -90,8 +93,18 @@ const SortableItem = ({
     transition: isDraggable ? transition : "none",
     display: "inline-block",
     width: "200px",
+    position: "relative",
   };
   const theme = useTheme();
+
+  const handleClick = () => {
+    if (isSelectMode) {
+      onToggleSelect(step.id);
+    } else {
+      stepDetails(step.id);
+    }
+  };
+
   return (
     <div
       id={step.id}
@@ -99,15 +112,27 @@ const SortableItem = ({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
-      draggable={isDraggable}
+      {...(isDraggable && !isSelectMode ? listeners : {})}
+      draggable={isDraggable && !isSelectMode}
       className={
-        selectedStepId === step.id
+        isSelectMode
+          ? isSelected
+            ? "StepsScrollingBoxHighlight"
+            : "StepsScrollingBox"
+          : selectedStepId === step.id
           ? "StepsScrollingBoxHighlight"
           : "StepsScrollingBox"
       }
-      onClick={() => stepDetails(step.id)}
+      onClick={handleClick}
     >
+      {isSelectMode && (
+        <input
+          type="checkbox"
+          checked={isSelected}
+          readOnly
+          className="StepSelectCheckbox"
+        />
+      )}
       <div className="StepsScrollingBoxInner">
         {step.video?.filePath ? (
           <video
@@ -208,6 +233,8 @@ const GuideDetails = () => {
     sessionStorage.setItem("stepsCollapsed", newValue);
   };
   const { isDrawerOpen } = useDrawer();
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedStepIds, setSelectedStepIds] = useState([]);
 
   useEffect(() => {
     if (weight > 1000) {
@@ -487,46 +514,74 @@ const GuideDetails = () => {
     setIsCloneGuidePartBox(true);
   };
 
+  const toggleStepSelection = (stepId) => {
+    setSelectedStepIds((prev) =>
+      prev.includes(stepId) ? prev.filter((id) => id !== stepId) : [...prev, stepId]
+    );
+  };
+
+  const handleExitSelectMode = () => {
+    setIsSelectMode(false);
+    setSelectedStepIds([]);
+  };
+
+  const selectableSteps = stepData.slice(1).map((s) => s.id);
+  const allSelectableSelected = selectableSteps.length > 0 && selectableSteps.every((id) => selectedStepIds.includes(id));
+
+  const handleToggleSelectAll = () => {
+    if (allSelectableSelected) {
+      setSelectedStepIds([]);
+    } else {
+      setSelectedStepIds(selectableSteps);
+    }
+  };
+
   const handleDeleteStep = async () => {
-    if (stepData.length <= 1) {
-      showAlert(
-        "error",
-        "Cannot Delete",
-        "Cannot delete the last step available..!",
-      );
+    const idsToDelete = isSelectMode ? selectedStepIds : [selectedStepId];
+
+    if (idsToDelete.length === 0) {
+      showAlert("error", "No Steps Selected", "Please select at least one step to delete.");
       return;
     }
 
+    if (stepData.length - idsToDelete.length < 1) {
+      showAlert("error", "Cannot Delete", "Cannot delete all steps. At least one step must remain.");
+      return;
+    }
+
+    const stepLabel = idsToDelete.length > 1 ? `these ${idsToDelete.length} steps` : "this step";
     const confirmed = await showConfirmation(
-      "Delete Step?",
-      "Are you sure you want to delete this step?",
+      idsToDelete.length > 1 ? `Delete ${idsToDelete.length} Steps?` : "Delete Step?",
+      `Are you sure you want to delete ${stepLabel}?`
     );
 
     if (!confirmed) return;
 
     setLoadingData(true);
-    const assignNextStep = stepData.find((item) => item?.id === selectedStepId);
-    let nextStepId = null;
-    const nextStep = stepData.find(
-      (item) => item?.sequence === assignNextStep.sequence + 1,
-    );
-    if (!nextStep) {
-      const previousStep = stepData.find(
-        (item) => item?.sequence === assignNextStep?.sequence - 1,
-      );
-      nextStepId = previousStep ? previousStep?.id : null;
-    } else {
-      nextStepId = nextStep?.id;
-    }
-
     try {
-      await deleteReorderSteps(selectedStepId);
+      await deleteGuideSteps(idsToDelete);
       await fetchStepsData();
-      showAlert("success", "Deleted!", "Step Deleted Successfully..!");
-      setSelectedStepId(nextStepId);
+      showAlert("success", "Deleted!", `${idsToDelete.length > 1 ? `${idsToDelete.length} Steps` : "Step"} Deleted Successfully!`);
+
+      if (isSelectMode) {
+        handleExitSelectMode();
+      } else {
+        const assignNextStep = stepData.find((item) => item?.id === selectedStepId);
+        const nextStep = stepData.find(
+          (item) => item?.sequence === assignNextStep?.sequence + 1
+        );
+        if (!nextStep) {
+          const previousStep = stepData.find(
+            (item) => item?.sequence === assignNextStep?.sequence - 1
+          );
+          setSelectedStepId(previousStep ? previousStep?.id : null);
+        } else {
+          setSelectedStepId(nextStep?.id);
+        }
+      }
     } catch (error) {
-      handleFetchError(error, "Couldn't Delete Guide Step ...!");
-      showAlert("error", "Failed", "Couldn't Delete Guide Step");
+      handleFetchError(error, "Couldn't Delete Guide Step(s)");
+      showAlert("error", "Failed", "Couldn't Delete Guide Step(s)");
     } finally {
       setLoadingData(false);
     }
@@ -1237,6 +1292,9 @@ const GuideDetails = () => {
                           selectedStepId={selectedStepId}
                           stepDetails={stepDetails}
                           isDraggable={!isReadOnly}
+                          isSelectMode={isSelectMode}
+                          isSelected={selectedStepIds.includes(step.id)}
+                          onToggleSelect={toggleStepSelection}
                         />
                       ))}
                     </SortableContext>
@@ -1262,24 +1320,49 @@ const GuideDetails = () => {
               <div className="StepControls">
                 <button
                   className="AddStep guides-button"
-                  disabled={loadingData || allDataIsFetched}
+                  disabled={loadingData || allDataIsFetched || isSelectMode}
                   onClick={handleCreateGuideStepBetweenSteps}
                 >
                   <ion-icon name="add-outline" title="Add Step"></ion-icon>
                 </button>
                 <button
                   onClick={handleCopyStep}
-                  disabled={loadingData || allDataIsFetched}
+                  disabled={loadingData || allDataIsFetched || isSelectMode}
                   className="guides-button"
                 >
                   <ion-icon name="copy-outline" title="Copy Step"></ion-icon>
                 </button>
                 <button
-                  className="DeleteStep guides-button"
-                  disabled={loadingData || allDataIsFetched}
-                  onClick={handleDeleteStep}
+                  className="guides-button"
+                  disabled={loadingData}
+                  title={isSelectMode ? "Exit Selection Mode" : "Select Multiple Steps"}
+                  onClick={() => isSelectMode ? handleExitSelectMode() : setIsSelectMode(true)}
+                  style={isSelectMode ? { outline: "2px solid #009cbb" } : {}}
                 >
-                  <ion-icon name="trash-outline" title="Delete Step"></ion-icon>
+                  <ion-icon name="checkbox-outline"></ion-icon>
+                </button>
+                {isSelectMode && (
+                  <button
+                    className="guides-button"
+                    disabled={loadingData}
+                    title={allSelectableSelected ? "Deselect All" : "Select All"}
+                    onClick={handleToggleSelectAll}
+                  >
+                    <ion-icon name={allSelectableSelected ? "square-outline" : "checkmark-done-outline"}></ion-icon>
+                  </button>
+                )}
+                <button
+                  className="DeleteStep guides-button"
+                  disabled={loadingData || (isSelectMode ? selectedStepIds.length === 0 : allDataIsFetched)}
+                  onClick={handleDeleteStep}
+                  title={isSelectMode && selectedStepIds.length > 0 ? `Delete ${selectedStepIds.length} step(s)` : "Delete Step"}
+                >
+                  <ion-icon name="trash-outline"></ion-icon>
+                  {isSelectMode && selectedStepIds.length > 0 && (
+                    <span style={{ fontSize: "12px", marginLeft: "2px" }}>
+                      ({selectedStepIds.length})
+                    </span>
+                  )}
                 </button>
               </div>
             )}
