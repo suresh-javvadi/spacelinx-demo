@@ -1192,7 +1192,9 @@ const EditRequisition = ({
                   canEdit={hasPermission(
                     PERMISSIONS.REQUISITIONS.DOCUMENTS.MODIFY,
                   )}
-                  canDelete={PERMISSIONS.REQUISITIONS.DOCUMENTS.DELETE}
+                  canDelete={hasPermission(
+                    PERMISSIONS.REQUISITIONS.DOCUMENTS.DELETE,
+                  )}
                   isDraft={selectedRequisition?.status === "Draft"}
                   tittle="Line Items Documents"
                 />

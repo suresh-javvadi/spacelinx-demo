@@ -11,6 +11,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { AlertsContext } from "../../features/AlertsContext/Context";
+import { useUserContext } from "../../features/userContext/UserContext";
 import { FlyoutAlerts } from "../../features/AlertsContext/Alerts";
 import {
   fetchDocumentsByEntityIdWithUsers,
@@ -46,13 +47,18 @@ const Documents = ({
   tittle,
 }) => {
   const { Alert } = useContext(AlertsContext);
+  const { userData, isSuperAdmin } = useUserContext();
+  const currentUserEmail = userData?.email;
+  const [selectedDoc, setSelectedDoc] = useState(null);
+  const isCreator =
+    selectedDoc?.createdBy?.toLowerCase() === currentUserEmail?.toLowerCase();
+  const isDeleteAllowed = isSuperAdmin || canDelete || (isCreator && isDraft);
   const [loadingData, setLoadingData] = useState(false);
   const [existingDocuments, setExistingDocuments] = useState([]);
   const [previewDoc, setPreviewDoc] = useState(null);
   const [csvData, setCsvData] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedDoc, setSelectedDoc] = useState(null);
   const [visibleRows, setVisibleRows] = useState(100);
   const [acceptedDocTypes, setAcceptedDocTypes] = useState([]);
   const [acceptedDocTypesLoading, setAcceptedDocTypesLoading] = useState(true);
@@ -552,15 +558,15 @@ const Documents = ({
                 </MenuItem>
                 <MenuItem
                   onClick={
-                    canDelete
+                    isDeleteAllowed
                       ? () => {
                           handleDeleteDocument(selectedDoc?.id);
                           handleMenuClose();
                         }
                       : undefined
                   }
-                  disabled={!canDelete}
-                  className={!canDelete ? "IonIconDisabled" : undefined}
+                  disabled={!isDeleteAllowed}
+                  className={!isDeleteAllowed ? "IonIconDisabled" : undefined}
                 >
                   <Delete className="DocumentDeleteIcon" /> Delete
                 </MenuItem>

@@ -334,6 +334,7 @@ const EditPartInventory = ({ handleCloseClick, selectedPartNumberSuffix }) => {
                   entityType="Part"
                   canDelete={hasPermission(PERMISSIONS.PARTS.DOCUMENTS.DELETE)}
                   canEdit={hasPermission(PERMISSIONS.PARTS.DOCUMENTS.MODIFY)}
+                  isDraft={selectedPart?.part?.status === "Draft"}
                 />
               </TabPanel>
               <TabPanel value="5">
