@@ -1,4 +1,5 @@
 import React, { forwardRef } from "react";
+import DOMPurify from "dompurify";
 import { Divider } from "@mui/material";
 import VideoFilePng from "../../Assest/Images/videoFileLogo.png";
 import NoImagePlaceholder from "../../Assest/Images/NoImage.jpg";
@@ -248,9 +249,10 @@ const PrintGuide = forwardRef(({ guideData }, ref) => {
                                   </p>
                                 )}
                                 <Divider orientation="vertical" flexItem />
-                                <p className="printTaskDescription">
-                                  {task.description}
-                                </p>
+                                <p
+                                  className="printTaskDescription"
+                                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(task.description) }}
+                                />
                               </div>
                               {task.ismandatory === 1 && (
                                 <p className="printTaskBehaviour">

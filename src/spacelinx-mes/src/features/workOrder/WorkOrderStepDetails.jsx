@@ -5,6 +5,7 @@ import {
   Divider,
   Button,
 } from "@mui/material";
+import DOMPurify from "dompurify";
 import LinearProgress from "@mui/material/LinearProgress";
 import React, { useEffect, useState, useContext } from "react";
 import {
@@ -694,9 +695,8 @@ const SubWorkOrderStepDetails = ({
                         ? "DescriptionCompleted"
                         : "Description"
                     }
-                  >
-                    {item.description}
-                  </p>
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.description) }}
+                  />
                   <p className="DataTypeOptions">
                     {item?.WOtaskDetails?.dataType?.radio ? (
                       item?.WOtaskDetails?.dataType?.radio.map(

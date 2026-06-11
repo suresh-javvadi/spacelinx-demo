@@ -120,8 +120,8 @@ const SortableItem = ({
             ? "StepsScrollingBoxHighlight"
             : "StepsScrollingBox"
           : selectedStepId === step.id
-          ? "StepsScrollingBoxHighlight"
-          : "StepsScrollingBox"
+            ? "StepsScrollingBoxHighlight"
+            : "StepsScrollingBox"
       }
       onClick={handleClick}
     >
@@ -516,7 +516,9 @@ const GuideDetails = () => {
 
   const toggleStepSelection = (stepId) => {
     setSelectedStepIds((prev) =>
-      prev.includes(stepId) ? prev.filter((id) => id !== stepId) : [...prev, stepId]
+      prev.includes(stepId)
+        ? prev.filter((id) => id !== stepId)
+        : [...prev, stepId],
     );
   };
 
@@ -526,7 +528,9 @@ const GuideDetails = () => {
   };
 
   const selectableSteps = stepData.slice(1).map((s) => s.id);
-  const allSelectableSelected = selectableSteps.length > 0 && selectableSteps.every((id) => selectedStepIds.includes(id));
+  const allSelectableSelected =
+    selectableSteps.length > 0 &&
+    selectableSteps.every((id) => selectedStepIds.includes(id));
 
   const handleToggleSelectAll = () => {
     if (allSelectableSelected) {
@@ -540,19 +544,32 @@ const GuideDetails = () => {
     const idsToDelete = isSelectMode ? selectedStepIds : [selectedStepId];
 
     if (idsToDelete.length === 0) {
-      showAlert("error", "No Steps Selected", "Please select at least one step to delete.");
+      showAlert(
+        "error",
+        "No Steps Selected",
+        "Please select at least one step to delete.",
+      );
       return;
     }
 
     if (stepData.length - idsToDelete.length < 1) {
-      showAlert("error", "Cannot Delete", "Cannot delete all steps. At least one step must remain.");
+      showAlert(
+        "error",
+        "Cannot Delete",
+        "Cannot delete all steps. At least one step must remain.",
+      );
       return;
     }
 
-    const stepLabel = idsToDelete.length > 1 ? `these ${idsToDelete.length} steps` : "this step";
+    const stepLabel =
+      idsToDelete.length > 1
+        ? `these ${idsToDelete.length} steps`
+        : "this step";
     const confirmed = await showConfirmation(
-      idsToDelete.length > 1 ? `Delete ${idsToDelete.length} Steps?` : "Delete Step?",
-      `Are you sure you want to delete ${stepLabel}?`
+      idsToDelete.length > 1
+        ? `Delete ${idsToDelete.length} Steps?`
+        : "Delete Step?",
+      `Are you sure you want to delete ${stepLabel}?`,
     );
 
     if (!confirmed) return;
@@ -561,18 +578,24 @@ const GuideDetails = () => {
     try {
       await deleteGuideSteps(idsToDelete);
       await fetchStepsData();
-      showAlert("success", "Deleted!", `${idsToDelete.length > 1 ? `${idsToDelete.length} Steps` : "Step"} Deleted Successfully!`);
+      showAlert(
+        "success",
+        "Deleted!",
+        `${idsToDelete.length > 1 ? `${idsToDelete.length} Steps` : "Step"} Deleted Successfully!`,
+      );
 
       if (isSelectMode) {
         handleExitSelectMode();
       } else {
-        const assignNextStep = stepData.find((item) => item?.id === selectedStepId);
+        const assignNextStep = stepData.find(
+          (item) => item?.id === selectedStepId,
+        );
         const nextStep = stepData.find(
-          (item) => item?.sequence === assignNextStep?.sequence + 1
+          (item) => item?.sequence === assignNextStep?.sequence + 1,
         );
         if (!nextStep) {
           const previousStep = stepData.find(
-            (item) => item?.sequence === assignNextStep?.sequence - 1
+            (item) => item?.sequence === assignNextStep?.sequence - 1,
           );
           setSelectedStepId(previousStep ? previousStep?.id : null);
         } else {
@@ -1248,11 +1271,17 @@ const GuideDetails = () => {
         onChange={handleToggleSteps}
         className="StepsAccordion"
       >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          sx={{
+            minHeight: "36px",
+            "& .MuiAccordionSummary-content": { margin: "6px 0" },
+          }}
+        >
           <h3>Steps</h3>
         </AccordionSummary>
 
-        <AccordionDetails>
+        <AccordionDetails sx={{ padding: "12px" }}>
           <div className="StepsSection">
             <div className={isReadOnly ? "PublishedStepsInfo" : "StepsInfo"}>
               <button
@@ -1335,8 +1364,16 @@ const GuideDetails = () => {
                 <button
                   className="guides-button"
                   disabled={loadingData}
-                  title={isSelectMode ? "Exit Selection Mode" : "Select Multiple Steps"}
-                  onClick={() => isSelectMode ? handleExitSelectMode() : setIsSelectMode(true)}
+                  title={
+                    isSelectMode
+                      ? "Exit Selection Mode"
+                      : "Select Multiple Steps"
+                  }
+                  onClick={() =>
+                    isSelectMode
+                      ? handleExitSelectMode()
+                      : setIsSelectMode(true)
+                  }
                   style={isSelectMode ? { outline: "2px solid #009cbb" } : {}}
                 >
                   <ion-icon name="checkbox-outline"></ion-icon>
@@ -1345,17 +1382,34 @@ const GuideDetails = () => {
                   <button
                     className="guides-button"
                     disabled={loadingData}
-                    title={allSelectableSelected ? "Deselect All" : "Select All"}
+                    title={
+                      allSelectableSelected ? "Deselect All" : "Select All"
+                    }
                     onClick={handleToggleSelectAll}
                   >
-                    <ion-icon name={allSelectableSelected ? "square-outline" : "checkmark-done-outline"}></ion-icon>
+                    <ion-icon
+                      name={
+                        allSelectableSelected
+                          ? "square-outline"
+                          : "checkmark-done-outline"
+                      }
+                    ></ion-icon>
                   </button>
                 )}
                 <button
                   className="DeleteStep guides-button"
-                  disabled={loadingData || (isSelectMode ? selectedStepIds.length === 0 : allDataIsFetched)}
+                  disabled={
+                    loadingData ||
+                    (isSelectMode
+                      ? selectedStepIds.length === 0
+                      : allDataIsFetched)
+                  }
                   onClick={handleDeleteStep}
-                  title={isSelectMode && selectedStepIds.length > 0 ? `Delete ${selectedStepIds.length} step(s)` : "Delete Step"}
+                  title={
+                    isSelectMode && selectedStepIds.length > 0
+                      ? `Delete ${selectedStepIds.length} step(s)`
+                      : "Delete Step"
+                  }
                 >
                   <ion-icon name="trash-outline"></ion-icon>
                   {isSelectMode && selectedStepIds.length > 0 && (

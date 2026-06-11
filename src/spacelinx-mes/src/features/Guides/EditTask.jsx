@@ -12,15 +12,20 @@ import {
 } from "@mui/material";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { updateGuideStepTask } from "../../services/guideTaskService";
 import { GuideContext } from "./GuideContext";
 import { AlertsContext } from "../../features/AlertsContext/Context";
 import "./Step.css";
 
+const isHtmlEmpty = (html) =>
+  !html || html.replace(/<[^>]+>/g, "").trim() === "";
+
 const TaskAccordion = ({
   handleResetDataTypeOptions,
   taskType,
-  setSelectedAccordion,
+  onClose,
   stepId,
   fetchTaskData,
   setMainTaskLoadingData,
@@ -70,8 +75,8 @@ const TaskAccordion = ({
             taskTypeDetails.dataType.text
               ? "Text"
               : taskTypeDetails.dataType.radio
-              ? "Radio"
-              : "List"
+                ? "Radio"
+                : "List",
           );
           if (taskTypeDetails.dataType.radio) {
             setEditRadioDataTypeValue(taskTypeDetails.dataType?.radio);
@@ -82,11 +87,11 @@ const TaskAccordion = ({
           }
         } else if (selectedTaskForEdit.type === "Genealogy") {
           const editGenealogy = genealogyOptions?.find(
-            (item) => item.part.id === taskTypeDetails.genealogy.genealogy.id
+            (item) => item.part.id === taskTypeDetails.genealogy.genealogy.id,
           );
           setEditGenealogyDetails(editGenealogy);
           setEditGenealogyQuantity(
-            taskTypeDetails.genealogy.genealogy?.quantity || 0
+            taskTypeDetails.genealogy.genealogy?.quantity || 0,
           );
         } else {
           return;
@@ -119,7 +124,7 @@ const TaskAccordion = ({
 
         if (editGenealogyQuantity > 1 && editTaskDescription.trim() === "") {
           setDescriptionError(
-            "Description is required for quantities greater than 1"
+            "Description is required for quantities greater than 1",
           );
           setMainTaskLoadingData(false);
           return;
@@ -129,21 +134,31 @@ const TaskAccordion = ({
         if (editGenealogyQuantity > genealogyCountLimit) {
           Alert(
             `You Cannot add quantity more than ${genealogyCountLimit}..`,
-            "error"
+            "error",
           );
           setMainTaskLoadingData(false);
           return;
         }
       }
 
-      if (editTaskDescription.trim() === "") {
+      const descEmpty =
+        editTaskTypeOption === "Genealogy"
+          ? editTaskDescription.trim() === ""
+          : isHtmlEmpty(editTaskDescription);
+      if (descEmpty) {
         Alert("Description cannot be empty", "error");
         setMainTaskLoadingData(false);
         return;
       }
 
+      const editTextContent = editTaskDescription
+        .replace(/<[^>]+>/g, "")
+        .trim();
       let updatedData = {
-        name: editTaskDescription,
+        name:
+          editTextContent.length > 255
+            ? editTextContent.substring(0, 252) + "..."
+            : editTextContent,
         type: editTaskTypeOption,
         ismandatory: editTaskBehaviourOption,
         guideStepId: stepId,
@@ -175,44 +190,44 @@ const TaskAccordion = ({
                 genealogy: null,
               }
             : editTaskTypeOption === "Assembly"
-            ? {
-                dataType: null,
-                assembly: { value: 1, response: "" },
-                test: null,
-                picture: null,
-                genealogy: null,
-              }
-            : editTaskTypeOption === "Test"
-            ? {
-                dataType: null,
-                assembly: null,
-                test: { value: 1, response: "" },
-                picture: null,
-                genealogy: null,
-              }
-            : editTaskTypeOption === "Picture"
-            ? {
-                dataType: null,
-                assembly: null,
-                test: null,
-                picture: { value: 1, response: "" },
-                genealogy: null,
-              }
-            : {
-                dataType: null,
-                assembly: null,
-                test: null,
-                picture: null,
-                genealogy: {
-                  genealogy: {
-                    id: editGenealogyDetails.part.id,
-                    number: editGenealogyDetails.part.number,
-                    name: editGenealogyDetails.part.name,
-                    quantity: editGenealogyQuantity,
-                  },
-                  value: [],
-                },
-              },
+              ? {
+                  dataType: null,
+                  assembly: { value: 1, response: "" },
+                  test: null,
+                  picture: null,
+                  genealogy: null,
+                }
+              : editTaskTypeOption === "Test"
+                ? {
+                    dataType: null,
+                    assembly: null,
+                    test: { value: 1, response: "" },
+                    picture: null,
+                    genealogy: null,
+                  }
+                : editTaskTypeOption === "Picture"
+                  ? {
+                      dataType: null,
+                      assembly: null,
+                      test: null,
+                      picture: { value: 1, response: "" },
+                      genealogy: null,
+                    }
+                  : {
+                      dataType: null,
+                      assembly: null,
+                      test: null,
+                      picture: null,
+                      genealogy: {
+                        genealogy: {
+                          id: editGenealogyDetails.part.id,
+                          number: editGenealogyDetails.part.number,
+                          name: editGenealogyDetails.part.name,
+                          quantity: editGenealogyQuantity,
+                        },
+                        value: [],
+                      },
+                    },
       };
 
       if (editTaskTypeOption === "Genealogy") {
@@ -246,6 +261,7 @@ const TaskAccordion = ({
       fetchTaskData();
       setTriggerReCall(true);
       Alert("Task Updated Successfully..!", "success");
+      onClose();
     } catch (error) {
       console.error(error);
       Alert("Couldn't update task details...!", "error");
@@ -284,7 +300,7 @@ const TaskAccordion = ({
     if (editGenealogyDetails?.part.id) {
       const availableQuantity =
         genealogyOptions.find(
-          (option) => option.part.id === editGenealogyDetails.part.id
+          (option) => option.part.id === editGenealogyDetails.part.id,
         )?.quantity || 0;
       const usedQuantity =
         countOfGenealogyParts[editGenealogyDetails.part.id] || 0;
@@ -310,8 +326,7 @@ const TaskAccordion = ({
   };
 
   return (
-    <div className="CreateTaskAccordion CreateAccordion">
-      <p className="CreateTask">Edit Task </p>
+    <div className="CreateTaskAccordion task-dialog-content">
       <div className="TaskRadiosDiv">
         <div className="TaskRadiosDiv1">
           <div className="TaskRadiosDiv1Inner">
@@ -410,23 +425,17 @@ const TaskAccordion = ({
           ) : null}
         </>
       ) : (
-        <TextField
-          label="Description"
-          multiline
-          fullWidth
-          rows={4}
-          value={editTaskDescription}
-          onChange={(e) => {
-            setEditTaskDescription(e.target.value);
-          }}
-          InputProps={{
-            style: {
-              fontSize: "13px",
-            },
-          }}
-          error={Boolean(descriptionError)}
-          helperText={descriptionError}
-        />
+        <div className="quill-wrapper">
+          <label className="quill-label">Description</label>
+          <ReactQuill
+            theme="snow"
+            value={editTaskDescription}
+            onChange={(content) => setEditTaskDescription(content)}
+          />
+          {descriptionError && (
+            <p className="quill-error">{descriptionError}</p>
+          )}
+        </div>
       )}
 
       {editTaskTypeOption === "Data" ? (
@@ -553,7 +562,7 @@ const TaskAccordion = ({
                   name="trash-outline"
                   onClick={() =>
                     setEditRadioDataTypeValue((prevValues) =>
-                      prevValues.filter((_, i) => i !== index)
+                      prevValues.filter((_, i) => i !== index),
                     )
                   }
                   style={{ cursor: "pointer" }}
@@ -597,7 +606,7 @@ const TaskAccordion = ({
                   name="trash-outline"
                   onClick={() =>
                     setEditListDataTypeValue((prevValues) =>
-                      prevValues.filter((_, i) => i !== index)
+                      prevValues.filter((_, i) => i !== index),
                     )
                   }
                   style={{ cursor: "pointer", color: "red" }}
@@ -607,15 +616,8 @@ const TaskAccordion = ({
       </div>
 
       <div className="CreateTaskButton">
-        <Button onClick={() => setSelectedAccordion(null)}>Cancel</Button>
-        <Button
-          onClick={() => {
-            updateTaskInfo();
-            setSelectedAccordion(null);
-          }}
-        >
-          Update
-        </Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={updateTaskInfo}>Update</Button>
       </div>
     </div>
   );

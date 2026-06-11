@@ -401,21 +401,28 @@
 
 .CreateAccordion {
   padding: 30px !important;
-
   height: 350px;
   overflow-y: auto;
   background-color: rgba(232, 232, 232, 1);
 }
+[AppTheme="dark"] .CreateAccordion {
+  background-color: var(--accordion-details-bg-dark);
+}
 .Accordion {
   padding: 30px !important;
-
   height: auto;
   background-color: rgba(232, 232, 232, 1);
 }
+[AppTheme="dark"] .Accordion {
+  background-color: var(--accordion-details-bg-dark);
+}
 .EditTaskAccordion {
   padding: 20px !important;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(232, 232, 232, 1);
   height: auto;
+}
+[AppTheme="dark"] .EditTaskAccordion {
+  background-color: var(--accordion-details-bg-dark);
 }
 .CreateTaskAccordion {
   display: flex;
@@ -432,10 +439,11 @@
 }
 .TaskRadiosDiv {
   display: flex;
-  gap: 10px;
-  flex-direction: column;
+  gap: 16px;
+  flex-direction: row;
   width: 100%;
-  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 .CreateTaskButton {
   display: flex;
@@ -446,6 +454,7 @@
 .TaskRadiosDiv1 {
   display: flex;
   flex-direction: column;
+  min-width: 160px;
 }
 .TaskRadiosDiv1 p {
   font-size: 12px;
@@ -487,19 +496,66 @@
   width: 100%;
   height: 100%;
 }
-.TasksList div {
+.TasksList > div {
   display: flex;
-  flex: auto 2;
+  flex: 1 1 auto;
   gap: 5px;
-  width: 100%;
+  min-width: 0;
   height: 100%;
   align-items: center;
 }
+.taskDescriptionWrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
 .taskDescription {
-  white-space: pre-wrap;
+  overflow: hidden;
+  white-space: normal;
   word-break: break-word;
   font-size: 12px;
-  padding: 10px 10px 10px;
+  padding: 4px 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 10;
+  line-clamp: 10;
+  -webkit-box-orient: vertical;
+  max-height: calc(1.4em * 10 + 8px);
+}
+.taskViewAllBtn {
+  background: none;
+  border: none;
+  color: #009cbb;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0 10px 4px;
+  text-align: left;
+  align-self: flex-end;
+  text-decoration: underline;
+}
+.taskViewAllBtn:hover {
+  opacity: 0.75;
+}
+.taskDescriptionFull {
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+.taskDescriptionFull p,
+.taskDescriptionFull ul,
+.taskDescriptionFull ol {
+  margin: 0 0 8px;
+}
+.taskDescription p,
+.taskDescription ul,
+.taskDescription ol {
+  margin: 0 0 4px;
+}
+.taskDescription strong {
+  font-weight: 600;
+}
+.taskDescription em {
+  font-style: italic;
 }
 .TasksList p {
   margin-left: 5px;
@@ -1057,4 +1113,114 @@
     justify-content: flex-start;
     margin-top: 8px;
   }
+}
+
+.quill-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  margin-top: 8px;
+}
+.quill-label {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+[AppTheme="dark"] .quill-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+.quill-error {
+  font-size: 12px;
+  color: #d32f2f;
+  margin: 2px 0 0;
+}
+.quill-wrapper .ql-container {
+  height: calc(100vh - 280px);
+  overflow-y: auto;
+  font-size: 13px;
+}
+.quill-wrapper .ql-editor {
+  min-height: 100%;
+}
+
+/* Light mode — border to match MUI TextField */
+.quill-wrapper .ql-toolbar.ql-snow,
+.quill-wrapper .ql-container.ql-snow {
+  border-color: rgba(0, 0, 0, 0.23);
+}
+
+/* Dark mode — full Quill skin override */
+[AppTheme="dark"] .ql-toolbar.ql-snow {
+  background-color: #2c2c2c;
+  border-color: #555;
+}
+[AppTheme="dark"] .ql-container.ql-snow {
+  background-color: #1a1a1a;
+  border-color: #555;
+  color: #e0e0e0;
+}
+[AppTheme="dark"] .ql-editor {
+  color: #e0e0e0;
+}
+[AppTheme="dark"] .ql-editor.ql-blank::before {
+  color: #666;
+}
+[AppTheme="dark"] .ql-toolbar.ql-snow .ql-stroke {
+  stroke: #b0b0b0;
+}
+[AppTheme="dark"] .ql-toolbar.ql-snow .ql-fill,
+[AppTheme="dark"] .ql-toolbar.ql-snow .ql-stroke.ql-fill {
+  fill: #b0b0b0;
+}
+[AppTheme="dark"] .ql-toolbar.ql-snow .ql-picker {
+  color: #b0b0b0;
+}
+[AppTheme="dark"] .ql-toolbar.ql-snow .ql-picker-options {
+  background-color: #2c2c2c;
+  border-color: #555;
+  color: #e0e0e0;
+}
+[AppTheme="dark"] .ql-toolbar.ql-snow .ql-picker-item:hover {
+  color: #00ccff;
+}
+[AppTheme="dark"] .ql-toolbar.ql-snow button:hover .ql-stroke,
+[AppTheme="dark"] .ql-toolbar.ql-snow button.ql-active .ql-stroke,
+[AppTheme="dark"] .ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke {
+  stroke: #00ccff;
+}
+[AppTheme="dark"] .ql-toolbar.ql-snow button:hover .ql-fill,
+[AppTheme="dark"] .ql-toolbar.ql-snow button.ql-active .ql-fill {
+  fill: #00ccff;
+}
+[AppTheme="dark"] .ql-toolbar.ql-snow button:hover,
+[AppTheme="dark"] .ql-toolbar.ql-snow button.ql-active,
+[AppTheme="dark"] .ql-toolbar.ql-snow .ql-picker-label:hover {
+  color: #00ccff;
+}
+
+/* Extra spacing inside the create/edit task dialog */
+.task-dialog-content {
+  display: flex;
+  flex-direction: column;
+}
+.StepsAccordion .MuiAccordionDetails-root {
+  padding: 8px;
+}
+
+.StepsAccordion .MuiAccordionSummary-root {
+  min-height: 36px;
+  padding: 0 14px; /* reduce horizontal padding too if needed */
+}
+
+.StepsAccordion .MuiAccordionSummary-content {
+  margin: 6px 0;
+}
+.StepsSection {
+  padding: 0;
+}
+
+.StepsInfo,
+.PublishedStepsInfo {
+  padding: 0;
+  align-items: center; /* makes sure the arrow buttons and cards stay vertically centered */
 }
