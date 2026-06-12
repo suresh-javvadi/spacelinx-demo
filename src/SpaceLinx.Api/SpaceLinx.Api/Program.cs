@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Configuration.AddEnvironmentVariables();
 
 // Configure Serilog
