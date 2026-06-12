@@ -111,8 +111,9 @@ const AddItems = ({
     {
       field: "rowType",
       headerName: "",
-      flex: 1,
-      maxWidth: 60,
+      flex: 0.4,
+      minWidth: 38,
+      maxWidth: 48,
       renderCell: ({ row }) => {
         if (row.equipmentType === "part") {
           return <ion-icon name="construct-outline"></ion-icon>;
@@ -127,8 +128,8 @@ const AddItems = ({
     {
       field: "number",
       headerName: "Number",
-      flex: 1,
-      minWidth: 50,
+      flex: 1.4,
+      minWidth: 140,
       valueGetter: (_value, row) => {
         if (row.equipmentType === "part") {
           return row.part?.partNumber;
@@ -193,8 +194,8 @@ const AddItems = ({
     {
       field: "name",
       headerName: "Name",
-      flex: 1,
-      minWidth: 50,
+      flex: 1.8,
+      minWidth: 180,
       valueGetter: (_value, row) => {
         if (row.equipmentType === "part") {
           return row.part?.name;
@@ -210,7 +211,7 @@ const AddItems = ({
       field: "type",
       headerName: "Type",
       flex: 1,
-      minWidth: 50,
+      minWidth: 100,
       valueGetter: (_value, row) => {
         if (row.equipmentType === "part") {
           return row.part?.partType?.name;
@@ -236,7 +237,7 @@ const AddItems = ({
       field: "weight",
       headerName: "Weight (g)",
       flex: 1,
-      minWidth: 50,
+      minWidth: 80,
       renderCell: ({ row }) =>
         row.part?.weight != null ? row.part.weight * row.quantity : "-",
     },
