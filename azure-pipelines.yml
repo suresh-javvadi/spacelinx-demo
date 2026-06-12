@@ -1,7 +1,7 @@
 # ============================================================
 # SpaceLinx MES - Azure DevOps CI/CD Pipeline
 # Mono-repo: .NET 10 API + React 18 Frontend
-# Flow: main → Dev | release/v* → UAT | v* tag → Prod + Demo
+# Flow: main → Dev | release/v* → UAT | v* tag → Prod
 # ============================================================
 
 trigger:
@@ -436,10 +436,10 @@ stages:
                     package: '$(Pipeline.Workspace)/frontend-uat/frontend.zip'
 
   # ──────────────────────────────────────────────────────────
-  # DEPLOY PROD + DEMO (on v* tags, with approval gate)
+  # DEPLOY PROD (on v* tags, with approval gate)
   # ──────────────────────────────────────────────────────────
   - stage: DeployProd
-    displayName: 'Deploy to Production + Demo'
+    displayName: 'Deploy to Production'
     dependsOn: [BuildAPI, BuildFrontend, ValidateDb]
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
     jobs:
@@ -479,44 +479,6 @@ stages:
 
           - publish: $(Build.ArtifactStagingDirectory)/frontend.zip
             artifact: frontend-prod
-            displayName: 'Upload frontend artifact'
-
-      # Build frontend for Demo
-      - job: BuildFrontendDemo
-        displayName: 'Build Frontend (Demo)'
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - task: UseNode@1
-            displayName: 'Install Node.js'
-            inputs:
-              version: '$(nodeVersion)'
-
-          - task: Cache@2
-            displayName: 'Cache npm (demo)'
-            inputs:
-              key: 'npm | "$(Agent.OS)" | $(frontendDir)/package-lock.json'
-              restoreKeys: 'npm | "$(Agent.OS)"'
-              path: $(frontendDir)/node_modules
-
-          - script: npm ci
-            displayName: 'Install dependencies'
-            workingDirectory: '$(frontendDir)'
-
-          - script: npm run build:demo
-            displayName: 'Build frontend (demo mode)'
-            workingDirectory: '$(frontendDir)'
-
-          - task: ArchiveFiles@2
-            displayName: 'Archive build'
-            inputs:
-              rootFolderOrFile: '$(frontendDir)/dist'
-              includeRootFolder: false
-              archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/frontend.zip'
-
-          - publish: $(Build.ArtifactStagingDirectory)/frontend.zip
-            artifact: frontend-demo
             displayName: 'Upload frontend artifact'
 
       # Deploy API to Prod
@@ -563,30 +525,6 @@ stages:
                     webAppName: 'spacelinxapiprod'
                     resourceGroupName: 'SpaceLinxProd'
 
-      # Deploy API to Demo
-      - deployment: DeployApiDemo
-        displayName: 'Deploy API (Demo)'
-        dependsOn: []
-        pool:
-          vmImage: 'ubuntu-latest'
-        environment: 'spacelinx-mes-demo'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  artifact: api
-
-                - task: AzureWebApp@1
-                  displayName: 'Deploy to spacelinxapidemo'
-                  inputs:
-                    azureSubscription: 'SpaceLinxProd'
-                    appType: 'webAppLinux'
-                    appName: 'spacelinxapidemo'
-                    resourceGroupName: 'SpaceLinxProd'
-                    package: '$(Pipeline.Workspace)/api/*.zip'
-                    runtimeStack: 'DOTNETCORE|10.0'
-
       # Deploy Frontend to Prod
       - deployment: DeployWebProd
         displayName: 'Deploy Frontend (Prod)'
@@ -617,26 +555,3 @@ stages:
                     action: 'Restart Azure App Service'
                     webAppName: 'spacelinxmesprod'
                     resourceGroupName: 'SpaceLinxProd'
-
-      # Deploy Frontend to Demo
-      - deployment: DeployWebDemo
-        displayName: 'Deploy Frontend (Demo)'
-        dependsOn: BuildFrontendDemo
-        pool:
-          vmImage: 'ubuntu-latest'
-        environment: 'spacelinx-mes-demo'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  artifact: frontend-demo
-
-                - task: AzureWebApp@1
-                  displayName: 'Deploy to spacelinxmesdemo'
-                  inputs:
-                    azureSubscription: 'SpaceLinxProd'
-                    appType: 'webApp'
-                    appName: 'spacelinxmesdemo'
-                    resourceGroupName: 'SpaceLinxProd'
-                    package: '$(Pipeline.Workspace)/frontend-demo/frontend.zip'
