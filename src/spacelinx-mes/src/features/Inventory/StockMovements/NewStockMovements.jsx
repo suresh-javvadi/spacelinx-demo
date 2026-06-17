@@ -6,14 +6,14 @@ import Cliploader from "../../../Components/Loaders/Cliploader";
 import { fetchLocationsLookUp } from "../../../services/locationService";
 import {
   createSMWithLineItems,
-  createStockMovement,
   submitSMWithLineItems,
 } from "../../../services/stockMovementService";
 import {
   fetchInPartsTrackingIdsById,
-  fetchInventoryPartsByLocation,
   fetchInventoryPartPurchaseHistory,
+  fetchInventoryPartWithPrice,
 } from "../../../services/inventoryPartService";
+import { fetchInventoryStockByLocation } from "../../../services/inventoryStockService";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import { fetchUserLookup } from "../../../services/userService";
 import Popover from "@mui/material/Popover";
@@ -27,12 +27,12 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
   const [loadingData, setLoadingData] = useState(false);
   const [loadingLocationData, setLoadingLocationData] = useState(false);
   const [locationsData, setLocationsData] = useState([]);
-  const [movementTypes, setMovementTypes] = useState([
+  const movementTypes = [
     { id: 2, name: "Reserved" },
     { id: 3, name: "Issued" },
     { id: 4, name: "Consumed" },
     { id: 5, name: "Adjustment" },
-  ]);
+  ];
   const [formData, setFormData] = useState({
     movementType: null,
     fromLocation: null,
@@ -89,11 +89,6 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [trackingOptionsMap, setTrackingOptionsMap] = useState({});
-  const selectedTrackingNumbers = React.useMemo(() => {
-    return selectedStockItems
-      .map((item) => item.trackingNumber)
-      .filter(Boolean);
-  }, [selectedStockItems]);
 
   const adjustmentTypes = ["Increase", "Decrease"];
 
@@ -163,6 +158,13 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
   };
 
   const validateIssueQuantity = (item) => {
+    // If available quantity is 0, allow 0 or empty issue quantity
+    if (item.qtyAvailable === 0) {
+      if (item.issueQuantity === "" || Number(item.issueQuantity) === 0) {
+        return "";
+      }
+    }
+
     if (item.issueQuantity === "") {
       return "Required";
     }
@@ -186,7 +188,12 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
   const validateTrackingNumber = (item, allItems) => {
     const value = item.trackingNumber;
-    const trackingType = item.trackingType?.value;
+    const trackingType = item.trackingType?.value || (typeof item.trackingType === 'string' ? item.trackingType.toLowerCase() : "");
+
+    // If no quantity is being issued, tracking number is not required
+    if (item.issueQuantity === "" || Number(item.issueQuantity) === 0) {
+      return "";
+    }
 
     if (trackingType === "none") {
       return "";
@@ -203,6 +210,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     const isDuplicate = allItems.some(
       (i) =>
         i.uniqueId !== item.uniqueId &&
+        i.partId === item.partId &&
         i.trackingNumber?.trim() === value.trim(),
     );
 
@@ -213,13 +221,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     return "";
   };
 
-  const validateTrackingType = (item) => {
-    if (!item.trackingType || !item.trackingType.value) {
-      return "Tracking Type is required";
-    }
 
-    return "";
-  };
 
   const validateAdjustmentType = (item) => {
     if (!item.adjustmentType) {
@@ -310,43 +312,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     updateLineItemError(uniqueId, "trackingNumber", error);
   };
 
-  const handleTrackingTypeChange = (uniqueId, value) => {
-    const isSerial = value?.value === "serial";
 
-    setSelectedStockItems((prev) =>
-      prev.map((item) =>
-        item.uniqueId === uniqueId
-          ? {
-              ...item,
-              trackingType: value,
-              issueQuantity: isSerial ? 1 : "",
-              trackingNumber: isSerial ? item.trackingNumber : "",
-            }
-          : item,
-      ),
-    );
-
-    const item = selectedStockItems.find((i) => i.uniqueId === uniqueId);
-
-    if (!item) return;
-
-    // ✅ REQUIRED validation
-    const trackingTypeError = validateTrackingType({
-      ...item,
-      trackingType: value,
-    });
-    updateLineItemError(uniqueId, "trackingType", trackingTypeError);
-
-    if (isSerial) {
-      const qtyError = validateIssueQuantity({
-        ...item,
-        issueQuantity: 1,
-      });
-      updateLineItemError(uniqueId, "issueQuantity", qtyError);
-    } else {
-      updateLineItemError(uniqueId, "issueQuantity", "");
-    }
-  };
 
   const handleRemarksPopoverOpen = (row, event) => {
     setActiveRowId(row.uniqueId);
@@ -381,7 +347,28 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
   const handleSelectItem = async (part) => {
     if (!part) return;
 
-    const isSerial = part.trackingType?.toLowerCase() === "serial";
+    // Look up the part in the selected location/bin stockData
+    const stockMatch = stockData.find((item) => item.partId === part.partId);
+
+    let trackingTypeStr = "None";
+    const rawTrackingType = part.trackingType || part.part?.trackingType || stockMatch?.trackingType;
+    if (rawTrackingType) {
+      trackingTypeStr = typeof rawTrackingType === 'object' ? (rawTrackingType.label || rawTrackingType.value || "None") : rawTrackingType;
+    } else if (part.isSerialNumberRequired || part.part?.isSerialNumberRequired || stockMatch?.isSerialNumberRequired) {
+      trackingTypeStr = "Serial";
+    } else if (part.trackingMethod || part.part?.trackingMethod || stockMatch?.trackingMethod) {
+      trackingTypeStr = part.trackingMethod || part.part?.trackingMethod || stockMatch?.trackingMethod;
+    }
+
+    if (trackingTypeStr.toLowerCase() === "serial") {
+      trackingTypeStr = "Serial";
+    } else if (trackingTypeStr.toLowerCase() === "batch") {
+      trackingTypeStr = "Batch";
+    } else {
+      trackingTypeStr = "None";
+    }
+
+    const isSerial = trackingTypeStr === "Serial";
     const uniqueId = `${part.partId}-${Date.now()}`;
 
     // Local lookup map of partId -> purchase history to resolve PO/GRN during auto-selection
@@ -391,21 +378,28 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     const parentHistory = await getPurchaseHistoryForPart(part.partId);
     localHistoryMap[part.partId] = parentHistory;
 
-    // Resolve PO/GRN for parent part — check trackingNumber or trackingId
-    const trackingNo = part.trackingNumber || part.trackingId;
-    const parentMatch = trackingNo
+    // Resolve PO/GRN for parent part — check trackingNumber, trackingId, or stockMatch.trackingId (fallback to first history record)
+    const trackingNo = part.trackingNumber || part.trackingId || stockMatch?.trackingId || "";
+    const parentMatch = (trackingNo
       ? parentHistory.find((x) => x.trackingId === trackingNo) ?? null
-      : null;
+      : null) || (parentHistory && parentHistory.length > 0 ? parentHistory[0] : null);
+
+    const parentQtyAvailable = stockMatch ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0) : 0;
 
     const newEntry = {
       ...part,
       uniqueId: uniqueId,
-      issueQuantity: isSerial ? 1 : "",
+      issueQuantity: (isSerial && parentQtyAvailable > 0) ? 1 : "",
+      trackingType: trackingTypeStr,
       trackingNumber: parentMatch?.trackingId || trackingNo || "",
       poNumber: parentMatch?.poNumber || "---",
       poQty: parentMatch?.receivedQuantity ?? null,
       grnNumber: parentMatch?.grnNumber || "---",
       remarks: "",
+      qtyAvailable: parentQtyAvailable,
+      quantity: stockMatch ? (stockMatch.qtyOnhand ?? 0) : 0,
+      binId: stockMatch ? stockMatch.binId : (formData?.bin?.binId || null),
+      binCode: stockMatch ? stockMatch.binCode : (formData?.bin?.binCode || ""),
     };
 
     let allNewItems = [newEntry];
@@ -428,21 +422,37 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
           const stockMatch = stockData.find((item) => item.partId === childPart.id);
 
-          // Only match by actual tracking ID — no arbitrary history[0] fallback
+          // Only match by actual tracking ID — fallback to first history item if not found or empty
           const childMatch = (stockMatch?.trackingId
             ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
-            : null) ?? null;
+            : null) || (childHistory && childHistory.length > 0 ? childHistory[0] : null);
 
-          const trackingTypeStr = childPart.isSerialNumberRequired ? "Serial" : "None";
+          const trackingTypeStr = (childPart.isSerialNumberRequired || childPart.part?.isSerialNumberRequired) ? "Serial" : "None";
 
           if (stockMatch) {
+            const childQtyAvailable = stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0;
             const isChildSerial = stockMatch.trackingType?.toLowerCase() === "serial";
+            let childTrackingTypeStr = "None";
+            if (stockMatch.trackingType) {
+              childTrackingTypeStr = typeof stockMatch.trackingType === 'object'
+                ? (stockMatch.trackingType.label || "None")
+                : stockMatch.trackingType;
+            }
+            if (childTrackingTypeStr.toLowerCase() === "serial") {
+              childTrackingTypeStr = "Serial";
+            } else if (childTrackingTypeStr.toLowerCase() === "batch") {
+              childTrackingTypeStr = "Batch";
+            } else {
+              childTrackingTypeStr = "None";
+            }
+
             return {
               ...stockMatch,
               partNumber: stockMatch.part?.partNumber || childPart.partNumber || "",
               partName: stockMatch.part?.name || childPart.name || "",
               uniqueId: `${stockMatch.partId}-${Date.now()}-${Math.random()}`,
-              issueQuantity: isChildSerial ? 1 : "",
+              issueQuantity: (isChildSerial && childQtyAvailable > 0) ? 1 : "",
+              trackingType: childTrackingTypeStr,
               trackingNumber: childMatch?.trackingId || stockMatch.trackingId || "",
               poNumber: childMatch?.poNumber || "---",
               poQty: childMatch?.receivedQuantity ?? null,
@@ -462,7 +472,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
               quantity: 0,
               trackingType: trackingTypeStr,
               uniqueId: `${childPart.id}-${Date.now()}-${Math.random()}`,
-              issueQuantity: trackingTypeStr?.toLowerCase() === "serial" ? 1 : "",
+              issueQuantity: "",
               trackingNumber: childMatch?.trackingId || "",
               poNumber: childMatch?.poNumber || "---",
               poQty: childMatch?.receivedQuantity ?? null,
@@ -503,6 +513,10 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
                 : Array.isArray(res)
                   ? res
                   : [];
+              const stockTrackingId = item.trackingNumber || item.trackingId;
+              if (stockTrackingId && !rawIds.includes(stockTrackingId)) {
+                rawIds.push(stockTrackingId);
+              }
               const options = rawIds.map((id) => ({
                 label: id,
                 value: id,
@@ -510,7 +524,9 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
               return { uniqueId: item.uniqueId, options };
             } catch (err) {
               console.error(`Failed to fetch tracking IDs for part ${item.partId}:`, err);
-              return { uniqueId: item.uniqueId, options: [] };
+              const stockTrackingId = item.trackingNumber || item.trackingId;
+              const options = stockTrackingId ? [{ label: stockTrackingId, value: stockTrackingId }] : [];
+              return { uniqueId: item.uniqueId, options };
             }
           })
         );
@@ -526,12 +542,12 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
           return updated;
         });
 
-        // Auto-select tracking number if there is only 1 option and no trackingNumber is set yet
+        // Auto-select tracking number if there are options available and no trackingNumber is set yet
         // And resolve PO/GRN details from the resolved purchase history
         setSelectedStockItems((prev) =>
           prev.map((item) => {
             const match = results.find((r) => r.uniqueId === item.uniqueId);
-            if (match && match.options.length === 1 && !item.trackingNumber) {
+            if (match && match.options.length > 0 && !item.trackingNumber) {
               const selectedValue = match.options[0].value;
               const history = localHistoryMap[item.partId] || [];
               const histMatch = history.find((x) => x.trackingId === selectedValue);
@@ -553,23 +569,19 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
   };
 
   useEffect(() => {
-    if (!stockData.length) {
-      setItems([]);
-      return;
-    }
-
-    let filteredStock = stockData;
-
-    if (formData?.bin?.binId) {
-      filteredStock = filteredStock.filter(
-        (item) => item.binId === formData.bin.binId,
-      );
-    }
-
-    filteredStock = filteredStock.filter((item) => item.qtyOnhand > 0);
-
-    setItems(filteredStock);
-  }, [formData.bin, stockData]);
+    const fetchParts = async () => {
+      setLoadingStockData(true);
+      try {
+        const data = await fetchInventoryPartWithPrice();
+        setItems(extractParts(data || []));
+      } catch (err) {
+        console.error("Failed to load parts inventory:", err);
+      } finally {
+        setLoadingStockData(false);
+      }
+    };
+    fetchParts();
+  }, []);
 
   const extractBins = (stockData = []) => {
     const map = new Map();
@@ -591,15 +603,20 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
     stockData.forEach((item) => {
       map.set(item.partId, {
+        ...item,
         id: item.partId,
         partId: item.partId,
         partNumber: item.partNumber,
         partName: item.partName,
         name: item.partName,
         manufacturingPartNumber: item.manufacturingPartNumber || "",
-        quantity: item.qtyOnhand,
+        quantity: item.qtyOnhand || item.quantity || 0,
         binId: item.binId,
         binCode: item.binCode,
+        trackingType: item.trackingType || item.part?.trackingType,
+        isSerialNumberRequired: item.isSerialNumberRequired ?? item.part?.isSerialNumberRequired,
+        trackingMethod: item.trackingMethod || item.part?.trackingMethod,
+        qtyAvailable: item.qtyAvailable || item.qtyOnhand || 0,
       });
     });
 
@@ -615,7 +632,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
     setLoadingStockData(true);
     try {
-      const data = await fetchInventoryPartsByLocation(id);
+      const data = await fetchInventoryStockByLocation(id);
 
       const stock = data || [];
       setStockData(stock);
@@ -787,6 +804,11 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       return "Select at least one item";
     }
 
+    const hasPositiveQty = selectedStockItems.some((item) => Number(item.issueQuantity) > 0);
+    if (!hasPositiveQty) {
+      return "At least one item must have a quantity greater than 0";
+    }
+
     let hasLineItemErrors = false;
 
     selectedStockItems.forEach((item) => {
@@ -825,17 +847,22 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     notes: formData.description || "",
     department: formData?.department?.name,
     projectId: formData?.project?.id,
-    lineItems: selectedStockItems.map((item) => ({
-      partId: item.partId,
-      quantity: Number(item.issueQuantity),
-      trackingId: item.trackingNumber,
-      trackingType: item.trackingType,
-      reason: item.remarks || "",
-      adjustmentType:
-        formData.movementType?.name === "Adjustment"
-          ? item.adjustmentType || ""
-          : null,
-    })),
+    lineItems: selectedStockItems
+      .filter((item) => {
+        const qty = Number(item.issueQuantity);
+        return !isNaN(qty) && qty > 0;
+      })
+      .map((item) => ({
+        partId: item.partId,
+        quantity: Number(item.issueQuantity),
+        trackingId: item.trackingNumber,
+        trackingType: item.trackingType,
+        reason: item.remarks || "",
+        adjustmentType:
+          formData.movementType?.name === "Adjustment"
+            ? item.adjustmentType || ""
+            : null,
+      })),
   });
 
   const handleSubmit = async () => {
@@ -871,6 +898,8 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       const res = await createSMWithLineItems(buildPayload());
       if (res?.id) setDraftId(res.id);
       Alert("Draft saved successfully", "success");
+      handleCloseClick();
+      handleRefresh();
     } catch (error) {
       Alert("Failed to save draft", "error");
       console.log(error);
@@ -930,7 +959,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       flex: 1,
       renderCell: ({ row }) => {
         const errorMsg = lineItemErrors[row.uniqueId];
-        const trackingType = row.trackingType?.value;
+        const trackingType = row.trackingType?.value || row.trackingType?.toLowerCase();
 
         if (trackingType === "none") {
           return <div>---</div>;
@@ -938,10 +967,20 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
         const allOptions = trackingOptionsMap[row.uniqueId] || [];
 
-        const filteredOptions = allOptions.filter((opt) => {
+        const finalOptions = [...allOptions];
+        if (row.trackingNumber && !finalOptions.some((opt) => opt.value === row.trackingNumber)) {
+          finalOptions.push({ label: row.trackingNumber, value: row.trackingNumber });
+        }
+
+        const selectedForPart = selectedStockItems
+          .filter((item) => item.partId === row.partId && item.uniqueId !== row.uniqueId)
+          .map((item) => item.trackingNumber)
+          .filter(Boolean);
+
+        const filteredOptions = finalOptions.filter((opt) => {
           if (opt.value === row.trackingNumber) return true;
 
-          return !selectedTrackingNumbers.includes(opt.value);
+          return !selectedForPart.includes(opt.value);
         });
 
         const selectedOption =
@@ -1321,16 +1360,14 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
                 }
                 readOnly={items.length === 0 || !formData?.movementType}
                 options={items.filter((item) => {
-                  const totalIssued = getTotalIssuedQuantityForPart(
-                    item.partId,
-                  );
-                  return totalIssued < item.qtyAvailable;
+                  const isSelected = selectedStockItems.some((i) => i.partId === item.partId);
+                  return !isSelected;
                 })}
                 loading={loadingStockData}
                 loadingText="Loading Inventory Parts..."
                 getOptionLabel={(option) =>
                   option
-                    ? `${option?.part?.partNumber} - ${option?.part?.name} - ${option?.part?.manufacturingPartNumber}`
+                    ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}`
                     : ""
                 }
                 isOptionEqualToValue={(option, value) =>
@@ -1342,14 +1379,12 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
                 renderOption={(props, option) => (
                   <li {...props} key={option.id}>
                     <div>
+                      <strong>{option.name}</strong>
                       <div style={{ fontSize: "0.85rem" }}>
-                        Part No: {option?.part?.partNumber}
+                        Part No: {option.partNumber}
                       </div>
                       <div style={{ fontSize: "0.85rem" }}>
-                        Part Name: {option?.part?.name}
-                      </div>
-                      <div style={{ fontSize: "0.85rem" }}>
-                        Manf. Part No: {option?.part?.manufacturingPartNumber}
+                        Manf. Part No: {option.manufacturingPartNumber}
                       </div>
                     </div>
                   </li>

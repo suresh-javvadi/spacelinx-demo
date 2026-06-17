@@ -19,7 +19,10 @@ import {
 } from "../../../services/stockMovementService";
 import { fetchFullBOMConsolidated } from "../../../services/childPartService";
 import { fetchInventoryStockByLocation } from "../../../services/inventoryStockService";
-import { fetchInventoryPartPurchaseHistory } from "../../../services/inventoryPartService";
+import {
+  fetchInventoryPartPurchaseHistory,
+  fetchInventoryPartWithPrice,
+} from "../../../services/inventoryPartService";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import { fetchUserLookup } from "../../../services/userService";
 import Popover from "@mui/material/Popover";
@@ -39,7 +42,6 @@ const EditStockMovements = ({
   const [loadingData, setLoadingData] = useState(true);
   const [readOnlyMode, setReadOnlyMode] = useState(true);
   const [locationsData, setLocationsData] = useState([]);
-  const [loadingLocationData, setLoadingLocationData] = useState(false);
   const movementTypes = [
     { id: 2, name: "Reserved" },
     { id: 3, name: "Issued" },
@@ -59,7 +61,6 @@ const EditStockMovements = ({
     project: null,
   });
   const [formErrors, setFormErrors] = useState({});
-  const [binsData, setBinsData] = useState([]);
   const [userData, setUserData] = useState([]);
   const [loadingStaffData, setLoadingStaffData] = useState(true);
   const [stockData, setStockData] = useState([]);
@@ -233,14 +234,11 @@ const EditStockMovements = ({
   };
 
   const fetchLocations = async () => {
-    setLoadingLocationData(true);
     try {
       const data = await fetchLocationsLookUp();
       setLocationsData(data || []);
     } catch {
       Alert("Failed to fetch locations", "error");
-    } finally {
-      setLoadingLocationData(false);
     }
   };
 
@@ -288,7 +286,6 @@ const EditStockMovements = ({
       const data = await fetchInventoryStockByLocation(id);
       const stock = data || [];
       setStockData(stock);
-      setBinsData(extractBins(stock));
     } catch {
       Alert("Failed to fetch stock data", "error");
     } finally {
@@ -342,45 +339,41 @@ const EditStockMovements = ({
     }
   }, [locationsData, formData.fromLocation?.id]);
 
-  // Filter parts based on bin and stock
   useEffect(() => {
-    if (!stockData.length) {
-      setItems([]);
-      return;
-    }
-    let filteredStock = stockData;
-    if (formData?.bin?.binId) {
-      filteredStock = filteredStock.filter(
-        (item) => item.binId === formData.bin.binId,
-      );
-    }
-    filteredStock = filteredStock.filter((item) => item.qtyOnhand > 0);
-    setItems(extractParts(filteredStock));
-  }, [formData.bin, stockData]);
-
-  const extractBins = (stockData = []) => {
-    const map = new Map();
-    stockData.forEach((item) => {
-      if (item.binId && item.binCode) {
-        map.set(item.binId, { binId: item.binId, binCode: item.binCode });
+    const fetchParts = async () => {
+      setLoadingStockData(true);
+      try {
+        const data = await fetchInventoryPartWithPrice();
+        setItems(extractParts(data || []));
+      } catch (err) {
+        console.error("Failed to load parts inventory:", err);
+      } finally {
+        setLoadingStockData(false);
       }
-    });
-    return Array.from(map.values());
-  };
+    };
+    fetchParts();
+  }, []);
+
+
 
   const extractParts = (stockData = []) => {
     const map = new Map();
     stockData.forEach((item) => {
       map.set(item.partId, {
+        ...item,
         id: item.partId,
         partId: item.partId,
         partNumber: item.partNumber,
         partName: item.partName,
         name: item.partName,
         manufacturingPartNumber: item.manufacturingPartNumber || "",
-        quantity: item.qtyOnhand,
+        quantity: item.qtyOnhand || item.quantity || 0,
         binId: item.binId,
         binCode: item.binCode,
+        trackingType: item.trackingType || item.part?.trackingType,
+        isSerialNumberRequired: item.isSerialNumberRequired ?? item.part?.isSerialNumberRequired,
+        trackingMethod: item.trackingMethod || item.part?.trackingMethod,
+        qtyAvailable: item.qtyAvailable || item.qtyOnhand || 0,
       });
     });
     return Array.from(map.values());
@@ -435,7 +428,6 @@ const EditStockMovements = ({
           fetchStockLocations(value.id);
         } else {
           setStockData([]);
-          setBinsData([]);
         }
         updatedData.bin = null;
       }
@@ -450,22 +442,54 @@ const EditStockMovements = ({
     // Fetch purchase history for parent part
     const parentHistory = await getPurchaseHistoryForPart(part.partId);
 
-    // Resolve PO/GRN for parent part — check trackingNumber or trackingId
-    const trackingNo = part.trackingNumber || part.trackingId;
-    const parentMatch = trackingNo
+    // Look up the part in the selected location/bin stockData
+    const stockMatch = stockData.find((item) => item.partId === part.partId);
+
+    // Resolve PO/GRN for parent part — check trackingNumber, trackingId, or stockMatch.trackingId (fallback to first history record)
+    const trackingNo = part.trackingNumber || part.trackingId || stockMatch?.trackingId || "";
+    const parentMatch = (trackingNo
       ? parentHistory.find((x) => x.trackingId === trackingNo) ?? null
-      : null;
+      : null) || (parentHistory && parentHistory.length > 0 ? parentHistory[0] : null);
+
+    let trackingTypeStr = "None";
+    const rawTrackingType = part.trackingType || part.part?.trackingType || stockMatch?.trackingType;
+    if (rawTrackingType) {
+      trackingTypeStr = typeof rawTrackingType === 'object' ? (rawTrackingType.label || rawTrackingType.value || "None") : rawTrackingType;
+    } else if (part.isSerialNumberRequired || part.part?.isSerialNumberRequired || stockMatch?.isSerialNumberRequired) {
+      trackingTypeStr = "Serial";
+    } else if (part.trackingMethod || part.part?.trackingMethod || stockMatch?.trackingMethod) {
+      trackingTypeStr = part.trackingMethod || part.part?.trackingMethod || stockMatch?.trackingMethod;
+    }
+
+    if (trackingTypeStr.toLowerCase() === "serial") {
+      trackingTypeStr = "Serial";
+    } else if (trackingTypeStr.toLowerCase() === "batch") {
+      trackingTypeStr = "Batch";
+    } else {
+      trackingTypeStr = "None";
+    }
+
+    const trackingTypeObj = trackingTypes.find(
+      (t) => t.value === trackingTypeStr.toLowerCase()
+    ) || { value: "none", label: "None" };
+
+    const isSerial = trackingTypeStr === "Serial";
+    const parentQtyAvailable = stockMatch ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0) : 0;
 
     const newEntry = {
       ...part,
       uniqueId: `${part.partId}-${Date.now()}`,
-      trackingType: "",
-      issueQuantity: "",
+      trackingType: trackingTypeObj,
+      issueQuantity: (isSerial && parentQtyAvailable > 0) ? 1 : "",
       trackingNumber: parentMatch?.trackingId || trackingNo || "",
       poNumber: parentMatch?.poNumber || "---",
       poQty: parentMatch?.receivedQuantity ?? null,
       grnNumber: parentMatch?.grnNumber || "---",
       remarks: "",
+      qtyAvailable: parentQtyAvailable,
+      quantity: stockMatch ? (stockMatch.qtyOnhand ?? 0) : 0,
+      binId: stockMatch ? stockMatch.binId : (formData?.bin?.binId || null),
+      binCode: stockMatch ? stockMatch.binCode : (formData?.bin?.binCode || ""),
     };
 
     let allNewItems = [newEntry];
@@ -491,20 +515,31 @@ const EditStockMovements = ({
             (item) => item.partId === childPart.id,
           );
 
-          // Only match by actual tracking ID — no arbitrary history[0] fallback
+          // Only match by actual tracking ID — fallback to first history item if not found or empty
           const childMatch = (stockMatch?.trackingId
             ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
-            : null) ?? null;
+            : null) || (childHistory && childHistory.length > 0 ? childHistory[0] : null);
 
-          const trackingTypeStr = childPart.isSerialNumberRequired ? "Serial" : "None";
+          const trackingTypeStr = (childPart.isSerialNumberRequired || childPart.part?.isSerialNumberRequired) ? "Serial" : "None";
+          const trackingTypeObj = trackingTypes.find(
+            (t) => t.value === trackingTypeStr.toLowerCase()
+          ) || { value: "none", label: "None" };
 
           if (stockMatch) {
+            const childQtyAvailable = stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0;
             const isChildSerial = stockMatch.trackingType?.toLowerCase() === "serial";
+            const childStockTrackingTypeStr = typeof stockMatch.trackingType === 'object'
+              ? (stockMatch.trackingType.value || "none")
+              : (stockMatch.trackingType || "none");
+            const childStockTrackingTypeObj = trackingTypes.find(
+              (t) => t.value === childStockTrackingTypeStr.toLowerCase()
+            ) || { value: "none", label: "None" };
+
             return {
               ...stockMatch,
               uniqueId: `${stockMatch.partId}-${Date.now()}-${Math.random()}`,
-              trackingType: stockMatch.trackingType || "",
-              issueQuantity: isChildSerial ? 1 : "",
+              trackingType: childStockTrackingTypeObj,
+              issueQuantity: (isChildSerial && childQtyAvailable > 0) ? 1 : "",
               trackingNumber: childMatch?.trackingId || stockMatch.trackingId || "",
               poNumber: childMatch?.poNumber || "---",
               poQty: childMatch?.receivedQuantity ?? null,
@@ -530,9 +565,9 @@ const EditStockMovements = ({
                 name: childPart.name || "",
               },
               quantity: 0,
-              trackingType: trackingTypeStr,
+              trackingType: trackingTypeObj,
               uniqueId: `${childPart.id}-${Date.now()}-${Math.random()}`,
-              issueQuantity: trackingTypeStr?.toLowerCase() === "serial" ? 1 : "",
+              issueQuantity: "",
               trackingNumber: childMatch?.trackingId || "",
               poNumber: childMatch?.poNumber || "---",
               poQty: childMatch?.receivedQuantity ?? null,
@@ -601,31 +636,7 @@ const EditStockMovements = ({
     updateLineItemError(uniqueId, "trackingNumber", error);
   };
 
-  const handleTrackingTypeChange = (uniqueId, value) => {
-    const isSerial = value?.value === "serial";
-    setSelectedStockItems((prev) =>
-      prev.map((item) =>
-        item.uniqueId === uniqueId
-          ? {
-              ...item,
-              trackingType: value,
-              issueQuantity: isSerial ? 1 : item.issueQuantity,
-            }
-          : item,
-      ),
-    );
-    const item = selectedStockItems.find((i) => i.uniqueId === uniqueId);
-    if (!item) return;
-    const trackingTypeError = validateTrackingType({
-      ...item,
-      trackingType: value,
-    });
-    updateLineItemError(uniqueId, "trackingType", trackingTypeError);
-    if (isSerial) {
-      const qtyError = validateIssueQuantity({ ...item, issueQuantity: 1 });
-      updateLineItemError(uniqueId, "issueQuantity", qtyError);
-    }
-  };
+
 
   const handleRemarksPopoverOpen = (row, event) => {
     setActiveRowId(row.uniqueId);
@@ -657,6 +668,13 @@ const EditStockMovements = ({
   };
 
   const validateIssueQuantity = (item) => {
+    // If available quantity is 0, allow 0 or empty issue quantity
+    if (item.quantity === 0) {
+      if (item.issueQuantity === "" || Number(item.issueQuantity) === 0) {
+        return "";
+      }
+    }
+
     if (item.issueQuantity === "") return "Issue Quantity is required";
     if (item.issueQuantity <= 0)
       return "Issue Quantity must be greater than zero";
@@ -672,7 +690,13 @@ const EditStockMovements = ({
 
   const validateTrackingNumber = (item, allItems) => {
     const value = item.trackingNumber;
-    const trackingType = item.trackingType?.value;
+    const trackingType = item.trackingType?.value || (typeof item.trackingType === 'string' ? item.trackingType.toLowerCase() : "");
+
+    // If no quantity is being issued, tracking number is not required
+    if (item.issueQuantity === "" || Number(item.issueQuantity) === 0) {
+      return "";
+    }
+
     if (trackingType === "none") return "";
     if (!value?.trim()) return "Tracking ID is required";
     if (!/^[a-zA-Z0-9-]+$/.test(value))
@@ -680,6 +704,7 @@ const EditStockMovements = ({
     const isDuplicate = allItems.some(
       (i) =>
         i.uniqueId !== item.uniqueId &&
+        i.partId === item.partId &&
         i.trackingNumber?.trim() === value.trim(),
     );
     if (isDuplicate) return "Tracking ID already used";
@@ -748,22 +773,31 @@ const EditStockMovements = ({
       notes: formData.description || "",
       department: formData?.department?.name,
       projectId: formData?.project?.id,
-      lineItems: selectedStockItems.map((item) => ({
-        partId: item.partId,
-        quantity: Number(item.issueQuantity) || 0,
-        trackingType: item.trackingType?.label || "",
-        trackingId: item.trackingNumber,
-        reason: item.remarks || "",
-        adjustmentType:
-          formData.movementType?.name === "Adjustment"
-            ? item.adjustmentType || ""
-            : null,
-      })),
+      lineItems: selectedStockItems
+        .filter((item) => {
+          const qty = Number(item.issueQuantity);
+          return !isNaN(qty) && qty > 0;
+        })
+        .map((item) => ({
+          partId: item.partId,
+          quantity: Number(item.issueQuantity),
+          trackingType: item.trackingType?.label || item.trackingType || "",
+          trackingId: item.trackingNumber,
+          reason: item.remarks || "",
+          adjustmentType:
+            formData.movementType?.name === "Adjustment"
+              ? item.adjustmentType || ""
+              : null,
+        })),
     };
   };
 
   const handleSaveDraft = async () => {
     const payload = buildPayload();
+    if (!payload.lineItems || payload.lineItems.length === 0) {
+      Alert("At least one item must have a quantity greater than 0 to save draft", "error");
+      return;
+    }
 
     setLoadingData(true);
     try {
@@ -799,6 +833,12 @@ const EditStockMovements = ({
 
     if (selectedStockItems.length === 0) {
       Alert("Please select at least one stock item", "error");
+      return;
+    }
+
+    const hasPositiveQty = selectedStockItems.some((item) => Number(item.issueQuantity) > 0);
+    if (!hasPositiveQty) {
+      Alert("At least one item must have a quantity greater than 0 to submit", "error");
       return;
     }
 
@@ -880,7 +920,8 @@ const EditStockMovements = ({
     const error = validateExpectedReturnDate(formData.movementDate, value);
     setFormErrors((prev) => {
       if (error) return { ...prev, expectedReturnDate: error };
-      const { expectedReturnDate, ...rest } = prev;
+      const rest = { ...prev };
+      delete rest.expectedReturnDate;
       return rest;
     });
   };
@@ -927,56 +968,7 @@ const EditStockMovements = ({
       field: "trackingType",
       headerName: "Tracking Type",
       flex: 1,
-      type: "singleSelect",
-      valueOptions: ["Serial", "Batch", "None"],
-      renderCell: ({ row }) => {
-        if (readOnlyMode) {
-          return row.trackingType?.label || row.trackingType || "";
-        }
-        return (
-          <div style={{ width: "100%" }}>
-            <Autocomplete
-              fullWidth
-              options={trackingTypes}
-              value={
-                trackingTypes.find(
-                  (t) => t.value === row.trackingType?.value,
-                ) || null
-              }
-              disableClearable
-              onChange={(_, newValue) =>
-                handleTrackingTypeChange(row.uniqueId, newValue || "")
-              }
-              getOptionLabel={(option) => option.label || ""}
-              isOptionEqualToValue={(option, value) =>
-                option.value === value?.value
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Select Type"
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      height: 40,
-                      padding: "0 10px",
-                      borderRadius: "6px",
-                      marginTop: "4px",
-                    },
-                    "& input": {
-                      padding: "4px 6px !important",
-                      fontSize: "14px",
-                    },
-                  }}
-                  fullWidth
-                  required
-                  error={Boolean(lineItemErrors[row.uniqueId]?.trackingType)}
-                  helperText={lineItemErrors[row.uniqueId]?.trackingType || ""}
-                />
-              )}
-            />
-          </div>
-        );
-      },
+      valueGetter: (_, row) => row.trackingType?.label || row.trackingType || "",
     },
     {
       field: "trackingNumber",
@@ -1485,10 +1477,8 @@ const EditStockMovements = ({
                 }
                 readOnly={readOnlyMode || items.length === 0}
                 options={items.filter((item) => {
-                  const totalIssued = getTotalIssuedQuantityForPart(
-                    item.partId,
-                  );
-                  return totalIssued < item.quantity;
+                  const isSelected = selectedStockItems.some((i) => i.partId === item.partId);
+                  return !isSelected;
                 })}
                 loading={loadingStockData}
                 loadingText="Loading Stock..."
