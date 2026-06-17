@@ -139,7 +139,15 @@ const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
         };
 
         if (existingIndex !== -1) {
-          updated[existingIndex] = childItem;
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            ...childItem,
+            quantity:
+              Number(updated[existingIndex].quantity || 0) + Number(finalQty),
+            description:
+              updated[existingIndex].description || childItem.description,
+            isBom: true,
+          };
         } else {
           updated.push(childItem);
         }
@@ -235,6 +243,47 @@ const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
     setEditIndex(null);
   };
 
+  const isBomChildItem = (item) =>
+    Boolean(item?.isBom) ||
+    String(item?.description || "").startsWith("Full BOM of ");
+
+  const rebuildBomChildrenFromParents = async (items) => {
+    const parentItems = items.filter(
+      (item) => !isBomChildItem(item) && item.part?.id,
+    );
+    const childTotals = new Map();
+
+    for (const parentItem of parentItems) {
+      const fullBom = await fetchFullBOMConsolidated(parentItem.part.id);
+
+      (fullBom || []).forEach((child) => {
+        if (!child?.id) return;
+
+        const bomQty = Number(child.totalQuantity ?? 1);
+        const contribution = Number(parentItem.quantity || 0) * bomQty;
+        const current = childTotals.get(child.id) || {
+          part: child,
+          quantity: 0,
+          description:
+            parentItem.description ||
+            `Full BOM of ${parentItem.part.partNumber} (${parentItem.part.name})`,
+          isBom: true,
+        };
+
+        childTotals.set(child.id, {
+          ...current,
+          quantity: current.quantity + contribution,
+          isBom: true,
+        });
+      });
+    }
+
+    return [
+      ...items.filter((item) => !isBomChildItem(item)),
+      ...childTotals.values(),
+    ];
+  };
+
   const handleAddLineItem = async () => {
     if (!validateLineItem()) return;
 
@@ -249,6 +298,33 @@ const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
 
     try {
       const fullBom = await fetchFullBOMConsolidated(parentPart.id);
+
+      if (editIndex !== null) {
+        const nextItems = lineItems.map((item, idx) =>
+          idx === editIndex
+            ? {
+                ...item,
+                part: parentPart,
+                quantity: parentQty,
+                description: lineItem.description || "",
+                isBom: false,
+              }
+            : item,
+        );
+
+        if (isBomChildItem(lineItems[editIndex])) {
+          setLineItems(nextItems);
+          Alert("Line item updated successfully", "info");
+          resetLineItemState();
+          return;
+        }
+
+        const rebuiltItems = await rebuildBomChildrenFromParents(nextItems);
+        setLineItems(rebuiltItems);
+        Alert("Parent part and consolidated BOM items added", "info");
+        resetLineItemState();
+        return;
+      }
 
       if (Array.isArray(fullBom) && fullBom.length > 0) {
         addOrUpdateParentWithBomLineItems(parentPart, parentQty, fullBom);

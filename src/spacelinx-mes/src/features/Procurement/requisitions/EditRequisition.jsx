@@ -421,18 +421,27 @@ const EditRequisition = ({
 
     // 🔒 CASE 1: EDIT MODE → UPDATE EXISTING ROW ONLY
     if (editIndex !== null) {
-      setLineItems((prev) =>
-        prev.map((item, idx) =>
-          idx === editIndex
-            ? {
-                ...item,
-                partId: selectedPart.id,
-                quantity: qty,
-                description: newLineItem.description,
-              }
-            : item,
-        ),
+      const currentItem = lineItems[editIndex];
+      const nextItems = lineItems.map((item, idx) =>
+        idx === editIndex
+          ? {
+              ...item,
+              partId: selectedPart.id,
+              quantity: qty,
+              description: newLineItem.description,
+              isBom: false,
+            }
+          : item,
       );
+
+      if (isBomChildItem(currentItem)) {
+        setLineItems(nextItems);
+        resetLineItemState();
+        return;
+      }
+
+      const rebuiltItems = await rebuildBomChildrenFromParents(nextItems);
+      setLineItems(rebuiltItems);
 
       resetLineItemState();
       return;
@@ -465,6 +474,54 @@ const EditRequisition = ({
     setNewLineItem({ part: null, quantity: "", description: "" });
     setLineItemErrors({});
     setEditIndex(null);
+  };
+
+  const isBomChildItem = (item) =>
+    String(item?.description || "").startsWith("Full BOM of ");
+
+  const rebuildBomChildrenFromParents = async (items) => {
+    const parentItems = items.filter(
+      (item) => !isBomChildItem(item) && (item.partId || item.part?.id),
+    );
+    const childTotals = new Map();
+
+    for (const parentItem of parentItems) {
+      const parentPartId = parentItem.partId || parentItem.part?.id;
+      if (!parentPartId) continue;
+
+      const parentPart =
+        partsOptions.find((part) => part.id === parentPartId) ||
+        parentItem.part ||
+        null;
+      const fullBom = await fetchFullBOMConsolidated(parentPartId);
+
+      (fullBom || []).forEach((child) => {
+        if (!child?.id) return;
+
+        const bomQty = Number(child.totalQuantity ?? 1);
+        const contribution = Number(parentItem.quantity || 0) * bomQty;
+        const current = childTotals.get(child.id) || {
+          partId: child.id,
+          quantity: 0,
+          description: `Full BOM of ${parentPart?.partNumber || ""} (${parentPart?.name || ""})`,
+          isBom: true,
+        };
+
+        childTotals.set(child.id, {
+          ...current,
+          quantity: current.quantity + contribution,
+          description:
+            current.description ||
+            `Full BOM of ${parentPart?.partNumber || ""} (${parentPart?.name || ""})`,
+          isBom: true,
+        });
+      });
+    }
+
+    return [
+      ...items.filter((item) => !isBomChildItem(item)),
+      ...childTotals.values(),
+    ];
   };
 
   const addEbomPartsToGrid = async (parentPart, parentQty, fullBom) => {
@@ -509,6 +566,11 @@ const EditRequisition = ({
           updated[existingIndex] = {
             ...updated[existingIndex],
             ...childItem,
+            quantity:
+              Number(updated[existingIndex].quantity || 0) + Number(finalQty),
+            description:
+              updated[existingIndex].description || childItem.description,
+            isBom: true,
           };
         } else {
           updated.push(childItem);
