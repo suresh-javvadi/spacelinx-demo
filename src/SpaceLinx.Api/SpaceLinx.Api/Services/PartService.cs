@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SpaceLinx.Api.Interfaces;
 using SpaceLinx.Model;
@@ -12,7 +12,7 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
     {
         try
         {
-            var record = await _spaceLinxContext.Parts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == partId);
+            var record = await _spaceLinxContext.Parts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == partId && x.DeletedBy == null);
             if (record == null)
             {
                 throw new ApplicationException("Part Not Found.");
@@ -58,7 +58,17 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
             await _spaceLinxContext.Parts.AddAsync(newPart);
             await _spaceLinxContext.SaveChangesAsync();
  
-            var eboms = await _spaceLinxContext.Eboms.AsNoTracking().Where(x => x.PartId == partId).ToListAsync();
+            var eboms = await _spaceLinxContext.Eboms.AsNoTracking()
+                .Where(x => x.PartId == partId && x.DeletedBy == null)
+                .ToListAsync();
+
+            var childPartIds = eboms.Select(e => e.ChildPartId).Distinct().ToList();
+            var activeChildParts = await _spaceLinxContext.Parts.AsNoTracking()
+                .Where(p => p.Id.HasValue && childPartIds.Contains(p.Id.Value) && p.DeletedBy == null)
+                .Select(p => p.Id.Value)
+                .ToListAsync();
+
+            eboms = eboms.Where(e => activeChildParts.Contains(e.ChildPartId)).ToList();
             foreach (var ebom in eboms)
             {
                 var newEbom = new Ebom
@@ -84,7 +94,7 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
  
     public bool IsPartEditable(Guid partId)
     {
-        var record =  _spaceLinxContext.Parts.AsNoTracking().FirstOrDefault(x => x.Id == partId);
+        var record =  _spaceLinxContext.Parts.AsNoTracking().FirstOrDefault(x => x.Id == partId && x.DeletedBy == null);
         if (record == null || record.Status != "Draft")
         {
             return false;
@@ -103,4 +113,3 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
         return true;
     }
 }
- 
