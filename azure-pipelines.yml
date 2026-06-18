@@ -26,6 +26,11 @@ pr:
 variables:
   dotnetVersion: '10.0.x'
   nodeVersion: '22.x'
+  # Vite/Rollup bundling of the frontend (~19k modules) peaks near Node's default
+  # ~2GB heap and intermittently OOMs (exit 134) during "rendering chunks" — it has
+  # failed a UAT build while the same code built fine in another mode/agent. Raise the
+  # heap for all frontend build jobs (exposed to script steps as the NODE_OPTIONS env var).
+  NODE_OPTIONS: '--max-old-space-size=4096'
   apiProject: 'src/SpaceLinx.Api/SpaceLinx.Api/SpaceLinx.Api.csproj'
   frontendDir: 'src/spacelinx-mes'
   buildConfiguration: 'Release'
