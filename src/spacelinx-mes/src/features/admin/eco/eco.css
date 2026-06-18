@@ -241,13 +241,43 @@
 }
 .ECOErrorGridContainer {
   width: 100%;
-  height: calc(100% - 30px);
+  height: calc(100% - 50px);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+}
+.ECOErrorTabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color, #333);
+  padding: 0 10px;
+  flex-shrink: 0;
+}
+.ECOErrorTabs button {
+  flex: 1;
+  width: auto !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.ECOErrorTabBadge {
+  background-color: var(--error-color);
+  color: #fff;
+  font-size: 11px;
+  border-radius: 10px;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+}
+.ECOErrorTabContent {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 10px 0 30px;
 }
 .ECOErrorDisplayDataGridDiv {
-  height: 50% !important;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -271,7 +301,8 @@
 }
 
 .ECOErrorDisplayGrid {
-  height: calc(100% - 50px);
+  flex: 1;
+  min-height: 0;
   width: 100%;
 }
 .ECOErrorDisplayHeader {

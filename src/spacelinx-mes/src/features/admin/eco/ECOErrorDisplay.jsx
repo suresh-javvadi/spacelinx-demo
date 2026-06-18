@@ -7,6 +7,8 @@ import { AlertsContext } from "../../AlertsContext/Context";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
 import { createEcoPart } from "../../../services/ecoPartService";
 import { createDocumentWithEntity } from "../../../services/documentsService";
+import { deleteEBom } from "../../../services/childPartService";
+import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import UploadDialog from "../../../Components/Documents/UploadDialog";
 import { fetchOptionSetByName } from "../../../services/optionSetService";
@@ -19,6 +21,8 @@ const ECOErrorDisplay = ({
 }) => {
   const { openPartDetailsDrawer } = usePartDetailsDrawer();
   const { Alert } = useContext(AlertsContext);
+  const [activeTab, setActiveTab] = useState(null);
+  const [deletedEbomIds, setDeletedEbomIds] = useState(new Set());
   const [addedParts, setAddedParts] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [currentPartToUpload, setCurrentPartToUpload] = useState(null);
@@ -279,33 +283,90 @@ const ECOErrorDisplay = ({
     },
   ];
 
-  const renderGrid = (
-    title,
-    description,
-    rows,
-    useAddButton = false,
-    loading,
-  ) =>
-    rows?.length > 0 && (
-      <div className="ECOErrorDisplayDataGridDiv">
-        <div className="ECOErrorDisplayHeaderDiv">
-          <p className="ECOErrorHeader"> {title} </p>{" "}
-          <p className="ECOErrorDes">{description}</p>
-        </div>
-
-        <div className="ECOErrorDisplayGrid">
-          <StyledDataGrid
-            rows={rows}
-            columns={useAddButton ? missingBOMColumns : missingDocsColumns}
-            getRowId={(row) => row.id}
-            disableRowSelectionOnClick
-            disableColumnMenu
-            loading={loading}
-            rowHeight={40}
-          />
-        </div>
-      </div>
+  const handleDeleteBomPart = async (ebomId) => {
+    const confirmed = await showConfirmation(
+      "Are you sure?",
+      "This part will be deleted from the BOM.",
     );
+    if (!confirmed) return;
+
+    setLoadingData(true);
+    try {
+      await deleteEBom(ebomId);
+      setDeletedEbomIds((prev) => new Set([...prev, ebomId]));
+      fetchEcoPartsData();
+      Alert("Removed part from BOM successfully.", "success");
+    } catch (error) {
+      Alert("Failed to remove part from BOM.", "error");
+      console.error("Error deleting BOM part:", error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  const deleteBomColumns = [
+    ...commonColumns,
+    {
+      field: "action",
+      headerName: "",
+      width: 40,
+      sortable: false,
+      disableColumnMenu: true,
+      align: "center",
+      renderCell: ({ row }) => (
+        <ion-icon
+          name="trash-outline"
+          style={{ cursor: "pointer", fontSize: "18px", color: "var(--error-color)" }}
+          onClick={async (e) => {
+            e.stopPropagation();
+            await handleDeleteBomPart(row.ebomId);
+          }}
+        />
+      ),
+    },
+  ];
+
+  const archivedRows =
+    errorData?.archivedBomParts
+      ?.filter((x) => !deletedEbomIds.has(x.ebomId))
+      .map((x) => ({ ...x.part, ebomId: x.ebomId })) || [];
+  const obsoleteRows =
+    errorData?.obsoleteBomParts
+      ?.filter((x) => !deletedEbomIds.has(x.ebomId))
+      .map((x) => ({ ...x.part, ebomId: x.ebomId })) || [];
+
+  const allTabs = [
+    {
+      key: "docs",
+      label: "Missing Documents",
+      description: "(Ensure each part has at least one document)",
+      rows: localMissingDocs,
+      columns: missingDocsColumns,
+    },
+    {
+      key: "draft",
+      label: "Draft BOM Parts",
+      description: "(Release them or add them to this ECO)",
+      rows: errorData?.nonReleasedMissingParts || [],
+      columns: missingBOMColumns,
+    },
+    {
+      key: "archived",
+      label: "Archived BOM Parts",
+      description: "(These parts are Archived — remove them from the BOM to proceed)",
+      rows: archivedRows,
+      columns: deleteBomColumns,
+    },
+    {
+      key: "obsolete",
+      label: "Obsolete BOM Parts",
+      description: "(These parts are Obsolete — remove them from the BOM to proceed)",
+      rows: obsoleteRows,
+      columns: deleteBomColumns,
+    },
+  ].filter((t) => t.rows.length > 0);
+
+  const currentTab = allTabs.find((t) => t.key === activeTab) || allTabs[0];
 
   return (
     <div className="ECOErrorDisplay">
@@ -315,20 +376,39 @@ const ECOErrorDisplay = ({
           <ion-icon name="close-outline"></ion-icon>
         </button>
       </div>
+
       <div className="ECOErrorGridContainer">
-        {renderGrid(
-          "Documents Missing in below Parts",
-          "(Ensure each part has at least one document)",
-          localMissingDocs,
-          false,
-          loadingData,
-        )}
-        {renderGrid(
-          "Below BOM Parts are still in Draft State",
-          "(Release them or add them to this ECO)",
-          errorData?.nonReleasedMissingParts,
-          true,
-          loadingData,
+        <div className="ECOErrorTabs EcoSections">
+          {allTabs.map((tab) => (
+            <button
+              key={tab.key}
+              className={currentTab?.key === tab.key ? "active" : "inactive"}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              {tab.label}
+              <span className="ECOErrorTabBadge">{tab.rows.length}</span>
+            </button>
+          ))}
+        </div>
+
+        {currentTab && (
+          <div className="ECOErrorTabContent">
+            <div className="ECOErrorDisplayHeaderDiv">
+              <p className="ECOErrorHeader">{currentTab.label}</p>
+              <p className="ECOErrorDes">{currentTab.description}</p>
+            </div>
+            <div className="ECOErrorDisplayGrid">
+              <StyledDataGrid
+                rows={currentTab.rows}
+                columns={currentTab.columns}
+                getRowId={(row) => row.id}
+                disableRowSelectionOnClick
+                disableColumnMenu
+                loading={loadingData}
+                rowHeight={40}
+              />
+            </div>
+          </div>
         )}
       </div>
 
