@@ -297,6 +297,10 @@ public class EcoController(SpaceLinxContext spaceLinxContext, IMapper mapper, IH
                 .FirstOrDefault(s => s.StartsWith("Child parts missing docs", StringComparison.OrdinalIgnoreCase));
             var unreleasedSegment = segments
                 .FirstOrDefault(s => s.StartsWith("Unreleased BOM parts not in ECO", StringComparison.OrdinalIgnoreCase));
+            var archivedSegment = segments
+                .FirstOrDefault(s => s.StartsWith("Archived BOM parts in ECO", StringComparison.OrdinalIgnoreCase));
+            var obsoleteSegment = segments
+                .FirstOrDefault(s => s.StartsWith("Obsolete BOM parts in ECO", StringComparison.OrdinalIgnoreCase));
 
             // Extract GUIDs
             var partsWithNoDocIds = partsSegment != null
@@ -320,6 +324,18 @@ public class EcoController(SpaceLinxContext spaceLinxContext, IMapper mapper, IH
                        .ToList()
                 : new List<Guid>();
 
+            var archivedEbomMap = archivedSegment != null
+                ? Regex.Matches(archivedSegment, @"EbomID:\s*([0-9A-Fa-f\-]{36}),PartID:\s*([0-9A-Fa-f\-]{36})")
+                       .GroupBy(m => Guid.Parse(m.Groups[2].Value))
+                       .ToDictionary(g => g.Key, g => Guid.Parse(g.First().Groups[1].Value))
+                : new Dictionary<Guid, Guid>();
+
+            var obsoleteEbomMap = obsoleteSegment != null
+                ? Regex.Matches(obsoleteSegment, @"EbomID:\s*([0-9A-Fa-f\-]{36}),PartID:\s*([0-9A-Fa-f\-]{36})")
+                       .GroupBy(m => Guid.Parse(m.Groups[2].Value))
+                       .ToDictionary(g => g.Key, g => Guid.Parse(g.First().Groups[1].Value))
+                : new Dictionary<Guid, Guid>();
+
             // Fetch parts
             var partsWithNoDocuments = await spaceLinxContext.Parts
                 .Where(p => partsWithNoDocIds.Contains(p.Id.Value))
@@ -333,13 +349,31 @@ public class EcoController(SpaceLinxContext spaceLinxContext, IMapper mapper, IH
                 .Where(p => unreleasedBomIds.Contains(p.Id.Value))
                 .ToListAsync();
 
+            var archivedBomParts = await spaceLinxContext.Parts
+                .Where(p => archivedEbomMap.Keys.Contains(p.Id.Value))
+                .ToListAsync();
+
+            var obsoleteBomParts = await spaceLinxContext.Parts
+                .Where(p => obsoleteEbomMap.Keys.Contains(p.Id.Value))
+                .ToListAsync();
+
             return BadRequest(new
             {
                 ecoMessage = "Eco validation failed",
                 Message = ecoMessage,
                 partsWithNoDocuments = mapper.Map<List<PartRefModel>>(partsWithNoDocuments),
                 bomPartsWithNoDocuments = mapper.Map<List<PartRefModel>>(bomChildPartsWithNoDocuments),
-                nonReleasedMissingParts = mapper.Map<List<PartRefModel>>(unreleasedBomParts)
+                nonReleasedMissingParts = mapper.Map<List<PartRefModel>>(unreleasedBomParts),
+                archivedBomParts = archivedBomParts.Select(p => new
+                {
+                    ebomId = archivedEbomMap.GetValueOrDefault(p.Id.Value),
+                    part = mapper.Map<PartRefModel>(p)
+                }),
+                obsoleteBomParts = obsoleteBomParts.Select(p => new
+                {
+                    ebomId = obsoleteEbomMap.GetValueOrDefault(p.Id.Value),
+                    part = mapper.Map<PartRefModel>(p)
+                })
             });
         }
         catch (Exception ex)

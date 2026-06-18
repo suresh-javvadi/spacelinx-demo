@@ -6,6 +6,8 @@ DECLARE
     v_part_docs_missing TEXT;
     v_child_docs_missing TEXT;
     v_unreleased_bom TEXT;
+    v_archived_bom TEXT;
+    v_obsolete_bom TEXT;
     v_eco_docs_count INT;
 BEGIN
     -- 4) Check ECO has at least one document
@@ -64,7 +66,7 @@ BEGIN
      WHERE ep.eco_id = p_ecoid
        AND ep.is_active = true
        AND ep.deleted_at IS NULL
-       AND c.status <> 'Release'
+       AND c.status NOT IN ('Release', 'Archived', 'Obsolete')
        AND c.is_active = true
        AND c.deleted_at IS NULL
        AND NOT EXISTS (
@@ -77,6 +79,42 @@ BEGIN
        );
     IF v_unreleased_bom IS NOT NULL THEN
         v_errors := v_errors || 'Unreleased BOM parts not in ECO: '||v_unreleased_bom||' | ';
+    END IF;
+
+    -- 5) BOM child parts must not be in Archived status
+    SELECT string_agg('EbomID:'|| b.id::text ||',PartID:'|| b.child_part_id::text, '; ')
+      INTO v_archived_bom
+      FROM mes.eco_part ep
+      JOIN mes.ebom b ON b.part_id = ep.part_id
+                     AND b.is_active = true
+                     AND b.deleted_at IS NULL
+      JOIN mes.part c ON c.id = b.child_part_id
+     WHERE ep.eco_id = p_ecoid
+       AND ep.is_active = true
+       AND ep.deleted_at IS NULL
+       AND c.status = 'Archived'
+       AND c.is_active = true
+       AND c.deleted_at IS NULL;
+    IF v_archived_bom IS NOT NULL THEN
+        v_errors := v_errors || 'Archived BOM parts in ECO: '||v_archived_bom||' | ';
+    END IF;
+
+    -- 6) BOM child parts must not be in Obsolete status
+    SELECT string_agg('EbomID:'|| b.id::text ||',PartID:'|| b.child_part_id::text, '; ')
+      INTO v_obsolete_bom
+      FROM mes.eco_part ep
+      JOIN mes.ebom b ON b.part_id = ep.part_id
+                     AND b.is_active = true
+                     AND b.deleted_at IS NULL
+      JOIN mes.part c ON c.id = b.child_part_id
+     WHERE ep.eco_id = p_ecoid
+       AND ep.is_active = true
+       AND ep.deleted_at IS NULL
+       AND c.status = 'Obsolete'
+       AND c.is_active = true
+       AND c.deleted_at IS NULL;
+    IF v_obsolete_bom IS NOT NULL THEN
+        v_errors := v_errors || 'Obsolete BOM parts in ECO: '||v_obsolete_bom||' | ';
     END IF;
 
     -- Raise exception if any rule failed
