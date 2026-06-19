@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
+import { Tab } from "@mui/material";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import { AlertsContext } from "../../AlertsContext/Context";
 import {
@@ -12,9 +14,9 @@ const TransactionHistory = ({ partId }) => {
   const [loadingData, setLoadingData] = useState(false);
   const [purchaseHistoryData, setPurchaseHistoryData] = useState([]);
   const [issuedHistoryData, setIssuedHistoryData] = useState([]);
+  const [subTab, setSubTab] = useState("1");
 
   const fetchPurchaseHistoryData = async () => {
-    setLoadingData(true);
     try {
       const data = await fetchInventoryPartPurchaseHistory(partId);
       data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -22,12 +24,10 @@ const TransactionHistory = ({ partId }) => {
     } catch (error) {
       console.error("Error fetching purchase history:", error);
       Alert("Error fetching purchase history", "error");
-    } finally {
-      setLoadingData(false);
     }
   };
+
   const fetchIssuedHistoryData = async () => {
-    setLoadingData(true);
     try {
       const data = await fetchInventoryPartIssuedHistory(partId);
       data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -39,27 +39,20 @@ const TransactionHistory = ({ partId }) => {
       }
       console.error("Error fetching issued history:", error);
       Alert("Error fetching issued history", "error");
-    } finally {
-      setLoadingData(false);
     }
   };
 
   useEffect(() => {
-    const loadHistoryData = async () => {
+    if (!partId) return;
+    const load = async () => {
       setLoadingData(true);
       try {
-        await Promise.all([
-          fetchPurchaseHistoryData(),
-          fetchIssuedHistoryData(),
-        ]);
+        await Promise.all([fetchPurchaseHistoryData(), fetchIssuedHistoryData()]);
       } finally {
         setLoadingData(false);
       }
     };
-
-    if (partId) {
-      loadHistoryData();
-    }
+    load();
   }, [partId]);
 
   const getPurchaseHistoryRowId = (row) =>
@@ -97,6 +90,7 @@ const TransactionHistory = ({ partId }) => {
     { field: "trackingId", headerName: "Tracking ID", flex: 1 },
     { field: "projectName", headerName: "Project", flex: 1 },
   ];
+
   const issuedHistoryColumns = [
     {
       field: "issuedDate",
@@ -116,34 +110,39 @@ const TransactionHistory = ({ partId }) => {
     { field: "trackingId", headerName: "Tracking ID", flex: 1 },
     { field: "projectName", headerName: "Project", flex: 1 },
   ];
+
   return (
     <div className="TransHistoryContainer">
-      <div className="TransHistoryInContainer">
-        <p className="TransHistoryHead">Purchase History</p>
-        <div className="HistoryDataGridContainer">
-          <StyledDataGrid
-            rows={purchaseHistoryData}
-            columns={purchaseHistoryColumns}
-            loading={loadingData}
-            getRowId={getPurchaseHistoryRowId}
-            className="DataGrid"
-            autoHeight={false}
-          />
-        </div>
-      </div>
-      <div className="TransHistoryInContainer">
-        <p className="TransHistoryHead">Issued History</p>
-        <div className="HistoryDataGridContainer">
-          <StyledDataGrid
-            rows={issuedHistoryData}
-            columns={issuedHistoryColumns}
-            loading={loadingData}
-            getRowId={getIssuedHistoryRowId}
-            className="DataGrid"
-            autoHeight={false}
-          />
-        </div>
-      </div>
+      <TabContext value={subTab}>
+        <TabList onChange={(_, v) => setSubTab(v)} variant="fullWidth">
+          <Tab label="Purchase History" value="1" />
+          <Tab label="Issue History" value="2" />
+        </TabList>
+        <TabPanel value="1" style={{ padding: 0, paddingTop: 12 }}>
+          <div className="HistoryDataGridContainerFull">
+            <StyledDataGrid
+              rows={purchaseHistoryData}
+              columns={purchaseHistoryColumns}
+              loading={loadingData}
+              getRowId={getPurchaseHistoryRowId}
+              className="DataGrid"
+              autoHeight={false}
+            />
+          </div>
+        </TabPanel>
+        <TabPanel value="2" style={{ padding: 0, paddingTop: 12 }}>
+          <div className="HistoryDataGridContainerFull">
+            <StyledDataGrid
+              rows={issuedHistoryData}
+              columns={issuedHistoryColumns}
+              loading={loadingData}
+              getRowId={getIssuedHistoryRowId}
+              className="DataGrid"
+              autoHeight={false}
+            />
+          </div>
+        </TabPanel>
+      </TabContext>
       <div className="AlertMessages">
         <FlyoutAlerts />
       </div>
