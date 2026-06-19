@@ -5,6 +5,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { IconButton, Tooltip } from "@mui/material";
 import { AlertsContext } from "../../AlertsContext/Context";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
+import { useUserContext } from "../../userContext/UserContext";
+import { PERMISSIONS } from "../../../constants/PagePermissions";
 import { createEcoPart } from "../../../services/ecoPartService";
 import { createDocumentWithEntity } from "../../../services/documentsService";
 import { deleteEBom } from "../../../services/childPartService";
@@ -21,6 +23,7 @@ const ECOErrorDisplay = ({
 }) => {
   const { openPartDetailsDrawer } = usePartDetailsDrawer();
   const { Alert } = useContext(AlertsContext);
+  const { hasPermission } = useUserContext();
   const [activeTab, setActiveTab] = useState(null);
   const [deletedEbomIds, setDeletedEbomIds] = useState(new Set());
   const [addedParts, setAddedParts] = useState([]);
@@ -192,7 +195,8 @@ const ECOErrorDisplay = ({
           {row.partNumber || "---"}
         </div>
       ),
-      valueGetter: (_value, row) => row.childPart?.partNumber || "---",
+      valueGetter: (_value, row) =>
+        row.childPart?.partNumber || row.partNumber || "---",
     },
     {
       field: "name",
@@ -203,7 +207,7 @@ const ECOErrorDisplay = ({
       field: "status",
       headerName: "Status",
       flex: 0.3,
-      valueGetter: (_value, row) => (row.status === "Draft" ? "" : row.status),
+      valueGetter: (_value, row) => row.status || "",
     },
     {
       field: "makeBuy",
@@ -284,6 +288,11 @@ const ECOErrorDisplay = ({
   ];
 
   const handleDeleteBomPart = async (ebomId) => {
+    if (!hasPermission(PERMISSIONS.PARTS.BOM.DELETE)) {
+      Alert("You don't have permission to delete BOMs.", "warning");
+      return;
+    }
+
     const confirmed = await showConfirmation(
       "Are you sure?",
       "This part will be deleted from the BOM.",
@@ -309,31 +318,40 @@ const ECOErrorDisplay = ({
     {
       field: "action",
       headerName: "",
-      width: 40,
+      width: 80,
       sortable: false,
       disableColumnMenu: true,
       align: "center",
-      renderCell: ({ row }) => (
-        <ion-icon
-          name="trash-outline"
-          style={{ cursor: "pointer", fontSize: "18px", color: "var(--error-color)" }}
-          onClick={async (e) => {
-            e.stopPropagation();
-            await handleDeleteBomPart(row.ebomId);
-          }}
-        />
-      ),
+      renderCell: ({ row }) =>
+        row.isDeleted ? (
+          <button className="DimButton" disabled>
+            <ion-icon name="checkmark-done-circle-outline"></ion-icon>Done
+          </button>
+        ) : (
+          <ion-icon
+            name="trash-outline"
+            style={{ cursor: "pointer", fontSize: "18px", color: "var(--error-color)" }}
+            onClick={async (e) => {
+              e.stopPropagation();
+              await handleDeleteBomPart(row.ebomId);
+            }}
+          />
+        ),
     },
   ];
 
   const archivedRows =
-    errorData?.archivedBomParts
-      ?.filter((x) => !deletedEbomIds.has(x.ebomId))
-      .map((x) => ({ ...x.part, ebomId: x.ebomId })) || [];
+    errorData?.archivedBomParts?.map((x) => ({
+      ...x.part,
+      ebomId: x.ebomId,
+      isDeleted: deletedEbomIds.has(x.ebomId),
+    })) || [];
   const obsoleteRows =
-    errorData?.obsoleteBomParts
-      ?.filter((x) => !deletedEbomIds.has(x.ebomId))
-      .map((x) => ({ ...x.part, ebomId: x.ebomId })) || [];
+    errorData?.obsoleteBomParts?.map((x) => ({
+      ...x.part,
+      ebomId: x.ebomId,
+      isDeleted: deletedEbomIds.has(x.ebomId),
+    })) || [];
 
   const allTabs = [
     {

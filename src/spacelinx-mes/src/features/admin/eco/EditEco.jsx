@@ -1016,7 +1016,11 @@ const EditEco = ({
         Array.isArray(error.response.data?.nonReleasedMissingParts) &&
         error.response.data.nonReleasedMissingParts.length === 0 &&
         Array.isArray(error.response.data?.partsWithNoDocuments) &&
-        error.response.data.partsWithNoDocuments.length === 0
+        error.response.data.partsWithNoDocuments.length === 0 &&
+        Array.isArray(error.response.data?.archivedBomParts) &&
+        error.response.data.archivedBomParts.length === 0 &&
+        Array.isArray(error.response.data?.obsoleteBomParts) &&
+        error.response.data.obsoleteBomParts.length === 0
       ) {
         showAlert(
           "error",

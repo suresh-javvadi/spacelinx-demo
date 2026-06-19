@@ -253,6 +253,7 @@ const Eco = () => {
   const handleRefresh = async () => {
     setLoadingData(true);
     await fetchEcoData();
+    await fetchUniquePartsWithOutobsoleteData();
   };
 
   return (
