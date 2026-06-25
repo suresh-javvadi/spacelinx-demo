@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +43,8 @@ public class GoodsReceiptNoteController(SpaceLinxContext spaceLinxContext, IMapp
                 .AsNoTracking()
                 .Include(g => g.GrnLineItems)
                     .ThenInclude(li => li.Part)
+                .Include(g => g.GrnLineItems)
+                    .ThenInclude(li => li.PoLineItem)
                 .FirstOrDefaultAsync(g => g.Id == id && g.DeletedBy == null);
 
         if (grnEntity == null)

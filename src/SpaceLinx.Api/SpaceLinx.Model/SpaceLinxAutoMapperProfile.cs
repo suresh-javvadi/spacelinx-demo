@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 
 namespace SpaceLinx.Model;
 
@@ -191,7 +191,8 @@ public class SpaceLinxAutoMapperProfile : Profile
         CreateMap<GrnLineItem, GrnLineItemRefModel>();
         CreateMap<GrnLineItemWriteModel, GrnLineItem>();
         CreateMap<GrnLineItemUpdateModel, GrnLineItem>();
-        CreateMap<GrnLineItem, GrnLineItemDetailReadModel>();
+        CreateMap<GrnLineItem, GrnLineItemDetailReadModel>()
+            .ForMember(dest => dest.OrderedQuantity, opt => opt.MapFrom(src => src.PoLineItem != null ? src.PoLineItem.OrderedQuantity : (int?)null));
         
         //Guide
         CreateMap<Guide, GuideDetailReadModel>();

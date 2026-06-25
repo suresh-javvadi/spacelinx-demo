@@ -4,6 +4,7 @@ public partial class GrnLineItemDetailReadModel : BaseReadModel
 {
     public Guid GrnId { get; set; }
     public Guid PartId { get; set; }
+    public int? OrderedQuantity { get; set; }
     public int? ReceivedQuantity { get; set; }
     public string? TrackingMethod { get; set; }
     public string? TrackingId { get; set; }
