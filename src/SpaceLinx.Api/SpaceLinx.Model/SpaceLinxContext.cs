@@ -4086,6 +4086,9 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.Qualification)
                 .HasMaxLength(100)
                 .HasColumnName("qualification");
+            entity.Property(e => e.HsnCode)
+                .HasMaxLength(50)
+                .HasColumnName("hsn_code");
             entity.Property(e => e.RadiationTolerance)
                 .HasMaxLength(100)
                 .HasColumnName("radiation_tolerance");

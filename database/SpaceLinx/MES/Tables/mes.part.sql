@@ -1,4 +1,4 @@
-﻿-- Table: mes.part
+-- Table: mes.part
 -- DROP TABLE IF EXISTS mes.part;
  
 CREATE TABLE mes.part (
@@ -19,6 +19,7 @@ CREATE TABLE mes.part (
     manufacturing_part_number TEXT UNIQUE,
     manufacturer_name VARCHAR(255),
     material VARCHAR(255),
+    hsn_code VARCHAR(50),
     trl INT,
     space_qualified BOOLEAN,
     item_type VARCHAR(255),    

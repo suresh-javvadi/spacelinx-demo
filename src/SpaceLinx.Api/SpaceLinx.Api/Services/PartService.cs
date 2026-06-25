@@ -48,6 +48,7 @@ public class PartService(SpaceLinxContext _spaceLinxContext, IMapper mapper, IHt
                 Specification = record.Specification,
                 Package = record.Package,
                 Qualification = record.Qualification,
+                HsnCode = record.HsnCode,
                 RadiationTolerance = record.RadiationTolerance,
                 TempRange = record.TempRange,
                 TempCoefficient = record.TempCoefficient,

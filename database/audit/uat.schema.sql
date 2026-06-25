@@ -3936,6 +3936,7 @@ CREATE TABLE mes.part (
     space_qualified boolean,
     trl integer,
     material character varying(255),
+    hsn_code character varying(50),
     country_of_origin_id uuid,
     short_description text,
     grade character varying(100),

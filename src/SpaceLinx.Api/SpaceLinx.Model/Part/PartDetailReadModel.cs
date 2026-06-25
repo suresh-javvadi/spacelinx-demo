@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model
+namespace SpaceLinx.Model
 {
     public partial class PartDetailReadModel
     {
@@ -34,6 +34,7 @@
         public string? Specification { get; set; }
         public string? Package { get; set; }
         public string? Qualification { get; set; }
+        public string? HsnCode { get; set; }
         public string? RadiationTolerance { get; set; }
         public string? TempRange { get; set; }
         public string? TempCoefficient { get; set; }
