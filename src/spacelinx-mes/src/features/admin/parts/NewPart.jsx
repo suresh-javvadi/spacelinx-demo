@@ -67,6 +67,9 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
   const capitalizeFirstLetter = (word) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
   };
+
+  const normalizePartNumber = (num) =>
+    num.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
   const [loadingData, setLoadingData] = useState(false);
   const [partTypes, setPartTypes] = useState([]);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
@@ -253,7 +256,7 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
     } else if (
       name === "manufacturingPartNumber" &&
       manufacturingPartNumbers.some(
-        (num) => num.trim().toLowerCase() === trimmedValue.toLowerCase(),
+        (num) => normalizePartNumber(num) === normalizePartNumber(trimmedValue),
       )
     ) {
       newErrors[name] = "Manufacturing Part Number already exists.";
@@ -353,7 +356,7 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
         valid = false;
       } else if (
         manufacturingPartNumbers.some(
-          (num) => num.trim().toLowerCase() === value.toLowerCase(),
+          (num) => normalizePartNumber(num) === normalizePartNumber(value),
         )
       ) {
         errors.manufacturingPartNumber =

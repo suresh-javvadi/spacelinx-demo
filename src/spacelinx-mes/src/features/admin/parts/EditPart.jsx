@@ -61,6 +61,9 @@ const EditPart = ({
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
+
+  const normalizePartNumber = (num) =>
+    num.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
   const [loadingData, setLoadingData] = useState(true);
   const [readOnlyMode, setReadOnlyMode] = useState(true);
   const [editPartName, setEditPartName] = useState("");
@@ -504,11 +507,11 @@ const EditPart = ({
       } else if (
         manufacturingPartNumbers.some(
           (num) =>
-            num.trim().toLowerCase() ===
-            editManufacturingPartNumber.trim().toLowerCase(),
+            normalizePartNumber(num) ===
+            normalizePartNumber(editManufacturingPartNumber),
         ) &&
-        editManufacturingPartNumber.trim().toLowerCase() !==
-          selectedPart?.part?.manufacturingPartNumber?.trim().toLowerCase()
+        normalizePartNumber(editManufacturingPartNumber) !==
+          normalizePartNumber(selectedPart?.part?.manufacturingPartNumber ?? "")
       ) {
         setEditManufacturingPartNumberError(
           "Manufacturing Part Number already exists.",
@@ -946,13 +949,13 @@ const EditPart = ({
                               } else if (
                                 manufacturingPartNumbers.some(
                                   (num) =>
-                                    num.trim().toLowerCase() ===
-                                    value.toLowerCase(),
+                                    normalizePartNumber(num) ===
+                                    normalizePartNumber(value),
                                 ) &&
-                                value.toLowerCase() !==
-                                  selectedPart?.part?.manufacturingPartNumber
-                                    ?.trim()
-                                    .toLowerCase()
+                                normalizePartNumber(value) !==
+                                  normalizePartNumber(
+                                    selectedPart?.part?.manufacturingPartNumber ?? "",
+                                  )
                               ) {
                                 setEditManufacturingPartNumberError(
                                   "Manufacturing Part Number already exists.",
