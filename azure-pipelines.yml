@@ -41,10 +41,85 @@ variables:
 
 stages:
   # ──────────────────────────────────────────────────────────
-  # BUILD API (.NET 10) — runs on every trigger
+  # DETECT CHANGES — fast stage that diffs the changed files and
+  # exposes per-area output variables. Used ONLY to skip irrelevant
+  # build/validate stages on PR-validation builds (Build.Reason =
+  # 'PullRequest'). Every non-PR run (main→Dev, release→UAT, tag→Prod,
+  # and any manual run) ignores these flags and builds everything, so
+  # deploys always ship a complete, consistent app.
+  # Fail-safe: if the PR diff can't be computed, buildAll=true.
+  # ──────────────────────────────────────────────────────────
+  - stage: DetectChanges
+    displayName: 'Detect changed areas'
+    jobs:
+      - job: Detect
+        displayName: 'Diff changed paths'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+            # Full history so the PR merge commit's parent (HEAD^1) is
+            # present for the diff; this job has no other heavy steps.
+            fetchDepth: 0
+          - bash: |
+              set -uo pipefail
+              buildAll=false
+              frontendChanged=false
+              apiChanged=false
+              dbChanged=false
+
+              if [ "$(Build.Reason)" = "PullRequest" ]; then
+                # ADO checks out refs/pull/N/merge (source merged into target).
+                # HEAD^1 = target tip, so HEAD^1..HEAD is exactly the PR's net diff.
+                FILES=$(git diff --name-only HEAD^1 HEAD 2>/dev/null) || FILES=""
+              else
+                # Not used for gating (non-PR runs build everything) — logged only.
+                FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null) || FILES=""
+              fi
+
+              if [ -z "$FILES" ] && [ "$(Build.Reason)" = "PullRequest" ]; then
+                echo "Could not determine changed files — building everything (fail-safe)."
+                buildAll=true
+              else
+                echo "Changed files:"
+                echo "$FILES"
+                while IFS= read -r f; do
+                  case "$f" in
+                    "") ;;
+                    src/spacelinx-mes/*) frontendChanged=true ;;
+                    src/SpaceLinx.Api/*) apiChanged=true ;;
+                    database/*)          dbChanged=true ;;
+                    # Pipeline yml, templates, root files, anything else → build all.
+                    *)                   buildAll=true ;;
+                  esac
+                done <<< "$FILES"
+              fi
+
+              echo "Result: buildAll=$buildAll frontendChanged=$frontendChanged apiChanged=$apiChanged dbChanged=$dbChanged"
+              echo "##vso[task.setvariable variable=buildAll;isOutput=true]$buildAll"
+              echo "##vso[task.setvariable variable=frontendChanged;isOutput=true]$frontendChanged"
+              echo "##vso[task.setvariable variable=apiChanged;isOutput=true]$apiChanged"
+              echo "##vso[task.setvariable variable=dbChanged;isOutput=true]$dbChanged"
+            name: detect
+            displayName: 'Compute changed areas'
+
+  # ──────────────────────────────────────────────────────────
+  # BUILD API (.NET 10) — every non-PR run; on PRs only when API/DB changed
   # ──────────────────────────────────────────────────────────
   - stage: BuildAPI
     displayName: 'Build API'
+    dependsOn: DetectChanges
+    # Run on every non-PR run (deploys need complete artifacts) and whenever
+    # detection didn't cleanly succeed (fail-open). On PR validation, skip only
+    # when neither API nor DB changed — the API stage also produces the dbscript
+    # artifact, so DB changes must build it too.
+    condition: |
+      or(
+        ne(variables['Build.Reason'], 'PullRequest'),
+        ne(dependencies.DetectChanges.result, 'Succeeded'),
+        eq(dependencies.DetectChanges.outputs['Detect.detect.buildAll'], 'true'),
+        eq(dependencies.DetectChanges.outputs['Detect.detect.apiChanged'], 'true'),
+        eq(dependencies.DetectChanges.outputs['Detect.detect.dbChanged'], 'true'))
     jobs:
       - job: Build
         displayName: 'Build & Publish .NET 10 API'
@@ -101,11 +176,19 @@ stages:
             displayName: 'Publish dbscript artifact'
 
   # ──────────────────────────────────────────────────────────
-  # BUILD FRONTEND (lint + build) — runs on every trigger
+  # BUILD FRONTEND (lint + build) — every non-PR run; on PRs only when frontend changed
   # ──────────────────────────────────────────────────────────
   - stage: BuildFrontend
     displayName: 'Build Frontend'
-    dependsOn: []
+    dependsOn: DetectChanges
+    # Run on every non-PR run and whenever detection didn't cleanly succeed
+    # (fail-open). On PR validation, skip only when the frontend didn't change.
+    condition: |
+      or(
+        ne(variables['Build.Reason'], 'PullRequest'),
+        ne(dependencies.DetectChanges.result, 'Succeeded'),
+        eq(dependencies.DetectChanges.outputs['Detect.detect.buildAll'], 'true'),
+        eq(dependencies.DetectChanges.outputs['Detect.detect.frontendChanged'], 'true'))
     jobs:
       - job: LintAndBuild
         displayName: 'Lint & Build React Frontend'
@@ -145,7 +228,17 @@ stages:
   # ──────────────────────────────────────────────────────────
   - stage: ValidateDb
     displayName: 'Validate DB migrations'
-    dependsOn: []
+    dependsOn: DetectChanges
+    # Drift + schema-fidelity only depend on the EF model (API) and database/.
+    # Non-PR runs always validate, and detection failures fail-open; PRs skip
+    # only when neither API nor DB changed.
+    condition: |
+      or(
+        ne(variables['Build.Reason'], 'PullRequest'),
+        ne(dependencies.DetectChanges.result, 'Succeeded'),
+        eq(dependencies.DetectChanges.outputs['Detect.detect.buildAll'], 'true'),
+        eq(dependencies.DetectChanges.outputs['Detect.detect.apiChanged'], 'true'),
+        eq(dependencies.DetectChanges.outputs['Detect.detect.dbChanged'], 'true'))
     jobs:
       - job: Drift
         displayName: 'EF drift + build-from-scratch'
