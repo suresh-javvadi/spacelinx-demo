@@ -21,6 +21,8 @@
         public decimal? ReservedPrice { get; set; }
         public decimal? AvailablePrice { get; set; }
         public decimal? TotalPrice { get; set; }
+        public long? OpeningQty { get; set; }
+        public decimal? OpeningPrice { get; set; }
         public int? ConsumedQuantity { get; set; }
         public bool? InventoryIsActive { get; set; }
         public DateTime? InventoryCreatedAt { get; set; }

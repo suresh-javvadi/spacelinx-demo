@@ -13,6 +13,8 @@
     qty_qc_failed INT DEFAULT 0,
     qty_scrapped INT DEFAULT 0,
     qty_returned INT DEFAULT 0,
+    opening_qty INT NOT NULL DEFAULT 0,
+    opening_price NUMERIC(18,4) DEFAULT 0,
     project_id UUID,
     assigned_user_id UUID,
     department VARCHAR(255),

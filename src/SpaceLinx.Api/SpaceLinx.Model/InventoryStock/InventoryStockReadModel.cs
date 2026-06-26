@@ -16,6 +16,8 @@
         public int QtyQcFailed { get; set; }
         public int QtyScrapped { get; set; }
         public int QtyReturned { get; set; }
+        public int OpeningQty { get; set; }
+        public decimal? OpeningPrice { get; set; }
         public decimal? UnitPrice { get; set; }
         public string? CurrencyConversion { get; set; }
         public Guid? ProjectId { get; set; }

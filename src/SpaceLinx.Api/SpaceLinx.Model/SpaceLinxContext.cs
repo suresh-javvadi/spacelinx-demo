@@ -2803,6 +2803,8 @@ public partial class SpaceLinxContext : DbContext
                 .ToView("inventory_part_price_vw", "sc");
 
             entity.Property(e => e.AvailablePrice).HasColumnName("available_price");
+            entity.Property(e => e.OpeningPrice).HasColumnName("opening_price");
+            entity.Property(e => e.OpeningQty).HasColumnName("opening_qty");
             entity.Property(e => e.BinId).HasColumnName("bin_id");
             entity.Property(e => e.ConsumedQuantity).HasColumnName("consumed_quantity");
             entity.Property(e => e.Description).HasColumnName("description");
@@ -3114,6 +3116,13 @@ public partial class SpaceLinxContext : DbContext
                 .HasComputedColumnSql("((((qty_issued)::numeric * unit_price) * conversion_rate))::numeric(18,4)", true)
                 .HasColumnName("issued_price");
             entity.Property(e => e.LocationId).HasColumnName("location_id");
+            entity.Property(e => e.OpeningPrice)
+                .HasPrecision(18, 4)
+                .HasDefaultValue(0m)
+                .HasColumnName("opening_price");
+            entity.Property(e => e.OpeningQty)
+                .HasDefaultValue(0)
+                .HasColumnName("opening_qty");
             entity.Property(e => e.PartId).HasColumnName("part_id");
             entity.Property(e => e.ProjectId).HasColumnName("project_id");
             entity.Property(e => e.QtyAvailable)

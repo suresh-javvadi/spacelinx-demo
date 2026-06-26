@@ -6114,7 +6114,9 @@ CREATE TABLE sc.inventory_stock (
     issued_price numeric(18,4) GENERATED ALWAYS AS (((((qty_issued)::numeric * unit_price) * conversion_rate))::numeric(18,4)) STORED,
     reserved_price numeric(18,4) GENERATED ALWAYS AS (((((qty_reserved)::numeric * unit_price) * conversion_rate))::numeric(18,4)) STORED,
     available_price numeric(18,4) GENERATED ALWAYS AS (((((((((qty_onhand - qty_reserved) - qty_issued) - qty_qc_pending) - qty_qc_failed))::numeric * unit_price) * conversion_rate))::numeric(18,4)) STORED,
-    total_price numeric(18,4) GENERATED ALWAYS AS (((((((qty_issued)::numeric * unit_price) * conversion_rate) + (((qty_reserved)::numeric * unit_price) * conversion_rate)) + (((((((qty_onhand - qty_reserved) - qty_issued) - qty_qc_pending) - qty_qc_failed))::numeric * unit_price) * conversion_rate)))::numeric(18,4)) STORED
+    total_price numeric(18,4) GENERATED ALWAYS AS (((((((qty_issued)::numeric * unit_price) * conversion_rate) + (((qty_reserved)::numeric * unit_price) * conversion_rate)) + (((((((qty_onhand - qty_reserved) - qty_issued) - qty_qc_pending) - qty_qc_failed))::numeric * unit_price) * conversion_rate)))::numeric(18,4)) STORED,
+    opening_qty integer DEFAULT 0 NOT NULL,
+    opening_price numeric(18,4) DEFAULT 0
 );
 
 

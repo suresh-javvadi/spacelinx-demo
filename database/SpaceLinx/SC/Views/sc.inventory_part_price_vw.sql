@@ -19,6 +19,8 @@
     sum(ins.reserved_price) AS reserved_price,
     sum(ins.available_price) AS available_price,
     sum(ins.total_price) AS total_price,
+    sum(ins.opening_qty) AS opening_qty,
+    sum(ins.opening_price) AS opening_price,
     i.consumed_quantity,
     i.is_active AS inventory_is_active,
     i.created_at AS inventory_created_at,
