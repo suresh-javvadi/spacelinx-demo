@@ -1,4 +1,24 @@
--- ===== repeatable/views/01_common_document_with_users_vw.sql =====
+-- ============================================================================
+-- DEMO bundle: (1) ensure inventory_stock opening-balance columns exist, then
+-- (2) (re)create all repeatable views from current source.
+-- Safe to re-run. OWNER/GRANT lines stripped (those roles don't exist on Neon).
+-- ============================================================================
+
+-- (1) Columns the inventory_part_price_vw depends on
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='sc' AND table_name='inventory_stock' AND column_name='opening_qty') THEN
+        ALTER TABLE sc.inventory_stock ADD COLUMN opening_qty INT NOT NULL DEFAULT 0;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='sc' AND table_name='inventory_stock' AND column_name='opening_price') THEN
+        ALTER TABLE sc.inventory_stock ADD COLUMN opening_price NUMERIC(18,4) DEFAULT 0;
+    END IF;
+END
+$$;
+
+-- DEMO: all repeatable views, regenerated from current source. OWNER/GRANT lines stripped (those roles don't exist on Neon).
+
+-- ===== 01_common_document_with_users_vw.sql =====
 DROP VIEW IF EXISTS common.document_with_users_vw CASCADE;
 
 CREATE VIEW common.document_with_users_vw AS
@@ -27,7 +47,7 @@ CREATE VIEW common.document_with_users_vw AS
   WHERE (d.deleted_at IS NULL);
 
 
--- ===== repeatable/views/02_mes_eco_with_users_vw.sql =====
+-- ===== 02_mes_eco_with_users_vw.sql =====
 DROP VIEW IF EXISTS mes.eco_with_users_vw CASCADE;
 
 CREATE VIEW mes.eco_with_users_vw AS
@@ -62,7 +82,7 @@ CREATE VIEW mes.eco_with_users_vw AS
   GROUP BY eco.id, eco.number, eco.name, eco.reason_for_change, eco.description, eco.change_type, eco.impact_analysis, eco.priority, eco.requestor, eco.approver, eco.planned_implementation_date, eco.approved_by, eco.approved_date, eco.status, eco.is_active, eco.created_at, eco.created_by, eco.updated_at, eco.updated_by, req_user.id, req_user.first_name, req_user.last_name, req_user.email;
 
 
--- ===== repeatable/views/03_mes_guide_mbom_vw.sql =====
+-- ===== 03_mes_guide_mbom_vw.sql =====
 DROP VIEW IF EXISTS mes.guide_mbom_vw CASCADE;
 
 CREATE VIEW mes.guide_mbom_vw AS
@@ -94,7 +114,7 @@ CREATE VIEW mes.guide_mbom_vw AS
  HAVING ((gse.part_id IS NOT NULL) OR (e.child_part_id IS NOT NULL));
 
 
--- ===== repeatable/views/04_mes_guide_mbom_details.sql =====
+-- ===== 04_mes_guide_mbom_details.sql =====
 DROP VIEW IF EXISTS mes.guide_mbom_details CASCADE;
 
 CREATE VIEW mes.guide_mbom_details AS
@@ -115,7 +135,7 @@ UNION
   WHERE (((g.status)::text = 'Draft'::text) AND (g.deleted_by IS NULL));
 
 
--- ===== repeatable/views/05_mes_parts_not_associated_with_guides.sql =====
+-- ===== 05_mes_parts_not_associated_with_guides.sql =====
 DROP VIEW IF EXISTS mes.parts_not_associated_with_guides CASCADE;
 
 CREATE VIEW mes.parts_not_associated_with_guides AS
@@ -143,7 +163,7 @@ CREATE VIEW mes.parts_not_associated_with_guides AS
                   WHERE ((g.part_id = eb.part_id) AND (g.deleted_by IS NULL)))))))));
 
 
--- ===== repeatable/views/06_mes_workorderguidestepsview.sql =====
+-- ===== 06_mes_workorderguidestepsview.sql =====
 DROP VIEW IF EXISTS mes.workorderguidestepsview CASCADE;
 
 CREATE VIEW mes.workorderguidestepsview AS
@@ -163,7 +183,7 @@ CREATE VIEW mes.workorderguidestepsview AS
   ORDER BY wo.id, gs.sequence;
 
 
--- ===== repeatable/views/07_pm_resource_workload_vw.sql =====
+-- ===== 07_pm_resource_workload_vw.sql =====
 DROP VIEW IF EXISTS pm.resource_workload_vw CASCADE;
 
 CREATE VIEW pm.resource_workload_vw AS
@@ -203,7 +223,7 @@ CREATE VIEW pm.resource_workload_vw AS
   WHERE ((deleted_at IS NULL) AND (is_active = true));
 
 
--- ===== repeatable/views/08_pm_task_gantt_vw.sql =====
+-- ===== 08_pm_task_gantt_vw.sql =====
 DROP VIEW IF EXISTS pm.task_gantt_vw CASCADE;
 
 CREATE VIEW pm.task_gantt_vw AS
@@ -254,7 +274,7 @@ CREATE VIEW pm.task_gantt_vw AS
   WHERE (t.deleted_at IS NULL);
 
 
--- ===== repeatable/views/09_sc_company_with_organization_vw.sql =====
+-- ===== 09_sc_company_with_organization_vw.sql =====
 DROP VIEW IF EXISTS sc.company_with_organization_vw CASCADE;
 
 CREATE VIEW sc.company_with_organization_vw AS
@@ -280,7 +300,7 @@ UNION ALL
   WHERE (o.deleted_by IS NULL);
 
 
--- ===== repeatable/views/10_sc_grn_with_user_vw.sql =====
+-- ===== 10_sc_grn_with_user_vw.sql =====
 DROP VIEW IF EXISTS sc.grn_with_user_vw CASCADE;
 
 CREATE VIEW sc.grn_with_user_vw AS
@@ -337,7 +357,7 @@ CREATE VIEW sc.grn_with_user_vw AS
   WHERE (grn.deleted_by IS NULL);
 
 
--- ===== repeatable/views/11_sc_grns_by_purchase_order_vw.sql =====
+-- ===== 11_sc_grns_by_purchase_order_vw.sql =====
 DROP VIEW IF EXISTS sc.grns_by_purchase_order_vw CASCADE;
 
 CREATE VIEW sc.grns_by_purchase_order_vw AS
@@ -376,7 +396,7 @@ CREATE VIEW sc.grns_by_purchase_order_vw AS
   GROUP BY grn.id, grn.grn_number, grn.purchase_order_id, grn.received_date, grn.received_by_id, u.first_name, u.last_name, u.email, grn.location_id, loc.number, loc.name, grn.description, grn.vendor_reference_id, grn.status, grn.vendor_id, vendor.vendor_code, vendor.name, grn.is_active, grn.created_at, grn.created_by, grn.updated_at, grn.updated_by;
 
 
--- ===== repeatable/views/12_sc_inventory_goods_vw.sql =====
+-- ===== 12_sc_inventory_goods_vw.sql =====
 DROP VIEW IF EXISTS sc.inventory_goods_vw CASCADE;
 
 CREATE VIEW sc.inventory_goods_vw AS
@@ -413,7 +433,7 @@ CREATE VIEW sc.inventory_goods_vw AS
   WHERE (((p.item_type)::text = 'Goods'::text) AND (p.deleted_by IS NULL));
 
 
--- ===== repeatable/views/13_sc_inventory_part_price_vw.sql =====
+-- ===== 13_sc_inventory_part_price_vw.sql =====
 DROP VIEW IF EXISTS sc.inventory_part_price_vw CASCADE;
 
 CREATE VIEW sc.inventory_part_price_vw AS
@@ -436,6 +456,8 @@ CREATE VIEW sc.inventory_part_price_vw AS
     sum(ins.reserved_price) AS reserved_price,
     sum(ins.available_price) AS available_price,
     sum(ins.total_price) AS total_price,
+    sum(ins.opening_qty) AS opening_qty,
+    sum(ins.opening_price) AS opening_price,
     i.consumed_quantity,
     i.is_active AS inventory_is_active,
     i.created_at AS inventory_created_at,
@@ -462,7 +484,7 @@ CREATE VIEW sc.inventory_part_price_vw AS
   GROUP BY i.id, i.location_id, i.bin_id, i.sku_code, i.reorder_level, i.unit_price, i.consumed_quantity, i.is_active, i.created_at, i.created_by, i.updated_at, i.updated_by, p.id, p.part_number, p.part_type_id, p.part_number_suffix, p.version, p.name, p.description, p.weight, p.unit_price, p.status, p.manufacturing_part_number, p.is_serial_number_required, p.is_active;
 
 
--- ===== repeatable/views/14_sc_inventory_part_vw.sql =====
+-- ===== 14_sc_inventory_part_vw.sql =====
 DROP VIEW IF EXISTS sc.inventory_part_vw CASCADE;
 
 CREATE VIEW sc.inventory_part_vw AS
@@ -505,7 +527,7 @@ CREATE VIEW sc.inventory_part_vw AS
   WHERE (i.deleted_at IS NULL);
 
 
--- ===== repeatable/views/15_sc_inventory_services_vw.sql =====
+-- ===== 15_sc_inventory_services_vw.sql =====
 DROP VIEW IF EXISTS sc.inventory_services_vw CASCADE;
 
 CREATE VIEW sc.inventory_services_vw AS
@@ -542,7 +564,7 @@ CREATE VIEW sc.inventory_services_vw AS
   WHERE (((p.item_type)::text = 'Services'::text) AND (p.deleted_by IS NULL));
 
 
--- ===== repeatable/views/16_sc_inventory_transaction_vw.sql =====
+-- ===== 16_sc_inventory_transaction_vw.sql =====
 DROP VIEW IF EXISTS sc.inventory_transaction_vw CASCADE;
 
 CREATE VIEW sc.inventory_transaction_vw AS
@@ -583,7 +605,7 @@ CREATE VIEW sc.inventory_transaction_vw AS
   WHERE (it.deleted_by IS NULL);
 
 
--- ===== repeatable/views/17_sc_issue_history_vw.sql =====
+-- ===== 17_sc_issue_history_vw.sql =====
 DROP VIEW IF EXISTS sc.issue_history_vw CASCADE;
 
 CREATE VIEW sc.issue_history_vw AS
@@ -607,7 +629,7 @@ CREATE VIEW sc.issue_history_vw AS
   WHERE (((sm.movement_type)::text = 'Issued'::text) AND (sm.deleted_by IS NULL) AND (smli.deleted_by IS NULL));
 
 
--- ===== repeatable/views/18_sc_purchase_history_vw.sql =====
+-- ===== 18_sc_purchase_history_vw.sql =====
 DROP VIEW IF EXISTS sc.purchase_history_vw CASCADE;
 
 CREATE VIEW sc.purchase_history_vw AS
@@ -631,7 +653,7 @@ CREATE VIEW sc.purchase_history_vw AS
   WHERE ((grn.deleted_by IS NULL) AND (gli.deleted_by IS NULL));
 
 
--- ===== repeatable/views/19_sc_purchase_orders_vw.sql =====
+-- ===== 19_sc_purchase_orders_vw.sql =====
 DROP VIEW IF EXISTS sc.purchase_orders_vw CASCADE;
 
 CREATE VIEW sc.purchase_orders_vw AS
@@ -674,7 +696,7 @@ CREATE VIEW sc.purchase_orders_vw AS
   WHERE ((po.is_active = true) AND (po.deleted_by IS NULL));
 
 
--- ===== repeatable/views/20_sc_requisitions_with_user_vw.sql =====
+-- ===== 20_sc_requisitions_with_user_vw.sql =====
 DROP VIEW IF EXISTS sc.requisitions_with_user_vw CASCADE;
 
 CREATE VIEW sc.requisitions_with_user_vw AS
@@ -719,7 +741,7 @@ CREATE VIEW sc.requisitions_with_user_vw AS
   WHERE (r.deleted_by IS NULL);
 
 
--- ===== repeatable/views/21_sc_scrap_request_with_user_vw.sql =====
+-- ===== 21_sc_scrap_request_with_user_vw.sql =====
 DROP VIEW IF EXISTS sc.scrap_request_with_user_vw CASCADE;
 
 CREATE VIEW sc.scrap_request_with_user_vw AS
@@ -765,7 +787,7 @@ CREATE VIEW sc.scrap_request_with_user_vw AS
   WHERE (sr.deleted_by IS NULL);
 
 
--- ===== repeatable/views/22_sc_stock_movement_with_user_vw.sql =====
+-- ===== 22_sc_stock_movement_with_user_vw.sql =====
 DROP VIEW IF EXISTS sc.stock_movement_with_user_vw CASCADE;
 
 CREATE VIEW sc.stock_movement_with_user_vw AS
@@ -813,7 +835,7 @@ CREATE VIEW sc.stock_movement_with_user_vw AS
   WHERE (sm.deleted_by IS NULL);
 
 
--- ===== repeatable/views/23_sc_vendor_return_request_with_user_vw.sql =====
+-- ===== 23_sc_vendor_return_request_with_user_vw.sql =====
 DROP VIEW IF EXISTS sc.vendor_return_request_with_user_vw CASCADE;
 
 CREATE VIEW sc.vendor_return_request_with_user_vw AS
