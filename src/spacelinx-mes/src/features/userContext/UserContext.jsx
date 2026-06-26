@@ -4,6 +4,7 @@ import { fetchUsersWithEmail } from "../../services/unAuthorizedUserService";
 import { useNavigate } from "react-router-dom";
 import { fetchRolePermissionByRoleId } from "../../services/rolePermissionService";
 import { fetchOptionSetByName } from "../../services/optionSetService";
+import { DEMO_MODE, DEMO_EMAIL } from "../../demoMode";
 
 const UserContext = createContext();
 
@@ -60,8 +61,9 @@ export const UserContextProvider = ({ children }) => {
   const fetchUserRoles = async () => {
     setLoadingRoles(true);
     try {
-      if (accounts.length > 0) {
-        const email = accounts[0].username;
+      // DEMO ONLY: there is no MSAL account; use the fixed demo email instead.
+      if (DEMO_MODE || accounts.length > 0) {
+        const email = DEMO_MODE ? DEMO_EMAIL : accounts[0].username;
         const user = await fetchUsersWithEmail(email);
         const pathsData = await fetchOptionSetByName("Path_Permissions");
         setPermissionSet(pathsData);

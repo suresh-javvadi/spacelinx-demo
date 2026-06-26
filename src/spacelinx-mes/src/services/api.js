@@ -1,5 +1,6 @@
 import axios from "axios";
 import msalInstance from "../msalConfig";
+import { DEMO_MODE } from "../demoMode";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -146,6 +147,13 @@ api.interceptors.request.use(
   async (config) => {
     config.headers["SPACELINX-APP-NAME"] = appName;
 
+    // DEMO ONLY: no MSAL, no token. The API authenticates every request as the
+    // fixed demo user (DemoMode), so we just forward the tenant header and return.
+    if (DEMO_MODE) {
+      config.headers["SPACELINX-TENANT-ID"] = tenantId;
+      return config;
+    }
+
     if (config.url && config.url.includes("UserUa/ua/checkuser")) {
       delete config.headers["Authorization"];
       return config;
@@ -189,6 +197,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // DEMO ONLY: never bounce to MSAL login on auth errors.
+    if (DEMO_MODE) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       console.warn("Handling 401 error — token refresh needed");

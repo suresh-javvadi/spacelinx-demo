@@ -112,7 +112,15 @@ public static class ConfigureServices
 
         services.AddSingleton(provider =>
         {
+            // Blob storage is optional for demo/local runs. When no connection string is
+            // configured, fall back to the well-known Azurite dev placeholder so the client
+            // constructs successfully — only actual file upload/download will fail, instead
+            // of breaking every endpoint that depends on a file service.
             var connectionString = configuration["BlobStorage:ConnectionString"];
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                connectionString = "UseDevelopmentStorage=true";
+            }
             var blobServiceClient = new BlobServiceClient(connectionString);
             return blobServiceClient;
         });

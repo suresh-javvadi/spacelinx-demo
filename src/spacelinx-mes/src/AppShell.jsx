@@ -13,6 +13,7 @@ import { IssuesProvider } from "./features/issues/IssuesContext";
 import Header from "./Components/Header/Header";
 import Navbar from "./Components/NavBar/Navbar";
 import Content from "./Components/Content/Content";
+import { DEMO_MODE } from "./demoMode";
 
 const DIRECT_DETAIL_BASE_PATHS = [
   "/procurement/purchaseorders",
@@ -64,6 +65,22 @@ const AuthenticatedApp = ({ location, navigate }) => {
 const AppShell = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  // DEMO ONLY: no MSAL session exists, so the MSAL templates would render the
+  // unauthenticated view. Render the full app directly instead.
+  if (DEMO_MODE) {
+    return (
+      <DeepLinkProvider>
+        <FeatureBitContextProvider>
+          <PartDetailsDrawerProvider>
+            <IssuesProvider>
+              <AuthenticatedApp location={location} navigate={navigate} />
+            </IssuesProvider>
+          </PartDetailsDrawerProvider>
+        </FeatureBitContextProvider>
+      </DeepLinkProvider>
+    );
+  }
 
   return (
     <React.Fragment>

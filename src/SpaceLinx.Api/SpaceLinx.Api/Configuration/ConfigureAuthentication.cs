@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Net.Mail;
 using System.Security.Authentication;
@@ -11,6 +12,20 @@ public static class ConfigureAuthentication
     public static IServiceCollection AddSpaceLinxAuthentication(this IServiceCollection services,
         IConfiguration configuration)
     {
+        // DEMO ONLY: when enabled, bypass Azure AD entirely and authenticate every request
+        // as the fixed demo user. Keeps [Authorize] / the fallback policy satisfied without a login.
+        if (configuration.GetValue<bool>("DemoMode:Enabled"))
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = DemoAuthenticationHandler.SchemeName;
+                options.DefaultChallengeScheme = DemoAuthenticationHandler.SchemeName;
+            }).AddScheme<AuthenticationSchemeOptions, DemoAuthenticationHandler>(
+                DemoAuthenticationHandler.SchemeName, _ => { });
+
+            return services;
+        }
+
         //Add Services
         services.AddAuthentication(options =>
         {
