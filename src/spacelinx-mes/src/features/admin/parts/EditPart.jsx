@@ -135,6 +135,7 @@ const EditPart = ({
   const [gradeTypes, setGradeTypes] = useState([]);
   const [loadingGradeTypes, setLoadingGradeTypes] = useState(true);
   const [editGrade, setEditGrade] = useState(null);
+  const [editHsnCode, setEditHsnCode] = useState("");
   const [showCustomGrade, setShowCustomGrade] = useState(false);
   const [customGrade, setCustomGrade] = useState("");
   const [editSpecification, setEditSpecification] = useState("");
@@ -253,6 +254,7 @@ const EditPart = ({
     },
     { setter: setEditTempRange, key: "tempRange", from: "part" },
     { setter: setEditTempCoefficient, key: "tempCoefficient", from: "part" },
+    { setter: setEditHsnCode, key: "hsnCode", from: "part" },
   ];
 
   useEffect(() => {
@@ -475,6 +477,7 @@ const EditPart = ({
       setEditGrade(gradeState.editGrade);
       setShowCustomGrade(gradeState.showCustomGrade);
       setCustomGrade(gradeState.customGrade);
+      setEditHsnCode(selectedPart?.part?.hsnCode || "");
     }
   };
 
@@ -618,7 +621,7 @@ const EditPart = ({
       spaceQualified: spaceQualified,
       material: material || null,
       grade: showCustomGrade ? customGrade : editGrade,
-
+      hsnCode: editHsnCode || null,
       shortDescription: shortDescription || null,
       subsystemId: editSubsystem?.id,
       partLevelId: editPartLevel?.id,
@@ -954,7 +957,8 @@ const EditPart = ({
                                 ) &&
                                 normalizePartNumber(value) !==
                                   normalizePartNumber(
-                                    selectedPart?.part?.manufacturingPartNumber ?? "",
+                                    selectedPart?.part
+                                      ?.manufacturingPartNumber ?? "",
                                   )
                               ) {
                                 setEditManufacturingPartNumberError(
@@ -1328,6 +1332,14 @@ const EditPart = ({
                           fullWidth
                         />
                       )}
+                      <TextField
+                        label="HSN Code"
+                        className="AdminTextFeilds"
+                        value={editHsnCode}
+                        InputProps={{ readOnly: readOnlyMode }}
+                        onChange={(e) => setEditHsnCode(e.target.value)}
+                        fullWidth
+                      />
                     </div>
                     <div className="GrnNewFlyoutContentTopgap">
                       {/* DESCRIPTION */}
