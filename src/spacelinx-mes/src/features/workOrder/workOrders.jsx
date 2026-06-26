@@ -392,7 +392,7 @@ const WorkOrders = () => {
             handleAssign("", row);
           }}
           name="information-circle-outline"
-          style={{ color: "#009cdd", fontSize: "18px" }}
+          style={{ color: "#6366F1", fontSize: "18px" }}
         ></ion-icon>
       ),
     },

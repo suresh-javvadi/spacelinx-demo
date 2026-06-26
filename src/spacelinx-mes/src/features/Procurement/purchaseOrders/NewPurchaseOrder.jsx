@@ -727,7 +727,7 @@ const NewPurchaseOrder = () => {
                 >
                   <ClipLoader
                     size={30}
-                    color={"#009cbb"}
+                    color={"#4F46E5"}
                     loading={loadingData}
                   />
                 </div>
@@ -795,7 +795,7 @@ const NewPurchaseOrder = () => {
                         {vendorDetailsLoading ? (
                           <ClipLoader
                             size={30}
-                            color={"#009cbb"}
+                            color={"#4F46E5"}
                             loading={true}
                           />
                         ) : (

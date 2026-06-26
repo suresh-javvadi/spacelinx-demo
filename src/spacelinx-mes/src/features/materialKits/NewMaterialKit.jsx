@@ -220,7 +220,7 @@ const NewMaterialKit = ({
               renderOption={(props, option) => (
                 <MenuItem
                   {...props}
-                  style={{ color: option.guideId && "#00ccff" }}
+                  style={{ color: option.guideId && "#6366F1" }}
                 >
                   {`${option.partNumber} - ${option.name}`}
                 </MenuItem>

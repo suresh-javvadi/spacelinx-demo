@@ -333,7 +333,7 @@ const MaterialKits = () => {
               Confirm
             </Button>
           ) : (
-            <p style={{ color: "#00ccff" }}>{record.status}</p>
+            <p style={{ color: "#6366F1" }}>{record.status}</p>
           )
         ) : null,
     },
@@ -510,7 +510,7 @@ const MaterialKits = () => {
             pagination={false}
             loading={{
               spinning: loadingData,
-              indicator: <ClipLoader color={"#009cbb"}></ClipLoader>,
+              indicator: <ClipLoader color={"#4F46E5"}></ClipLoader>,
             }}
             scroll={{
               y: "calc(100vh - 220px)",

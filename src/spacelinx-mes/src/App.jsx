@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { MsalProvider } from "@azure/msal-react";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { ConfigProvider } from "antd";
 import UnAuthorizedUser from "./Components/Content/UnAuthorizedUser";
 import "./App.css";
 import GetTheme from "./Theme";
@@ -69,18 +70,28 @@ function App({ msalInstance }) {
     <MsalProvider instance={msalInstance}>
       <ThemeContext.Provider value={{ theme, toggleTheme }}>
         <ThemeProvider theme={muiTheme}>
-          <CssBaseline />
-          <div className="App" id={theme}>
-            {loading || loadingRoles ? (
-              <Cliploader loading={true} />
-            ) : !isUserActive || !userAuthenticated ? (
-              <UnAuthorizedUser />
-            ) : (
-              <React.Fragment>
-                <AppShell />
-              </React.Fragment>
-            )}
-          </div>
+          <ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: "#6366F1",
+                colorLink: "#6366F1",
+                colorInfo: "#6366F1",
+              },
+            }}
+          >
+            <CssBaseline />
+            <div className="App" id={theme}>
+              {loading || loadingRoles ? (
+                <Cliploader loading={true} />
+              ) : !isUserActive || !userAuthenticated ? (
+                <UnAuthorizedUser />
+              ) : (
+                <React.Fragment>
+                  <AppShell />
+                </React.Fragment>
+              )}
+            </div>
+          </ConfigProvider>
         </ThemeProvider>
       </ThemeContext.Provider>
     </MsalProvider>

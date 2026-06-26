@@ -238,7 +238,7 @@
   margin-left: 20px;
   border-radius: 10px;
   position: relative;
-  border: 2px solid #009cbb40;
+  border: 2px solid #4F46E540;
 }
 
 .ProductsScrollingBoxHighlight {
@@ -246,15 +246,15 @@
   display: flex;
   width: 210px !important;
   height: 210px;
-  box-shadow: 1px 2px 10px #009cbb65;
+  box-shadow: 1px 2px 10px #4F46E565;
   margin-left: 20px;
   border-radius: 10px;
-  border: 2px solid #009cbb;
+  border: 2px solid #4F46E5;
   position: relative;
 }
 .ProductsScrollingBox:hover {
   cursor: pointer;
-  box-shadow: 1px 1px 15px #009cbb65;
+  box-shadow: 1px 1px 15px #4F46E565;
 }
 .ProductsScrollingBox img,
 .ProductsScrollingBoxHighlight img {
@@ -274,7 +274,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background-color: #009cbbb2;
+  background-color: #4F46E5b2;
   color: #fff;
 }
 .ProductsScrollingBoxInner {

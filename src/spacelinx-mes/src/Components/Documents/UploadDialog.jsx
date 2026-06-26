@@ -203,7 +203,7 @@ const UploadDialog = ({
                 <p
                   style={{
                     marginTop: "16px",
-                    color: "#009cbb",
+                    color: "#4F46E5",
                     fontWeight: 500,
                   }}
                 >

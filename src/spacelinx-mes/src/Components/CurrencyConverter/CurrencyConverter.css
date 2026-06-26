@@ -36,7 +36,7 @@
 }
 
 .currency-dropdown:focus {
-  border-color: #00ccff !important;
+  border-color: #6366F1 !important;
   box-shadow: 0 0 0 2px rgba(0, 204, 255, 0.4);
 }
 

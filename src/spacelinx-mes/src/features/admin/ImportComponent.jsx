@@ -129,7 +129,7 @@ const ImportComponent = ({
       >
         Add New
       </Button>
-      <IconButton onClick={handleMenuOpen} sx={{ color: "#00ccff" }}>
+      <IconButton onClick={handleMenuOpen} sx={{ color: "#6366F1" }}>
         <MoreHoriz />
       </IconButton>
       <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>

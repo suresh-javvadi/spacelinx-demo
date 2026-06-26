@@ -63,10 +63,10 @@
 
 .icon-download,
 .icon-upload {
-  color: #009cbb;
+  color: #4F46E5;
   margin-left: 8px;
   font-size: 11px;
-  border: 2px solid #009cbb;
+  border: 2px solid #4F46E5;
   padding: 3px;
   border-radius: 50%;
 }
@@ -93,7 +93,7 @@
 
 .availableCountText {
   text-decoration: underline;
-  color: #009cbb;
+  color: #4F46E5;
 }
 
 .css-46bh2p-MuiCardContent-root {
@@ -136,12 +136,12 @@
   font-family: "roboto";
 }
 .fileName {
-  color: #009cbb;
+  color: #4F46E5;
   margin-right: -15px !important;
 }
 .downloadButton {
   background-color: transparent !important;
-  color: #009cbb !important;
+  color: #4F46E5 !important;
   border: none;
   padding: 0;
   min-width: auto;

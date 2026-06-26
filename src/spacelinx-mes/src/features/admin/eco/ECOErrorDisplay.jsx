@@ -275,9 +275,9 @@ const ECOErrorDisplay = ({
                 }}
               >
                 {isAddedToECO ? (
-                  <CheckCircleIcon sx={{ color: "#009cbb" }} />
+                  <CheckCircleIcon sx={{ color: "#4F46E5" }} />
                 ) : (
-                  <AddCircleOutlineIcon sx={{ color: "#00ccff" }} />
+                  <AddCircleOutlineIcon sx={{ color: "#6366F1" }} />
                 )}
               </IconButton>
             </span>

@@ -146,7 +146,7 @@
 .VendorName {
   font-weight: bold;
   font-size: 1.2rem;
-  color: #009cbb;
+  color: #4F46E5;
 }
 .VendorCode {
   font-size: 0.9rem !important;
@@ -246,7 +246,7 @@
 .vendor-details strong {
   margin: 0;
   font-size: 1rem;
-  color: #009cbb;
+  color: #4F46E5;
 }
 
 .vendor-details .full-width {
@@ -359,7 +359,7 @@
   font-size: 15px !important;
 }
 .VendorAddressesEditBtn {
-  color: #009cbb !important;
+  color: #4F46E5 !important;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -462,7 +462,7 @@
   box-shadow: 0 0 2px #a1a1a1;
 }
 .details-table .PO_Link {
-  color: #009cbb !important;
+  color: #4F46E5 !important;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -623,7 +623,7 @@
   grid-template-columns: 1fr 10px 2fr;
 }
 .AddOption {
-  color: #009cbb;
+  color: #4F46E5;
 }
 /* Hover for line item options */
 .LineItemsPartOption:hover {
@@ -817,7 +817,7 @@
   color: rgb(255, 255, 255) !important;
   border: 1px solid rgb(109, 109, 109) !important;
   border-radius: 3px;
-  background-color: #009cbb !important;
+  background-color: #4F46E5 !important;
 }
 .disabledButton {
   opacity: 0.5;
@@ -833,7 +833,7 @@
   padding: 5px 10px;
   border: none;
   font-size: 12px !important;
-  color: #009cbb !important;
+  color: #4F46E5 !important;
   border: 1px solid rgb(109, 109, 109) !important;
   border-radius: 3px;
   background-color: transparent !important;
@@ -868,7 +868,7 @@
   justify-content: space-between;
 }
 .HighlightBtn {
-  background-color: #009cbb !important;
+  background-color: #4F46E5 !important;
   color: white !important;
 }
 .VendorDetailsDiv {

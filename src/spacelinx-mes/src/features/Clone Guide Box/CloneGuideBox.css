@@ -56,14 +56,14 @@
 }
 .confirmationBoxBtns .Confirm {
   color: white;
-  background-color: #009cbb;
+  background-color: #4F46E5;
   transition: 0.3s;
-  border: 0.1px solid #009cbb;
+  border: 0.1px solid #4F46E5;
 }
 .confirmationBoxBtns .Confirm:hover {
   background-color: white;
-  color: #009cbb;
-  border: 0.1px solid #009cbb;
+  color: #4F46E5;
+  border: 0.1px solid #4F46E5;
   transition: 0.3s;
 }
 .confirmationBoxBtns .CancelBtn {

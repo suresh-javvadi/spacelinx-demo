@@ -126,8 +126,8 @@ const baseStyles = (themeMode) => ({
       height: "30px",
       fontSize: "12px !important",
       color: "var(--light-secondary-color)",
-      border: "1px solid #00ccff40",
-      backgroundColor: "#00ccff26",
+      border: "1px solid #6366F140",
+      backgroundColor: "#6366F126",
       margin: "0 5px",
     },
   },
@@ -137,7 +137,7 @@ const baseStyles = (themeMode) => ({
   },
 
   "& .MuiDataGrid-toolbarQuickFilter .MuiInputBase-root": {
-    border: "1px solid #00ccff40 !important",
+    border: "1px solid #6366F140 !important",
     height: "30px",
     fontSize: "14px",
   },

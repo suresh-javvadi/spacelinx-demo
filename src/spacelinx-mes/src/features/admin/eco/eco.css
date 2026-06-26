@@ -177,7 +177,7 @@
 .EcoSections .active {
   color: var(--link-color);
   width: 33.33%;
-  border-bottom: 2px solid #00ccff;
+  border-bottom: 2px solid #6366F1;
 }
 
 .EcoSections .inactive {

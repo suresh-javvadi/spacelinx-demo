@@ -967,7 +967,7 @@ const GuideDetails = () => {
           <ion-icon name="chevron-forward-outline"></ion-icon>
           <p className="guide-number">
             {loadGuideData ? (
-              <ClipLoader color={"#009cbb"} loading={loadGuideData} />
+              <ClipLoader color={"#4F46E5"} loading={loadGuideData} />
             ) : (
               guideData?.number
             )}
@@ -1126,7 +1126,7 @@ const GuideDetails = () => {
         <div className="GuideDetailsHeader">
           {loadGuideData ? (
             <ClipLoader
-              color={"#009cbb"}
+              color={"#4F46E5"}
               loading={loadGuideData}
               className="GuideDetailsHeaderLoader"
             />
@@ -1301,7 +1301,7 @@ const GuideDetails = () => {
               <div className="StepsScrollContainer">
                 {loadingData ? (
                   <div className="productLoader">
-                    <ClipLoader color={"#009cbb"} loading={loadingData} />
+                    <ClipLoader color={"#4F46E5"} loading={loadingData} />
                   </div>
                 ) : (
                   <DndContext
@@ -1374,7 +1374,7 @@ const GuideDetails = () => {
                       ? handleExitSelectMode()
                       : setIsSelectMode(true)
                   }
-                  style={isSelectMode ? { outline: "2px solid #009cbb" } : {}}
+                  style={isSelectMode ? { outline: "2px solid #4F46E5" } : {}}
                 >
                   <ion-icon name="checkbox-outline"></ion-icon>
                 </button>
@@ -1427,7 +1427,7 @@ const GuideDetails = () => {
       <div className="StepDetails">
         <div className="StepDetailsInfo">
           {loadingData ? (
-            <ClipLoader color={"#009cbb"} loading={loadingData} />
+            <ClipLoader color={"#4F46E5"} loading={loadingData} />
           ) : (
             <>
               <div className="StepTitleField">

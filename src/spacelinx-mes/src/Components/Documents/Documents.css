@@ -133,7 +133,7 @@
   margin-right: 20px;
 }
 .DocumentDownloadIcon {
-  color: #00ccff;
+  color: #6366F1;
   margin-right: 20px;
 }
 .DocumentDelete {
@@ -326,7 +326,7 @@
 }
 
 #light .NoPreviewIconWrapper {
-  background-color: rgba(0, 156, 187, 0.1);
+  background-color: rgba(79, 70, 229, 0.1);
 }
 
 #dark .NoPreviewIconWrapper {
@@ -339,7 +339,7 @@
 }
 
 #light .NoPreviewIcon {
-  color: #009cbb;
+  color: #4F46E5;
 }
 
 #dark .NoPreviewIcon {
@@ -361,19 +361,19 @@
 }
 
 .DownloadButton {
-  background: linear-gradient(135deg, #009cbb, #007e9d) !important;
+  background: linear-gradient(135deg, #4F46E5, #4F46E5) !important;
   color: white !important;
   font-weight: 600 !important;
   border-radius: 10px !important;
   text-transform: none !important;
   padding: 10px 28px !important;
-  box-shadow: 0 4px 14px rgba(0, 156, 187, 0.3);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
   transition: all 0.35s ease;
 }
 
 .DownloadButton:hover {
-  background: linear-gradient(135deg, #00b3d1, #0093a8) !important;
-  box-shadow: 0 6px 20px rgba(0, 156, 187, 0.4);
+  background: linear-gradient(135deg, #6366F1, #4F46E5) !important;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
 }
 .UploadDialogMainContainer {
   display: flex;
@@ -453,12 +453,12 @@
 .EntityDocsAction {
   padding: 6px !important;
   border-radius: 6px;
-  color: #00ccff !important;
+  color: #6366F1 !important;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .EntityDocsAction:hover {
-  color: #009cbb !important;
+  color: #4F46E5 !important;
 }
 .EntityDocsHeader {
   display: flex;

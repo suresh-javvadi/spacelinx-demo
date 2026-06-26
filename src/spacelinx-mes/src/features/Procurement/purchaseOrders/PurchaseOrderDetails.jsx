@@ -1122,7 +1122,7 @@ const PurchaseOrderDetails = () => {
                   minHeight: 300,
                 }}
               >
-                <ClipLoader size={30} color="#009cbb" loading={true} />
+                <ClipLoader size={30} color="#4F46E5" loading={true} />
               </div>
             ) : (
               <div className="PurchaseOrdersDetailsTab">
@@ -1190,7 +1190,7 @@ const PurchaseOrderDetails = () => {
                       {vendorDetailsLoading ? (
                         <ClipLoader
                           size={30}
-                          color={"#009cbb"}
+                          color={"#4F46E5"}
                           loading={vendorDetailsLoading}
                         />
                       ) : (

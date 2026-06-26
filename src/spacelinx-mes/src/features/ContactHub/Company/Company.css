@@ -12,7 +12,7 @@
 div .AddButton {
   margin-left: 96.3%;
   margin-bottom: 5px;
-  color: #009cbb;
+  color: #4F46E5;
 }
 .VendorCreateFlyoutFooter ion-icon {
   margin-right: 68%;
@@ -222,7 +222,7 @@ div .AddButton {
   margin-right: 16px;
 }
 .VendorPartsAddButton {
-  background-color: #009cbb !important;
+  background-color: #4F46E5 !important;
   color: white !important;
   padding: 8px 16px !important;
   border: none !important;

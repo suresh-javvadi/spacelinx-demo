@@ -430,7 +430,7 @@ const PODocuments = ({
         <DialogContent dividers className="PreviewContentContainer">
           {previewLoading ? (
             <div className="PreviewLoaderContainer">
-              <ClipLoader color="#009cbb" size={30} />
+              <ClipLoader color="#4F46E5" size={30} />
               <p>Loading preview...</p>
             </div>
           ) : (

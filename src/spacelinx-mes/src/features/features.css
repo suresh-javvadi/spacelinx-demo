@@ -118,7 +118,7 @@
   font-size: 13px;
   padding: 0 14px;
   color: #ffffff;
-  background-color: rgb(0, 156, 187);
+  background-color: rgb(79, 70, 229);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -126,7 +126,7 @@
 }
 
 .permission-button:hover {
-  background-color: rgb(0, 130, 160);
+  background-color: rgb(79, 70, 229);
 }
 .data-grid-section {
   height: calc(100vh - 230px);
@@ -659,7 +659,7 @@ div.Active-Button {
 .AttachButton {
   width: 150px;
   height: 50px;
-  background-color: #009cbb !important;
+  background-color: #4F46E5 !important;
   color: #ffffff !important;
 }
 .ChildPartCancelButton {
@@ -858,7 +858,7 @@ div.Active-Button {
   align-items: center;
 }
 .DownloadUpload {
-  color: #009cbb;
+  color: #4F46E5;
 }
 
 .roles-container {
@@ -1369,7 +1369,7 @@ div.Active-Button {
 }
 
 .ant-spin-dot-item {
-  background-color: #009cbb !important;
+  background-color: #4F46E5 !important;
 }
 
 .PartBomHierarchyDataGridDiv .ant-spin-nested-loading > .ant-spin {

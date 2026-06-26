@@ -527,15 +527,15 @@
   display: flex;
   width: 165px !important;
   height: 135px;
-  box-shadow: 1px 2px 10px #009cbb65;
+  box-shadow: 1px 2px 10px #4F46E565;
   margin-left: 20px;
   border-radius: 10px;
-  border: 2px solid #009cbb;
+  border: 2px solid #4F46E5;
   position: relative;
 }
 .WOStepsScrollingBox:hover {
   cursor: pointer;
-  box-shadow: 1px 1px 15px #009cbb65;
+  box-shadow: 1px 1px 15px #4F46E565;
 }
 .WOStepsScrollingBox .WOStepsScrollingBoxInner img,
 .WOStepsScrollingBoxHighlight img {
@@ -647,7 +647,7 @@
 }
 .WoTimerDiv ion-icon {
   font-size: 28px;
-  color: rgba(0, 156, 187, 1);
+  color: rgba(79, 70, 229, 1);
 }
 .WoTimerDiv ion-icon:hover {
   cursor: pointer;
@@ -657,7 +657,7 @@
   align-items: center;
   font-size: 12px;
   font-weight: 800;
-  color: rgba(0, 156, 187, 1);
+  color: rgba(79, 70, 229, 1);
 }
 
 .WOStepDetails .WOStepDetailsInfo {
@@ -749,7 +749,7 @@
 .GenealogyResponse p {
   display: flex;
   font-size: 12px;
-  color: #007bff;
+  color: #6366F1;
 }
 .GenealogyResponse p:hover {
   cursor: pointer;
@@ -850,7 +850,7 @@
   gap: 20px;
 }
 .WOCompleteBtn {
-  background-color: #009cbb !important;
+  background-color: #4F46E5 !important;
   color: #ffffff !important;
 }
 .WOCompleteBtnContainer {

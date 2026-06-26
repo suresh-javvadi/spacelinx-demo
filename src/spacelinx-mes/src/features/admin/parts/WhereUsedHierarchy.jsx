@@ -1001,7 +1001,7 @@ const WhereUsedHierarchy = ({ selectedPartId: propPartId }) => {
         {loadingData ? (
           <div className="HierarchyLoading">
             <ClipLoader
-              color={"#01bfe5"}
+              color={"#6366F1"}
               loading={loadingData}
               size={50}
               aria-label="Loading Spinner"

@@ -382,7 +382,7 @@ const Build = ({ selectedProductId, selectedProductPartId }) => {
                         <tr key={row.id}>
                           <td colSpan={9} style={{ textAlign: "center" }}>
                             <ClipLoader
-                              color={"#009cbb"}
+                              color={"#4F46E5"}
                               loading={buildLoadingData}
                               size={30}
                               aria-label="Loading Spinner"

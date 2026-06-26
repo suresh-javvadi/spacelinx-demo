@@ -107,7 +107,7 @@ const POApprovals = ({
   if (loadingUsers || loadingConfig || loadingData) {
     return (
       <div className="po-approvals__loader">
-        <ClipLoader size={30} color="#009cbb" loading={true} />
+        <ClipLoader size={30} color="#4F46E5" loading={true} />
       </div>
     );
   }

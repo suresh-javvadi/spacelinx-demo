@@ -353,7 +353,7 @@ function Header() {
                 onClick={handleLogout}
                 style={{
                   paddingLeft: 0,
-                  color: "#00ccff",
+                  color: "#6366F1",
                   textAlign: "center",
                 }}
               >

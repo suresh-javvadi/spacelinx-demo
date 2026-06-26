@@ -27,7 +27,7 @@ const POApprovalTracker = ({ approvers = [], loadingData }) => {
   if (loadingData) {
     return (
       <div className="po-approvals__loader">
-        <ClipLoader size={30} color="#009cbb" loading />
+        <ClipLoader size={30} color="#4F46E5" loading />
       </div>
     );
   }

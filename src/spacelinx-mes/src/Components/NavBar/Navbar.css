@@ -78,15 +78,15 @@
 }
 .custom-popper .MuiListItem-root:hover .MuiListItemText-primary,
 .custom-popper .MuiListItem-root:hover {
-  color: #00ccff !important;
+  color: #6366F1 !important;
   background-color: var(--navbar-custom-popper) !important;
 }
 .navListItem:hover .MuiListItemText-primary {
-  color: #00ccff !important;
+  color: #6366F1 !important;
 }
 
 .navListItem:hover .navbar-icons svg {
-  color: #00ccff !important;
+  color: #6366F1 !important;
 }
 
 .navListItem {
@@ -129,7 +129,7 @@
   top: 0;
   width: 6px;
   height: 100%;
-  background-color: #00ccff;
+  background-color: #6366F1;
   border-radius: 4px 0 0 4px;
   transition: transform 150ms ease;
 }

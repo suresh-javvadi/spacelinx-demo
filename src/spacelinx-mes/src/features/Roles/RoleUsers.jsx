@@ -208,7 +208,7 @@ const RoleUsers = ({ selectedRoleId }) => {
                   {...props}
                   style={{
                     fontWeight: "bold",
-                    color: "#009CBB",
+                    color: "#4F46E5",
                   }}
                 >
                   Add New User

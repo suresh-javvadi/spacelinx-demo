@@ -11,7 +11,7 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #009cbb;
+  accent-color: #4F46E5;
 }
 
 .stepTitle {
@@ -146,7 +146,7 @@
   height: 155px;
   position: relative;
   border-radius: 10px;
-  box-shadow: 0 0 2px #009cbb;
+  box-shadow: 0 0 2px #4F46E5;
 }
 .StepsScrollingBoxInner .guide-image {
   width: 95%;
@@ -208,7 +208,7 @@
   background-color: var(--light-primary-color);
   color: var(--secondary-color);
   cursor: pointer;
-  border: 1px solid #009cbb;
+  border: 1px solid #4F46E5;
   transition: 0.3s;
 }
 .GuideDetailsBreadCrumb .GuideDetailsBreadCrumbLink {
@@ -230,7 +230,7 @@
   height: 160px;
   margin-left: 20px;
   border-radius: 10px;
-  border: 2px solid #009cbb;
+  border: 2px solid #4F46E5;
   position: relative;
 }
 .StepsScrollingBox {
@@ -243,7 +243,7 @@
 }
 .StepsScrollingBox:hover {
   cursor: pointer;
-  box-shadow: 1px 1px 15px #009cbb65;
+  box-shadow: 1px 1px 15px #4F46E565;
 }
 .StepsScrollingBox img,
 .StepsScrollingBoxHighlight img,
@@ -334,8 +334,8 @@
   align-items: center;
   font-size: 20px;
   padding: 5px;
-  border: 1px solid #00ccff40;
-  background-color: #00ccff26;
+  border: 1px solid #6366F140;
+  background-color: #6366F126;
 }
 
 .PasteContainer ion-icon,
@@ -525,7 +525,7 @@
 .taskViewAllBtn {
   background: none;
   border: none;
-  color: #009cbb;
+  color: #4F46E5;
   font-size: 11px;
   cursor: pointer;
   padding: 0 10px 4px;
@@ -816,7 +816,7 @@
   display: flex;
   gap: 5px;
   font-weight: 700;
-  color: rgba(0, 156, 187, 1);
+  color: rgba(79, 70, 229, 1);
 }
 
 .image-editor-container.full-screen {
@@ -911,7 +911,7 @@
   gap: 3px;
 }
 .GuideDraftButtons.disabled {
-  background-color: #009cbbc0;
+  background-color: #4F46E5c0;
   color: var(--dark-text-color);
   cursor: not-allowed;
   border: 1px solid #a9a9a9;
@@ -942,7 +942,7 @@
   color: var(--light-primary-color);
 }
 #dark .guides-button {
-  background-color: #001f26;
+  background-color: #1E1B4B;
   color: var(--light-secondary-color);
 }
 #light .StepImageControls button [name="create-outline"] {
@@ -1013,7 +1013,7 @@
 
 .GuidePartName p.AppHyperLink {
   cursor: pointer;
-  color: #009cbb;
+  color: #4F46E5;
   text-decoration: underline;
   margin: 0;
 }
@@ -1073,7 +1073,7 @@
 
 .GuidePublishButton {
   color: var(--light-primary-color);
-  background-color: rgba(0, 156, 187, 1);
+  background-color: rgba(79, 70, 229, 1);
   border: none;
   border-radius: 8px;
   padding: 10px 10px;
@@ -1186,21 +1186,21 @@
   color: #e0e0e0;
 }
 [AppTheme="dark"] .ql-toolbar.ql-snow .ql-picker-item:hover {
-  color: #00ccff;
+  color: #6366F1;
 }
 [AppTheme="dark"] .ql-toolbar.ql-snow button:hover .ql-stroke,
 [AppTheme="dark"] .ql-toolbar.ql-snow button.ql-active .ql-stroke,
 [AppTheme="dark"] .ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke {
-  stroke: #00ccff;
+  stroke: #6366F1;
 }
 [AppTheme="dark"] .ql-toolbar.ql-snow button:hover .ql-fill,
 [AppTheme="dark"] .ql-toolbar.ql-snow button.ql-active .ql-fill {
-  fill: #00ccff;
+  fill: #6366F1;
 }
 [AppTheme="dark"] .ql-toolbar.ql-snow button:hover,
 [AppTheme="dark"] .ql-toolbar.ql-snow button.ql-active,
 [AppTheme="dark"] .ql-toolbar.ql-snow .ql-picker-label:hover {
-  color: #00ccff;
+  color: #6366F1;
 }
 
 /* Extra spacing inside the create/edit task dialog */

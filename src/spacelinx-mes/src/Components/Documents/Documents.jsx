@@ -445,7 +445,7 @@ const Documents = ({
           {loadingData ? (
             <div className="LoaderContainer">
               <ClipLoader
-                color={"#009cbb"}
+                color={"#4F46E5"}
                 loading={loadingData}
                 size={30}
                 aria-label="Loading Spinner"
@@ -623,7 +623,7 @@ const Documents = ({
         <DialogContent dividers className="PreviewContentContainer">
           {previewLoading ? (
             <div className="PreviewLoaderContainer">
-              <ClipLoader color="#009cbb" size={30} />
+              <ClipLoader color="#4F46E5" size={30} />
               <p>Loading preview...</p>
             </div>
           ) : (

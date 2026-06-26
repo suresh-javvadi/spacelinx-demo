@@ -55,7 +55,7 @@ const Admin = () => {
         {loadingData ? (
           <div className="loader-container">
             <ClipLoader
-              color={"#009cbb"}
+              color={"#4F46E5"}
               loading={loadingData}
               size={30}
               aria-label="Loading Spinner"

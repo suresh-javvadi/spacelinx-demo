@@ -224,8 +224,8 @@
 .AssigneeAvatar {
   width: 36px !important;
   height: 36px !important;
-  /* background-color: #00c2ff !important; */
-  background: linear-gradient(90deg, #3a3939 0%, #009cbb 100%);
+  /* background-color: #6366F1 !important; */
+  background: linear-gradient(90deg, #3a3939 0%, #4F46E5 100%);
   color: #fff !important;
   font-weight: 600;
   font-size: 14px;
@@ -264,11 +264,11 @@
 }
 
 .MuiTab-root.Mui-selected {
-  color: #00c2ff !important;
+  color: #6366F1 !important;
 }
 
 .MuiTabs-indicator {
-  background-color: #00c2ff !important;
+  background-color: #6366F1 !important;
 }
 
 .SubtasksSection {
@@ -344,7 +344,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: #00c2ff;
+  background-color: #6366F1;
   color: #000;
   display: flex;
   align-items: center;
@@ -386,8 +386,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: rgba(0, 194, 255, 0.15);
-  color: #00c2ff;
+  background-color: rgba(99, 102, 241, 0.15);
+  color: #6366F1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -432,8 +432,8 @@
 }
 
 .MyTaskCard:hover {
-  border-color: #00c2ff;
-  box-shadow: 0 0 8px rgba(0, 194, 255, 0.3);
+  border-color: #6366F1;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
 }
 
 .MyTaskCard .TaskInfo {
@@ -498,7 +498,7 @@
 .TaskProgressText {
   font-size: 12px;
   font-weight: 600;
-  color: #00c2ff;
+  color: #6366F1;
 }
 
 .TaskProgressBar {
@@ -508,7 +508,7 @@
 }
 
 .TaskProgressBar .MuiLinearProgress-bar {
-  background-color: #00c2ff !important;
+  background-color: #6366F1 !important;
 }
 .taskType {
   background-color: #1d293d;
