@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 export const DrawerContext = createContext();
 
 export const DrawerProvider = ({ children }) => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);

@@ -8,7 +8,7 @@ const GetTheme = (themeMode) =>
         ? {
             primary: { main: "#a1a1a1" },
             secondary: { main: "#8c8c8c" },
-            background: { paper: "#2C2C2C" },
+            background: { paper: "#16161f", default: "#0a0a14" },
           }
         : {
             primary: { main: "#A1A1A1" },
@@ -41,11 +41,30 @@ const GetTheme = (themeMode) =>
                 ? "var(--light-primary-color)"
                 : "var(--dark-primary-color)",
             "&.Mui-selected": {
-              color: "var(--light-primary-color)",
-              backgroundColor: "rgba(94, 88, 91, 1)",
+              color: "#6366F1",
+              backgroundColor: "rgba(99, 102, 241, 0.12)",
             },
             textTransform: "none",
             flex: "1",
+          },
+        },
+      },
+      MuiTabs: {
+        styleOverrides: {
+          indicator: {
+            backgroundColor: "#6366F1",
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          colorPrimary: {
+            backgroundColor: "#6366F1",
+            color: "#ffffff",
+          },
+          outlinedPrimary: {
+            borderColor: "#6366F1",
+            color: "#6366F1",
           },
         },
       },
@@ -69,10 +88,7 @@ const GetTheme = (themeMode) =>
                 ? "1px solid var(--border-color-dark)"
                 : "1px solid var(--border-color-light)",
             "&:not(.Mui-disabled):hover": {
-              backgroundColor:
-                themeMode === "dark"
-                  ? "var(--button-background-color-dark)"
-                  : "var(--button-background-color-light)",
+              backgroundColor: "rgba(99, 102, 241, 0.1)",
               border:
                 themeMode === "dark"
                   ? "1px solid var(--border-color-dark)"
@@ -190,6 +206,13 @@ const GetTheme = (themeMode) =>
           },
           bar: {
             backgroundColor: "var(--link-color)",
+          },
+        },
+      },
+      MuiCircularProgress: {
+        styleOverrides: {
+          root: {
+            color: "#6366F1",
           },
         },
       },

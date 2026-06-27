@@ -18,7 +18,7 @@ const ExportButtons = () => {
 
   const handleExportCSV = () => {
     apiRef.current.exportDataAsCsv({
-      fileName: `Spacelinx_${new Date().toISOString().split("T")[0]}`,
+      fileName: `SARSPACE_${new Date().toISOString().split("T")[0]}`,
       allColumns: true,
       utf8WithBom: true,
     });
@@ -41,7 +41,7 @@ const ExportButtons = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
     XLSX.writeFile(
       workbook,
-      `Spacelinx_${new Date().toISOString().split("T")[0]}.xlsx`,
+      `SARSPACE_${new Date().toISOString().split("T")[0]}.xlsx`,
     );
   };
 
@@ -78,12 +78,13 @@ const CustomToolbar = ({ showDensitySelector }) => (
 
 const baseStyles = (themeMode) => ({
   // Main grid background
-  backgroundColor: themeMode === "dark" ? "#000000" : "#F2F2F2",
+  backgroundColor: themeMode === "dark" ? "#0a0a14" : "#F2F2F2",
   color: themeMode === "dark" ? "#FFFFFF" : "#000000",
 
   // Column header
   "& .MuiDataGrid-columnHeader": {
-    backgroundColor: themeMode === "dark" ? "#2c2c2c" : "#f1efef",
+    backgroundColor: themeMode === "dark" ? "#1a1a24" : "#eceefb",
+    borderBottom: "2px solid rgba(99, 102, 241, 0.45)",
     boxShadow:
       themeMode === "dark"
         ? "0px 4px 4px 0px #00000026"
@@ -103,8 +104,16 @@ const baseStyles = (themeMode) => ({
     cursor: "pointer",
     backgroundColor:
       themeMode === "dark"
-        ? "rgba(255, 255, 255, 0.08)"
-        : "rgba(0, 0, 0, 0.04)",
+        ? "rgba(99, 102, 241, 0.14)"
+        : "rgba(99, 102, 241, 0.08)",
+  },
+
+  // Selected row
+  "& .MuiDataGrid-row.Mui-selected, & .MuiDataGrid-row.Mui-selected:hover": {
+    backgroundColor:
+      themeMode === "dark"
+        ? "rgba(99, 102, 241, 0.24)"
+        : "rgba(99, 102, 241, 0.16)",
   },
 
   // Cell borders

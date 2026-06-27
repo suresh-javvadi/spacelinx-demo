@@ -11,7 +11,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("../../../../Assest/Images/loginpage/loginpagebackground.png");
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(99, 102, 241, 0.35),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(79, 70, 229, 0.4),
+      transparent 45%
+    ),
+    #0a0a0f;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -42,16 +53,53 @@
   height: 70px;
   object-fit: contain;
 }
+.BrandWordmarkLogin {
+  font-family: var(--header-font-family);
+  font-weight: 700;
+  font-size: 2.75rem;
+  letter-spacing: 0.14em;
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  user-select: none;
+}
+.BrandWordmarkLoginAccent {
+  -webkit-text-fill-color: transparent;
+}
 .xdlinxlogo {
   height: 75px;
   object-fit: contain;
   opacity: 0.8;
 }
+.LoginCard {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 44px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.LoginTagline {
+  margin: 0 0 6px;
+  color: #c7c7d1;
+  font-family: var(--body-font-family);
+  font-size: 0.95rem;
+  text-align: center;
+  max-width: 320px;
+}
 .SignInOptions2 {
   display: flex;
   justify-content: center;
-  width: 60%;
-  margin-top: 30px; /* Remove unnecessary margins */
+  margin-top: 14px;
 }
 
 .SignInCard {
@@ -68,28 +116,36 @@
   color: black;
   text-align: center;
   margin-bottom: 10px;
-  font-family: poppins;
+  font-family: var(--body-font-family);
 }
 
 .GoogleButton {
   display: flex;
-  width: 100%;
-  max-width: 300px;
+  min-width: 260px;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  color: black;
-  /* border: solid 1px grey; */
-  padding: 10px;
-  border-radius: 5px;
-  transition: 0.1s;
+  color: #1a1a1a;
+  background: #ffffff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 12px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
   cursor: pointer;
-  font-size: 17px;
-  font-weight: 700;
+  font-family: var(--body-font-family);
+  font-size: 15px;
+  font-weight: 600;
 }
-
+.GoogleButton img {
+  height: 18px;
+  width: 18px;
+  object-fit: contain;
+}
 .GoogleButton:hover {
-  background-color: rgb(185, 183, 183);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
 }
 
 .SignInGoogle {

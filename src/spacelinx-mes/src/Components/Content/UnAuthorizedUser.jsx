@@ -4,7 +4,6 @@ import "./UnAuthorizedUser.css";
 import { Button } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Header from "../UnAuthenticatedFiles/UAHeader/Header";
-import xdlinxLogo from "../../Assest/Images/logos/poweredbyxdlinx.png";
 import LockIcon from "@mui/icons-material/Lock";
 
 const UnAuthorizedUser = ({ isUserActive, userAuthenticated }) => {
@@ -36,10 +35,19 @@ const UnAuthorizedUser = ({ isUserActive, userAuthenticated }) => {
           </div>
 
           <div className="footer">
-            <img src={xdlinxLogo} alt="Powered by XDLINX Space LABS" />
+            <span
+              style={{
+                fontFamily: "var(--header-font-family)",
+                fontWeight: 700,
+                fontSize: "1.6rem",
+                letterSpacing: "0.14em",
+              }}
+            >
+              SAR<span style={{ color: "var(--primary-color)" }}>SPACE</span>
+            </span>
             <p>
-              Copyright &copy;{new Date().getFullYear()} XDLINX Space Labs Pvt
-              Ltd Confidential and Proprietary.
+              Copyright &copy;{new Date().getFullYear()} SARSPACE. Confidential
+              and Proprietary.
             </p>
           </div>
         </div>

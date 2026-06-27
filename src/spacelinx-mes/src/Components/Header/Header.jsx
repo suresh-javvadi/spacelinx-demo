@@ -6,12 +6,11 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useMsal } from "@azure/msal-react";
 import { useDrawer } from "../../useDrawerHook";
 import { ThemeContext } from "../../App";
-import spacelinxLogo from "../../Assest/Images/logos/spacelinxlogo.png";
 import "./Header.css";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
@@ -39,7 +38,6 @@ function Header() {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const [issuesDialogOpen, setIssuesDialogOpen] = useState(false);
   const { fetchIssuesData } = useIssues();
-  const [notificationAnchor, setNotificationAnchor] = useState(null);
   const {
     userRolesAndPermissions,
     userData,
@@ -85,13 +83,6 @@ function Header() {
     setCreateMenuAnchor(null);
     setMenuAnchor(null);
   };
-  const handleOpenNotificationMenu = (event) => {
-    setNotificationAnchor(event.currentTarget);
-  };
-
-  const handleCloseNotificationMenu = () => {
-    setNotificationAnchor(null);
-  };
 
   const handleLogout = () => {
     sessionStorage.removeItem("activeRole");
@@ -115,7 +106,7 @@ function Header() {
           zIndex: "(theme) => theme.zIndex.drawer + 1",
           height: "60px",
           boxShadow: "none",
-          backgroundColor: theme === "dark" ? "#2c2c2c" : "#ffffff",
+          backgroundColor: theme === "dark" ? "#0d0d18" : "#ffffff",
           color: theme === "dark" ? "#ffffff" : "#000000",
         }}
       >
@@ -130,20 +121,11 @@ function Header() {
             <MenuIcon />
           </IconButton>
           <div className="logo">
-            <img src={spacelinxLogo} alt="Logo" className="logo-img" />
+            <span className="brand-wordmark" aria-label="SARSPACE">
+              SAR<span className="brand-wordmark-accent">SPACE</span>
+            </span>
           </div>
           <div className="HeaderIconsContainer">
-            <IconButton
-              className="header-icon HeaderDocsIcon"
-              onClick={() =>
-                window.open(
-                  "https://spacelinxdocs.azurewebsites.net/",
-                  "_blank"
-                )
-              }
-            >
-              <ion-icon name="help-circle-outline"></ion-icon>
-            </IconButton>
             <IconButton
               onClick={() => setIssuesDialogOpen(true)}
               className="header-icons HeaderIssuesIcon"
@@ -154,16 +136,10 @@ function Header() {
               onClick={handleOpenCreateMenu}
               className="header-icon HeaderAddIcon"
             >
-              <ion-icon name="add-outline"></ion-icon>
-            </IconButton>
-            <IconButton
-              onClick={handleOpenNotificationMenu}
-              className="header-icon"
-            >
-              <NotificationsIcon />
+              <AddCircleOutlineIcon />
             </IconButton>
             <IconButton onClick={handleOpenMenu} className="header-icon">
-              <AccountCircleIcon />
+              <AccountCircleOutlinedIcon />
             </IconButton>
           </div>
         </Toolbar>
@@ -260,22 +236,6 @@ function Header() {
           </div>
         </Menu>
         <Menu
-          anchorEl={notificationAnchor}
-          open={Boolean(notificationAnchor)}
-          onClose={handleCloseNotificationMenu}
-          sx={{ display: "flex", marginX: "12px", marginY: "8px" }}
-        >
-          <div className="profile-container">
-            <div className="profile-container-two">
-              <NotificationsIcon
-                sx={{ fontSize: "30px", marginBottom: "10px" }}
-              />
-              <p className="profile-name">Notifications</p>
-              <p className="profile-email">No new notifications</p>
-            </div>
-          </div>
-        </Menu>
-        <Menu
           anchorEl={menuAnchor}
           open={Boolean(menuAnchor)}
           onClose={handleCloseMenu}
@@ -283,7 +243,7 @@ function Header() {
         >
           <div className="profile-container">
             <div className="profile-container-two">
-              <AccountCircleIcon
+              <AccountCircleOutlinedIcon
                 sx={{ fontSize: "50px", marginBottom: "10px" }}
               />
               <p className="profile-name">

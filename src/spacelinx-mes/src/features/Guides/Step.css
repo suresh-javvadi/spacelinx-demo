@@ -214,14 +214,14 @@
 .GuideDetailsBreadCrumb .GuideDetailsBreadCrumbLink {
   color: var(--secondary-color);
   text-decoration: none;
-  font-family: "Square721 BdEx BT Bold";
+  font-family: var(--header-font-family);
 }
 .GuideDetailsBreadCrumb .GuideDetailsBreadCrumbLink:hover {
   color: var(--secondary-color);
   text-decoration: underline;
 }
 .GuideDetailsBreadCrumb1 .guide-number {
-  font-family: "Square721 BdEx BT Bold";
+  font-family: var(--header-font-family);
 }
 .StepsScrollingBoxHighlight {
   cursor: pointer;

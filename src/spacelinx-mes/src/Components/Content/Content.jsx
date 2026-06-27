@@ -3,6 +3,7 @@ import { Routes, Route, useParams, Navigate } from "react-router-dom";
 import "./Content.css";
 import { useUserContext } from "../../features/userContext/UserContext";
 import UnAuthorizedUser from "./UnAuthorizedUser";
+import NotFound from "./NotFound";
 import { PERMISSIONS } from "../../constants/PagePermissions";
 import BreadCrumbs from "../Pages/BreadCrumbs/BreadCrumbs";
 import Cliploader from "../Loaders/Cliploader";
@@ -666,6 +667,7 @@ const Content = ({ status }) => {
             path="/settings/issuelist"
             element={renderProtectedComponent("ISSUELIST.VIEW", IssuesList)}
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </div>

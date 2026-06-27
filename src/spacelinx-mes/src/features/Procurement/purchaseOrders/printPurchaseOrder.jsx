@@ -8,7 +8,6 @@ import {
   Image,
   Font,
 } from "@react-pdf/renderer";
-import logo from "../../../Assest/Images/logos/xdlinxlogolightmode.png";
 import tarunSignature from "../../../Assest/Images/signatures/tarun-signature.png";
 import sudheerSignature from "../../../Assest/Images/signatures/sudheer-signature.png";
 import NotoSansRegular from "../../../Assest/Fonts/NotoSans-Regular.ttf";
@@ -452,7 +451,16 @@ const PrintPurchaseOrder = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.headerSection}>
           <View style={styles.header}>
-            <Image src={logo} alt="Logo" style={{ height: 40 }} />
+            <Text
+              style={{
+                fontFamily: "Helvetica-Bold",
+                fontSize: 20,
+                letterSpacing: 2,
+                color: "#4F46E5",
+              }}
+            >
+              SARSPACE
+            </Text>
           </View>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>PURCHASE ORDER</Text>

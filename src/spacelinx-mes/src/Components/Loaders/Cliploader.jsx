@@ -1,15 +1,17 @@
 import React from "react";
-import { ClipLoader } from "react-spinners";
 
-const Cliploader = ({ loading }) => (
+// SARSPACE branded loader — a gradient ring (replaces the plain spinner).
+// Keeps the same API (`loading`, optional `size`) so all existing call sites work.
+const Cliploader = ({ loading = true, size = 40 }) => (
   <div className="loader-container">
-    <ClipLoader
-      color={"#4F46E5"}
-      loading={loading}
-      size={30}
-      aria-label="Loading Spinner"
-      data-testid="loader"
-    />
+    {loading && (
+      <span
+        className="sarspace-loader"
+        style={{ width: size, height: size }}
+        role="status"
+        aria-label="Loading"
+      />
+    )}
   </div>
 );
 

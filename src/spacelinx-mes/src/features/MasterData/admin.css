@@ -41,7 +41,7 @@
 }
 .admin-container h1,
 .admin-container h2 {
-  font-family: "Square721 BdEx BT Bold", sans-serif;
+  font-family: var(--header-font-family);
 }
 
 #dark .masterdata-card {

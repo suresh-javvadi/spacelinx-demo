@@ -7,7 +7,7 @@ import { ConfigProvider } from "antd";
 import UnAuthorizedUser from "./Components/Content/UnAuthorizedUser";
 import "./App.css";
 import GetTheme from "./Theme";
-import Cliploader from "./Components/Loaders/Cliploader";
+import BrandSplash from "./Components/Loaders/BrandSplash";
 import { useUserContext } from "./features/userContext/UserContext";
 import { retryPendingRequest } from "../src/services/api.js";
 import { EventType } from "@azure/msal-browser";
@@ -82,7 +82,7 @@ function App({ msalInstance }) {
             <CssBaseline />
             <div className="App" id={theme}>
               {loading || loadingRoles ? (
-                <Cliploader loading={true} />
+                <BrandSplash />
               ) : !isUserActive || !userAuthenticated ? (
                 <UnAuthorizedUser />
               ) : (

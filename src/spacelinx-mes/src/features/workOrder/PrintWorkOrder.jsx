@@ -2,7 +2,6 @@ import React, { forwardRef } from "react";
 import { Divider } from "@mui/material";
 import VideoFilePng from "../../Assest/Images/videoFileLogo.png";
 import NoImagePlaceholder from "../../Assest/Images/NoImage.jpg";
-import XDwatermark from "../../Assest/Images/XDwatermark.png";
 import {
   FaHammer,
   FaFileAlt,
@@ -45,8 +44,7 @@ const PrintWorkOrder = forwardRef(({ workOrderData }, ref) => {
   const PageFooter = ({ currentPage, totalPages }) => (
     <div className="printPageFooter">
       <div>
-        Copyright &copy;{currentYear} XDLINX Space Labs Pvt Ltd Confidential and
-        Proprietary
+        Copyright &copy;{currentYear} SARSPACE. Confidential and Proprietary
       </div>
     </div>
   );
@@ -70,7 +68,7 @@ const PrintWorkOrder = forwardRef(({ workOrderData }, ref) => {
           <p>Total Steps: {workOrderData?.workOrderSteps?.length || 0}</p>
         </div>
         <div className="coverPageFooter">
-          <p>Copyright &copy;{currentYear} XDLINX Space Labs Pvt Ltd</p>
+          <p>Copyright &copy;{currentYear} SARSPACE</p>
           <p>Confidential and Proprietary</p>
         </div>
       </div>
@@ -79,7 +77,7 @@ const PrintWorkOrder = forwardRef(({ workOrderData }, ref) => {
 
   return (
     <div ref={ref} className="printContainer">
-      <img src={XDwatermark} alt="Watermark" className="printWatermark" />
+      <div className="printWatermark">SARSPACE</div>
       <CoverPage workOrderData={workOrderData} />
       {workOrderData?.workOrderSteps
         ?.sort((a, b) => a.guideStep.sequence - b.guideStep.sequence)

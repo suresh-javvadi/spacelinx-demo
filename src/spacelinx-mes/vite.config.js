@@ -1,9 +1,22 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { fileURLToPath } from "url";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      // Route all react-spinners imports to the branded SARSPACE loader shim.
+      // The deep-path entry must come first so it matches before the bare one.
+      "react-spinners/ClipLoader": fileURLToPath(
+        new URL("./src/shims/reactSpinners.jsx", import.meta.url)
+      ),
+      "react-spinners": fileURLToPath(
+        new URL("./src/shims/reactSpinners.jsx", import.meta.url)
+      ),
+    },
+  },
   build: {
     rollupOptions: {
       output: {

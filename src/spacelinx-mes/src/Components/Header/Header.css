@@ -1,3 +1,14 @@
+/* Header bar: subtle indigo hairline + depth */
+.MuiAppBar-root {
+  background-image: none !important;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.3) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+}
+#dark .MuiAppBar-root,
+[AppTheme="dark"] .MuiAppBar-root {
+  background-color: #0d0d18 !important;
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -7,6 +18,25 @@
 .logo-img {
   height: 50%;
   width: auto;
+}
+
+.brand-wordmark {
+  font-family: var(--header-font-family);
+  font-weight: 700;
+  font-size: 1.55rem;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.brand-wordmark-accent {
+  -webkit-text-fill-color: transparent;
 }
 
 .HeaderIconsContainer {

@@ -6,10 +6,10 @@ const getThemeStyles = () => {
 
   return isDarkMode
     ? {
-        background: "#2c2c2c",
+        background: "#16161f",
         color: "var( --dark-text-color)",
         confirmButtonColor: "#d33",
-        cancelButtonColor: "#555",
+        cancelButtonColor: "#3a3a4c",
         cancelButtonTextColor: "var( --dark-text-color)",
       }
     : {
@@ -40,7 +40,7 @@ export const showAlert = (
     timer: !confirmButton ? 1500 : null,
     showConfirmButton: confirmButton,
     confirmButtonText: confirmButtonText || "OK",
-    confirmButtonColor: themeStyles.confirmButtonColor,
+    confirmButtonColor: "#6366F1",
     didOpen: () => {
       const swalPopup = document.querySelector(".swal2-container");
       if (swalPopup) {
