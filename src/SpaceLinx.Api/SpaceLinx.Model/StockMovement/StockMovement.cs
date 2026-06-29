@@ -20,9 +20,11 @@ public partial class StockMovement : BaseModel
     public DateOnly? ExpectedReturnDate { get; set; }
     public DateOnly? ProjectDate { get; set; }
     public Guid? ProjectId { get; set; }
+    public Guid? SubProjectId { get; set; }
     public string? Department { get; set; }
     public Guid? AssignedUserId { get; set; }
     public virtual Project? Project { get; set; }
+    public virtual SubProject? SubProject { get; set; }
     public virtual User? AssignedUser { get; set; }
     public virtual Location? FromLocation { get; set; }
     public virtual Location? ToLocation { get; set; }

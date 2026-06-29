@@ -177,6 +177,8 @@ public partial class SpaceLinxContext : DbContext
 
     public virtual DbSet<Project> Projects { get; set; }
 
+    public virtual DbSet<SubProject> SubProjects { get; set; }
+
     public virtual DbSet<PurchaseHistoryVw> PurchaseHistoryVws { get; set; }
 
     public virtual DbSet<PurchaseOrder> PurchaseOrders { get; set; }
@@ -4704,6 +4706,68 @@ public partial class SpaceLinxContext : DbContext
                 .HasConstraintName("project_project_manager_id_fkey");
         });
 
+        modelBuilder.Entity<SubProject>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("sub_project_pkey");
+
+            entity.ToTable("sub_project", "pm");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.Budget)
+                .HasPrecision(18, 4)
+                .HasColumnName("budget");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CreatedBy)
+                .HasMaxLength(255)
+                .HasColumnName("created_by");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.DeletedBy)
+                .HasMaxLength(255)
+                .HasColumnName("deleted_by");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.EndDate).HasColumnName("end_date");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .HasColumnName("name");
+            entity.Property(e => e.ProgramId).HasColumnName("program_id");
+            entity.Property(e => e.ProjectId).HasColumnName("project_id");
+            entity.Property(e => e.ProjectManagerId).HasColumnName("project_manager_id");
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
+            entity.Property(e => e.Status)
+                .HasMaxLength(255)
+                .HasColumnName("status");
+            entity.Property(e => e.SubProjectCode)
+                .HasMaxLength(255)
+                .HasDefaultValueSql("pm.generate_project_code()")
+                .HasColumnName("sub_project_code");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedBy)
+                .HasMaxLength(255)
+                .HasColumnName("updated_by");
+
+            entity.HasOne(d => d.Project).WithMany()
+                .HasForeignKey(d => d.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("sub_project_project_id_fkey");
+
+            entity.HasOne(d => d.Program).WithMany()
+                .HasForeignKey(d => d.ProgramId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("sub_project_program_id_fkey");
+
+            entity.HasOne(d => d.ProjectManager).WithMany()
+                .HasForeignKey(d => d.ProjectManagerId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("sub_project_project_manager_id_fkey");
+        });
+
         modelBuilder.Entity<PurchaseHistoryVw>(entity =>
         {
             entity
@@ -5632,6 +5696,7 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.PerformedById).HasColumnName("performed_by_id");
             entity.Property(e => e.ProjectDate).HasColumnName("project_date");
             entity.Property(e => e.ProjectId).HasColumnName("project_id");
+            entity.Property(e => e.SubProjectId).HasColumnName("sub_project_id");
             entity.Property(e => e.ReferenceNumber)
                 .HasMaxLength(255)
                 .HasColumnName("reference_number");
@@ -5672,6 +5737,11 @@ public partial class SpaceLinxContext : DbContext
                 .HasForeignKey(d => d.ProjectId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("stock_movement_project_id_fkey");
+
+            entity.HasOne(d => d.SubProject).WithMany()
+                .HasForeignKey(d => d.SubProjectId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("stock_movement_sub_project_id_fkey");
 
             entity.HasOne(d => d.ToBin).WithMany()
                 .HasForeignKey(d => d.ToBinId)

@@ -17,6 +17,7 @@ public class StockMovementWithLineItemsWriteModel
     public DateOnly? ExpectedReturnDate { get; set; }
     public DateOnly? ProjectDate { get; set; }
     public Guid? ProjectId { get; set; }
+    public Guid? SubProjectId { get; set; }
     public string? Department { get; set; }
     public Guid? AssignedUserId { get; set; }
     public List<StockMovementLineItemWriteModel> LineItems { get; set; } = new();

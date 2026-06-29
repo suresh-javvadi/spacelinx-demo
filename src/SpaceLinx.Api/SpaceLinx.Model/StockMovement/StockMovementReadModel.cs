@@ -18,9 +18,11 @@ public partial class StockMovementReadModel : BaseReadModel
     public DateOnly? ExpectedReturnDate { get; set; }
     public DateOnly? ProjectDate { get; set; }
     public Guid? ProjectId { get; set; }
+    public Guid? SubProjectId { get; set; }
     public string? Department { get; set; }
     public Guid? AssignedUserId { get; set; }
     public virtual ProjectRefModel? Project { get; set; }
+    public virtual SubProjectRefModel? SubProject { get; set; }
     public virtual UserRefModel? AssignedUser { get; set; }
     public virtual LocationRefModel? FromLocation { get; set; }
     public virtual LocationRefModel? ToLocation { get; set; }

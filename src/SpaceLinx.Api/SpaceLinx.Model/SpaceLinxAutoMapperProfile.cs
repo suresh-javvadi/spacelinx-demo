@@ -413,6 +413,12 @@ public class SpaceLinxAutoMapperProfile : Profile
         CreateMap<ProjectWriteModel, Project>();
         CreateMap<ProjectUpdateModel, Project>();
 
+        //SubProject
+        CreateMap<SubProject, SubProjectReadModel>();
+        CreateMap<SubProject, SubProjectRefModel>();
+        CreateMap<SubProjectWriteModel, SubProject>();
+        CreateMap<SubProjectUpdateModel, SubProject>();
+
         //PurchaseOrder
         CreateMap<PurchaseOrder, PurchaseOrderReadModel>();
         CreateMap<PurchaseOrder, PurchaseOrderRefModel>();

@@ -51,6 +51,7 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             ToLocationId = request.ToLocationId,
             ToBinId = request.ToBinId,
             ProjectId = request.ProjectId,
+            SubProjectId = request.SubProjectId,
             Department = request.Department,
             AssignedUserId = request.AssignedUserId,
             PerformedById = request.PerformedById ?? user?.Id,
@@ -367,6 +368,7 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
         stockMovement.ToLocationId = request.ToLocationId;
         stockMovement.ToBinId = request.ToBinId;
         stockMovement.ProjectId = request.ProjectId;
+        stockMovement.SubProjectId = request.SubProjectId;
         stockMovement.Department = request.Department;
         stockMovement.AssignedUserId = request.AssignedUserId;
         stockMovement.PerformedById = request.PerformedById ?? user?.Id;

@@ -4933,6 +4933,32 @@ CREATE TABLE pm.project (
 
 
 --
+-- Name: sub_project; Type: TABLE; Schema: pm; Owner: -
+--
+
+CREATE TABLE pm.sub_project (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    sub_project_code character varying(255) DEFAULT pm.generate_project_code() NOT NULL,
+    name character varying(255) NOT NULL,
+    description text,
+    project_id uuid NOT NULL,
+    program_id uuid,
+    project_manager_id uuid,
+    start_date timestamp with time zone,
+    end_date timestamp with time zone,
+    status character varying(255),
+    budget numeric(18,4),
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created_by character varying(255) NOT NULL,
+    updated_at timestamp with time zone,
+    updated_by character varying(255),
+    deleted_at timestamp with time zone,
+    deleted_by character varying(255)
+);
+
+
+--
 -- Name: project_code_seq; Type: SEQUENCE; Schema: pm; Owner: -
 --
 
@@ -6358,7 +6384,8 @@ CREATE TABLE sc.stock_movement (
     project_date date,
     department character varying(255),
     project_id uuid,
-    assigned_user_id uuid
+    assigned_user_id uuid,
+    sub_project_id uuid
 );
 
 
@@ -8291,6 +8318,14 @@ ALTER TABLE ONLY pm.project
 
 
 --
+-- Name: sub_project sub_project_pkey; Type: CONSTRAINT; Schema: pm; Owner: -
+--
+
+ALTER TABLE ONLY pm.sub_project
+    ADD CONSTRAINT sub_project_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: resource_allocation resource_allocation_pkey; Type: CONSTRAINT; Schema: pm; Owner: -
 --
 
@@ -9972,6 +10007,30 @@ ALTER TABLE ONLY pm.project
 
 
 --
+-- Name: sub_project sub_project_program_id_fkey; Type: FK CONSTRAINT; Schema: pm; Owner: -
+--
+
+ALTER TABLE ONLY pm.sub_project
+    ADD CONSTRAINT sub_project_program_id_fkey FOREIGN KEY (program_id) REFERENCES pm.program(id) ON DELETE SET NULL;
+
+
+--
+-- Name: sub_project sub_project_project_id_fkey; Type: FK CONSTRAINT; Schema: pm; Owner: -
+--
+
+ALTER TABLE ONLY pm.sub_project
+    ADD CONSTRAINT sub_project_project_id_fkey FOREIGN KEY (project_id) REFERENCES pm.project(id) ON DELETE CASCADE;
+
+
+--
+-- Name: sub_project sub_project_project_manager_id_fkey; Type: FK CONSTRAINT; Schema: pm; Owner: -
+--
+
+ALTER TABLE ONLY pm.sub_project
+    ADD CONSTRAINT sub_project_project_manager_id_fkey FOREIGN KEY (project_manager_id) REFERENCES application."user"(id) ON DELETE SET NULL;
+
+
+--
 -- Name: resource_allocation resource_allocation_project_id_fkey; Type: FK CONSTRAINT; Schema: pm; Owner: -
 --
 
@@ -10689,6 +10748,14 @@ ALTER TABLE ONLY sc.scrap_request
 
 ALTER TABLE ONLY sc.stock_movement
     ADD CONSTRAINT stock_movement_project_id_fkey FOREIGN KEY (project_id) REFERENCES pm.project(id) ON DELETE SET NULL;
+
+
+--
+-- Name: stock_movement stock_movement_sub_project_id_fkey; Type: FK CONSTRAINT; Schema: sc; Owner: -
+--
+
+ALTER TABLE ONLY sc.stock_movement
+    ADD CONSTRAINT stock_movement_sub_project_id_fkey FOREIGN KEY (sub_project_id) REFERENCES pm.sub_project(id) ON DELETE SET NULL;
 
 
 --

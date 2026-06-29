@@ -175,6 +175,7 @@
     <Build Include="PM\Tables\pm.milestone.sql" />
     <Build Include="PM\Tables\pm.program.sql" />
     <Build Include="PM\Tables\pm.project.sql" />
+    <None Include="PM\Tables\pm.sub_project.sql" />
     <Build Include="PM\Tables\pm.task.sql" />
     <Build Include="PM\Tables\pm.task_alter.sql" />
     <Build Include="PM\Tables\pm.task_dependency.sql" />

@@ -154,8 +154,11 @@ public class SpaceLinxConstants
             { typeof(ScrapRequest), new Expression<Func<ScrapRequest, object>>[]
                 { x => x.ApprovedBy, x => x.Grn, x => x.Po, x => x.Location,x => x.RaisedBy, x => x.Wo, }
             },
+            { typeof(SubProject), new Expression<Func<SubProject, object>>[]
+                { x => x.Project, x => x.Program, x => x.ProjectManager }
+            },
             { typeof(StockMovement), new Expression<Func<StockMovement, object>>[]
-                { x => x.FromLocation, x => x.ToLocation, x => x.FromBin, x => x.ToBin, x => x.PerformedBy, x => x.WorkOrder, x => x.Project }
+                { x => x.FromLocation, x => x.ToLocation, x => x.FromBin, x => x.ToBin, x => x.PerformedBy, x => x.WorkOrder, x => x.Project, x => x.SubProject }
             },
             { typeof(StockMovementLineItem), new Expression<Func<StockMovementLineItem, object>>[]
                 { x => x.StockMovement, x => x.Part }
@@ -295,6 +298,7 @@ public class SpaceLinxConstants
             { typeof(Product), new string[] { nameof(Product.Name), nameof(Product.Number) } },
             { typeof(Program), new string[] { nameof(Program.ProgramCode), nameof(Program.Name), nameof(Program.Description), nameof(Program.StartDate), nameof(Program.EndDate), nameof(Program.CustomerId), nameof(Program.ProgramManagerId), nameof(Program.SupplyChainManagerId), nameof(Program.BuyerId), nameof(Program.Status) } },
             { typeof(Project), new string[] { nameof(Project.ProjectCode), nameof(Project.Name), nameof(Project.Description), nameof(Project.ProgramId), nameof(Project.ProjectManagerId), nameof(Project.StartDate), nameof(Project.EndDate), nameof(Project.Status), nameof(Project.Budget) } },
+            { typeof(SubProject), new string[] { nameof(SubProject.SubProjectCode), nameof(SubProject.Name), nameof(SubProject.Description), nameof(SubProject.ProjectId), nameof(SubProject.ProgramId), nameof(SubProject.ProjectManagerId), nameof(SubProject.StartDate), nameof(SubProject.EndDate), nameof(SubProject.Status), nameof(SubProject.Budget) } },
             { typeof(PurchaseOrder), new string[] {nameof(PurchaseOrder.Number), nameof(PurchaseOrder.CompanyId), nameof(PurchaseOrder.OrderDate), nameof(PurchaseOrder.Status), nameof(PurchaseOrder.TotalAmount), nameof(PurchaseOrder.ProjectId), nameof(PurchaseOrder.PoType), nameof(PurchaseOrder.BuyerId), nameof(PurchaseOrder.SupplyChainLeadId), nameof(PurchaseOrder.RequisitionId), nameof(PurchaseOrder.PaymentTermId), nameof(PurchaseOrder.CurrencyId), nameof(PurchaseOrder.ActualDeliveryDate), nameof(PurchaseOrder.ExpectedDeliveryDate), nameof(PurchaseOrder.RevisionHistory), nameof(PurchaseOrder.BillingAddressId), nameof(PurchaseOrder.DeliveryAddressId), nameof(PurchaseOrder.ShippingAddressId), nameof(PurchaseOrder.DeliveryStatus), nameof(PurchaseOrder.QuotationReferenceId), nameof(PurchaseOrder.PoTerms) } },
             { typeof(Requisition), new string[] { nameof(Requisition.ReqNumber), nameof(Requisition.RequestedById), nameof(Requisition.RequestDate), nameof(Requisition.Title), nameof(Requisition.ProjectId), nameof(Requisition.RequiredByDate), nameof(Requisition.Justification), nameof(Requisition.Priority), nameof(Requisition.Status), nameof(Requisition.TotalEstimatedAmount), nameof(Requisition.ApprovedBy), nameof(Requisition.RejectedBy), nameof(Requisition.ApproverComment) } },
             { typeof(RequisitionLineItem), new string[] { nameof(RequisitionLineItem.RequisitionId), nameof(RequisitionLineItem.PartId), nameof(RequisitionLineItem.Quantity), nameof(RequisitionLineItem.Description) } },
