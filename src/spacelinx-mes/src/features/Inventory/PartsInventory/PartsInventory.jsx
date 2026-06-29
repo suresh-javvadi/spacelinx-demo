@@ -56,6 +56,8 @@ const PartsInventory = () => {
     qtyReserved: row.qtyReserved ?? 0,
     qtyIssued: row.qtyIssued ?? 0,
     qtyAvailable: row.qtyAvailable ?? 0,
+    openingQty: row.openingQty ?? 0,
+    openingPrice: row.openingPrice ?? 0,
   }));
 
   useEffect(() => {
@@ -127,6 +129,13 @@ const PartsInventory = () => {
       flex: 1,
     },
     {
+      field: "openingQty",
+      headerName: "Opening Qty",
+      flex: 1,
+      type: "number",
+      renderCell: ({ row }) => <p>{row?.openingQty ?? 0}</p>,
+    },
+    {
       field: "qtyAvailable",
       headerName: "Available Qty",
       flex: 1,
@@ -195,6 +204,13 @@ const PartsInventory = () => {
           //     }`;
           //   },
           // },
+          {
+            field: "openingPrice",
+            headerName: "Opening Price",
+            flex: 1,
+            type: "number",
+            valueFormatter: (value) => formatAmount(value, 4),
+          },
           {
             field: "availablePrice",
             headerName: "Available qty Price",
