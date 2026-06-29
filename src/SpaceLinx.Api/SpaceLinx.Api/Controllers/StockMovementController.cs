@@ -68,6 +68,8 @@ public class StockMovementController(
             .Include(m => m.ToBin)
             .Include(m => m.PerformedBy)
             .Include(m => m.WorkOrder)
+            .Include(m => m.Project)
+            .Include(m => m.SubProject)
             .Include(m => m.StockMovementLineItems)
                 .ThenInclude(li => li.Part)
             .FirstOrDefaultAsync(m => m.Id == id && m.DeletedBy == null);
