@@ -9,5 +9,6 @@ public class GrnLineItemCreateModel : BaseWriteModel
     public string? TrackingId { get; set; }
     public DateOnly? ManufacturingDate { get; set; }
     public DateOnly? ExpiryDate { get; set; }
+    public string? DateCode { get; set; }
     public string? Remark { get; set; }
 }

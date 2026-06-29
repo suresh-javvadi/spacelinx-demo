@@ -7,6 +7,7 @@ CREATE TABLE sc.grn_line_item (
     tracking_id VARCHAR(255),
     manufacturing_date DATE,
     expiry_date DATE,
+    date_code VARCHAR(100),
     qc_status VARCHAR(50) CHECK (qc_status IN ('Pending', 'Pass', 'Fail')) DEFAULT 'Pending',
     qc_date TIMESTAMPTZ,
     checked_by_id UUID,

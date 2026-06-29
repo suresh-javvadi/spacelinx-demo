@@ -112,6 +112,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                     TrackingId = item.TrackingId,
                     ManufacturingDate = item.ManufacturingDate,
                     ExpiryDate = item.ExpiryDate,
+                    DateCode = item.DateCode,
                     Remark = item.Remark,
                     CreatedBy = UserEmail,
                     CreatedAt = DateTime.UtcNow,
@@ -289,6 +290,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                 lineItem.QcStatus = record.QcStatus;
                 lineItem.ManufacturingDate = record.ManufacturingDate;
                 lineItem.ExpiryDate = record.ExpiryDate;
+                lineItem.DateCode = record.DateCode;
                 lineItem.QcDate = DateTime.UtcNow;
                 lineItem.CheckedById = user?.Id;
                 lineItem.QcRemark = record.QcRemark;

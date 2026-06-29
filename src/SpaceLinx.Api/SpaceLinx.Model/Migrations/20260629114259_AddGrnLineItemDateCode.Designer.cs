@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SpaceLinx.Model;
@@ -12,9 +13,11 @@ using SpaceLinx.Model;
 namespace SpaceLinx.Model.Migrations
 {
     [DbContext(typeof(SpaceLinxContext))]
-    partial class SpaceLinxContextModelSnapshot : ModelSnapshot
+    [Migration("20260629114259_AddGrnLineItemDateCode")]
+    partial class AddGrnLineItemDateCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

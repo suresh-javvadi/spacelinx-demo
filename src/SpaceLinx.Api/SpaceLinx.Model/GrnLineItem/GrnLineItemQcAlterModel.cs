@@ -6,5 +6,6 @@ public partial class GrnLineItemQcAlterModel
     public string? QcStatus { get; set; }
     public DateOnly? ManufacturingDate { get; set; }
     public DateOnly? ExpiryDate { get; set; }
+    public string? DateCode { get; set; }
     public string? QcRemark { get; set; }
 }

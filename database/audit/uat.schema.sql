@@ -5863,6 +5863,7 @@ CREATE TABLE sc.grn_line_item (
     tracking_id character varying(255),
     manufacturing_date date,
     expiry_date date,
+    date_code character varying(100),
     qc_status character varying(50) DEFAULT 'Pending'::character varying,
     qc_date timestamp with time zone,
     checked_by_id uuid,

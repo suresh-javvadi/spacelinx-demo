@@ -10,6 +10,7 @@ public partial class GrnLineItem : BaseModel
     public string? TrackingId { get; set; }
     public DateOnly? ManufacturingDate { get; set; }
     public DateOnly? ExpiryDate { get; set; }
+    public string? DateCode { get; set; }
     public string? QcStatus { get; set; }
     public DateTime? QcDate { get; set; }
     public Guid? CheckedById { get; set; }

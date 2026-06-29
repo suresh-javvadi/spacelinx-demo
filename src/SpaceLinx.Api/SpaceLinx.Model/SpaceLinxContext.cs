@@ -2046,6 +2046,9 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.Disposition)
                 .HasMaxLength(50)
                 .HasColumnName("disposition");
+            entity.Property(e => e.DateCode)
+                .HasMaxLength(100)
+                .HasColumnName("date_code");
             entity.Property(e => e.ExpiryDate).HasColumnName("expiry_date");
             entity.Property(e => e.GrnId).HasColumnName("grn_id");
             entity.Property(e => e.IsActive)
