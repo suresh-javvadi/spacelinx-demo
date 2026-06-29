@@ -16,6 +16,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { PERMISSIONS } from "../../../constants/PagePermissions";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import Popover from "@mui/material/Popover";
+import { pdf } from "@react-pdf/renderer";
+import PrintGoodsReceiptNote from "./printGoodsReceiptNote";
+import { fetchPurchaseOrderwithId } from "../../../services/purchaseOrders";
 
 const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
   const { Alert } = useContext(AlertsContext);
@@ -24,6 +27,8 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
   const [editFlyOutTabsValue, setEditFlyOutTabsValue] = useState("1");
   const [loadingData, setLoadingData] = useState(true);
   const [lineItems, setLineItems] = useState([]);
+  const [poApprovals, setPoApprovals] = useState([]);
+  const [vendorName, setVendorName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [readOnlyMode, setReadOnlyMode] = useState(true);
   const [newDocuments, setNewDocuments] = useState([]);
@@ -93,6 +98,21 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
           ) || [];
 
         setLineItems(sortedData);
+
+        if (selectedGRN?.poId) {
+          try {
+            const poData = await fetchPurchaseOrderwithId(selectedGRN.poId);
+            setPoApprovals(poData?.approvals || []);
+            setVendorName(
+              selectedGRN?.vendor?.name || poData?.company?.name || "",
+            );
+          } catch {
+            setPoApprovals([]);
+            setVendorName(selectedGRN?.vendor?.name || "");
+          }
+        } else {
+          setVendorName(selectedGRN?.vendor?.name || "");
+        }
       }
     } catch (error) {
       Alert("Failed to load GRN details", "error");
@@ -238,6 +258,30 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
     { label: "P.O Status", value: formData.poStatus },
   ];
 
+  const handlePrintGRN = async () => {
+    try {
+      const doc = (
+        <PrintGoodsReceiptNote
+          grnData={{ ...selectedGRN, companyName: vendorName }}
+          lineItems={lineItems}
+          poApprovals={poApprovals}
+        />
+      );
+      const blob = await pdf(doc).toBlob();
+      const url = URL.createObjectURL(blob);
+      const newWindow = window.open(url, "_blank");
+      if (newWindow) {
+        newWindow.addEventListener("load", () => URL.revokeObjectURL(url));
+      } else {
+        Alert("Pop-ups are blocked. Please allow pop-ups to print.", "warning");
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      }
+    } catch (error) {
+      console.error("Failed to generate GRN PDF:", error);
+      Alert("Failed to generate PDF. Please try again.", "error");
+    }
+  };
+
   return (
     <div className="GrnNewFlyout">
       <div className="EditFlyoutHeader">
@@ -246,6 +290,14 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
           <p>
             <span>Status:</span> <span>{selectedGRN?.status}</span>{" "}
           </p>
+          <Divider
+            className="VerticalDivider"
+            orientation="vertical"
+            flexItem
+          />
+          <button onClick={handlePrintGRN} title="Print GRN">
+            <ion-icon name="print-outline" style={{ color: "#00ccff" }}></ion-icon>
+          </button>
           {selectedGRN?.status === "In Process" && (
             <>
               <Divider
