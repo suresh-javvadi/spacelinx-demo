@@ -256,14 +256,30 @@ public sealed class SpaceLinxAuditInterceptor : SaveChangesInterceptor
     private static bool ShouldRedact(Type type, string propertyName)
         => RedactCache.GetOrAdd((type, propertyName), key =>
         {
-            var prop = key.Item1.GetProperty(
-                key.Item2, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            var prop = GetPropertySafe(key.Item1, key.Item2);
             if (prop?.GetCustomAttribute<AuditRedactAttribute>() is not null)
             {
                 return true;
             }
             return SensitiveName.IsMatch(key.Item2);
         });
+
+    // Type.GetProperty throws AmbiguousMatchException when a subclass shadows a base property
+    // with 'new' (e.g. PartLevel.CreatedAt). Walk the hierarchy from most-derived using
+    // DeclaredOnly so we always get exactly one match.
+    private static PropertyInfo? GetPropertySafe(Type type, string propertyName)
+    {
+        for (var t = type; t != null; t = t.BaseType)
+        {
+            var prop = t.GetProperty(propertyName,
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.IgnoreCase);
+            if (prop != null)
+            {
+                return prop;
+            }
+        }
+        return null;
+    }
 
     private static bool IsExcluded(Type type, EntityState state)
     {

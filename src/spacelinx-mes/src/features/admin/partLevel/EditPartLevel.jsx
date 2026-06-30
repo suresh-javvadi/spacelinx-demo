@@ -35,6 +35,7 @@ const EditPartLevel = ({
       setFormData(values);
       setInitialValues(values);
       setErrors({});
+      setReadOnlyMode(true);
     }
   }, [selectedPartLevel]);
 
