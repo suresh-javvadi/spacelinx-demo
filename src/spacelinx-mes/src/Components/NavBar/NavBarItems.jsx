@@ -360,6 +360,11 @@ const NavBarItems = [
         permission: PERMISSIONS.PARTLEVELS.VIEW,
       },
       {
+        label: "Unit of Measure",
+        path: "/settings/unitofmeasure",
+        permission: PERMISSIONS.UNITOFMEASURE.VIEW,
+      },
+      {
         label: "Email Templates",
         path: "/settings/emailtemplates",
         permission: PERMISSIONS.EMAILTEMPLATES.VIEW,

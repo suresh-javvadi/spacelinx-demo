@@ -373,8 +373,9 @@ const EditPart = ({
   };
 
   useEffect(() => {
+    setReadOnlyMode(true);
     fetchPartVersionsData();
-  }, []);
+  }, [selectedPartNumberSuffix]);
 
   const fetchPartVersionsData = async () => {
     setLoadingData(true);
@@ -469,7 +470,7 @@ const EditPart = ({
       setReferenceNumber(selectedPart?.part?.referenceNumber || "");
       setEditSpaceQualifiedError("");
       setEditTRL(selectedPart?.part?.trl || "");
-      setEditManufacturerName(selectedId?.part?.manufacturerName || "");
+      setEditManufacturerName(selectedPart?.part?.manufacturerName || "");
       setEditCountryOfOrigin(selectedPart?.part?.countryOfOrigin || "");
       setEditSerialNumberRequiredError("");
       setShortDescription(selectedPart?.part?.shortDescription || "");
@@ -478,6 +479,8 @@ const EditPart = ({
       setShowCustomGrade(gradeState.showCustomGrade);
       setCustomGrade(gradeState.customGrade);
       setEditHsnCode(selectedPart?.part?.hsnCode || "");
+      setEditSubsystem(selectedPart?.subSystem || null);
+      setEditPartLevel(selectedPart?.partLevel || null);
     }
   };
 

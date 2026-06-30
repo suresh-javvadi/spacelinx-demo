@@ -70,6 +70,11 @@ const cardData = [
         to: "/settings/partlevels",
         permission: PERMISSIONS.PARTLEVELS.VIEW,
       },
+      {
+        text: "Unit of Measure",
+        to: "/settings/unitofmeasure",
+        permission: PERMISSIONS.UNITOFMEASURE.VIEW,
+      },
     ],
   },
   {

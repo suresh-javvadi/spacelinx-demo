@@ -1764,6 +1764,30 @@
       "assigned": true
     },
     {
+      "key": "UNITOFMEASURE.DELETE",
+      "category": "UNITOFMEASURE",
+      "description": "Delete units of measure.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "UNITOFMEASURE.MODIFY",
+      "category": "UNITOFMEASURE",
+      "description": "Modify units of measure.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
+      "key": "UNITOFMEASURE.VIEW",
+      "category": "UNITOFMEASURE",
+      "description": "View units of measure.",
+      "inFrontend": true,
+      "inDb": false,
+      "assigned": false
+    },
+    {
       "key": "VENDORRETURNS.APPROVE",
       "category": "VENDORRETURNS",
       "description": "Approve vendor returns.",

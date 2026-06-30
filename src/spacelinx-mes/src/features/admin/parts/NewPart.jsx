@@ -41,7 +41,7 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
   const [formValues, setFormValues] = useState({
     partName: "",
     partType: null,
-    makeOrBuy: 0,
+    makeOrBuy: "0",
     uom: "",
     serialNumberRequiredValue: false,
     spaceQualified: true,
@@ -206,10 +206,10 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
     }
   };
   useEffect(() => {
-    setFormValues({
-      ...formValues,
+    setFormValues((prev) => ({
+      ...prev,
       uom: uomData?.find((item) => item?.name === "Each (EA)"),
-    });
+    }));
   }, [uomData]);
 
   useEffect(() => {

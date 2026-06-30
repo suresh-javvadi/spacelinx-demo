@@ -97,10 +97,13 @@ const filterTreeData = (data, term) => {
   const filteredData = [];
 
   for (const part of data) {
-    if (matchesSearch(part, term)) {
-      let partCopy = { ...part };
-      partCopy.children = part.children;
-      filteredData.push(partCopy);
+    const filteredChildren = part.children
+      ? filterTreeData(part.children, term)
+      : undefined;
+    const childrenMatch = filteredChildren && filteredChildren.length > 0;
+
+    if (matchesSearch(part, term) || childrenMatch) {
+      filteredData.push({ ...part, children: filteredChildren });
     }
   }
 

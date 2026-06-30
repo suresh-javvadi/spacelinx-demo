@@ -154,6 +154,9 @@ const Subsystems = lazy(
 const PartLevel = lazy(
   () => import("../../features/admin/partLevel/PartLevel"),
 );
+const UnitOfMeasure = lazy(
+  () => import("../../features/admin/UnitOfMeasure/UnitOfMeasure"),
+);
 const ApprovalsConfig = lazy(
   () => import("../../features/adminuser/ApprovalsConfig/ApprovalsConfig"),
 );
@@ -545,6 +548,13 @@ const Content = ({ status }) => {
             element={renderProtectedComponent(
               PERMISSIONS.PARTLEVELS.VIEW,
               PartLevel,
+            )}
+          />
+          <Route
+            path="/settings/unitofmeasure"
+            element={renderProtectedComponent(
+              PERMISSIONS.UNITOFMEASURE.VIEW,
+              UnitOfMeasure,
             )}
           />
           <Route
