@@ -1,5 +1,12 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { TextField, Autocomplete, Box, Tab, Button, Divider } from "@mui/material";
+import {
+  TextField,
+  Autocomplete,
+  Box,
+  Tab,
+  Button,
+  Divider,
+} from "@mui/material";
 import { AlertsContext } from "../../AlertsContext/Context";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
@@ -156,7 +163,7 @@ const NewGoodReceiptNote = ({
     }));
   };
 
-  const handlePurchaseOrderChange = (newValue) => {
+  const handlePurchaseOrderChange = async (newValue) => {
     const hasParts = selectedParts.length > 0;
     if (!newValue) {
       if (hasParts) {
@@ -173,6 +180,7 @@ const NewGoodReceiptNote = ({
       setSelectedPO(null);
       setLineItems([]);
       setSelectedParts([]);
+      setLineItemErrors({});
       setFormData((prev) => ({ ...prev, vendor: null }));
       return;
     }
@@ -185,13 +193,48 @@ const NewGoodReceiptNote = ({
         setSelectedPO(selectedPO);
         return;
       }
-
-      setSelectedParts([]);
-      setLineItems([]);
     }
-    setSelectedPO(newValue);
 
-    loadPOLineItems(newValue.id);
+    setSelectedPO(newValue);
+    setSelectedParts([]);
+    setLineItems([]);
+    setLineItemErrors({});
+
+    const poLineItems = await loadPOLineItems(newValue.id);
+    const autoPopulatedParts = poLineItems
+      .map((item, index) => {
+        const matchedPart = partsData.find((part) => part.id === item.partId);
+
+        if (!matchedPart) {
+          return null;
+        }
+
+        const isPart = !matchedPart.itemType || matchedPart.itemType === "Part";
+        const isSerial = isPart && matchedPart.isSerialNumberRequired === true;
+        const trackingTypeObj = isPart
+          ? trackingTypes.find(
+              (t) => t.value === (isSerial ? "serial" : "batch"),
+            )
+          : null;
+
+        return {
+          ...matchedPart,
+          uniqueId: `${item.id || matchedPart.id}-${index}`,
+          poLineItemId: item.id,
+          pendingQuantity: item.pendingQuantity ?? 0,
+          orderedQuantity: item.orderedQuantity ?? 0,
+          receivedQuantity: isSerial ? 1 : "",
+          trackingType: trackingTypeObj,
+          trackingNumber: "",
+          remarks: "",
+          expectedDeliveryDate: item.expectedDeliveryDate ?? null,
+          actualDeliveryDate: item.actualDeliveryDate ?? null,
+          unitPrice: item.unitPrice ?? null,
+        };
+      })
+      .filter(Boolean);
+
+    setSelectedParts(autoPopulatedParts);
 
     const autoVendor = vendorsData.find((v) => v.id === newValue.companyId);
 
@@ -361,9 +404,11 @@ const NewGoodReceiptNote = ({
 
       setLineItems(filteredItems);
       setPoApprovals(data?.approvals || []);
+      return filteredItems;
     } catch {
       Alert("Failed to fetch PO line items", "error");
       setLineItems([]);
+      return [];
     } finally {
       setLoadingPartsData(false);
     }
@@ -847,6 +892,15 @@ const NewGoodReceiptNote = ({
       },
     },
     {
+      field: "orderedQuantity",
+      headerName: "Ordered Quantity",
+      flex: 0.8,
+      minWidth: 100,
+      renderCell: ({ row }) => (
+        <span>{row.orderedQuantity ?? row.OrderedQuantity ?? "-"}</span>
+      ),
+    },
+    {
       field: "receivedQuantity",
       headerName: "Received Qty",
       flex: 0.8,
@@ -932,9 +986,16 @@ const NewGoodReceiptNote = ({
           {createdGrn && (
             <>
               <button onClick={handlePrintCreatedGRN} title="Print GRN">
-                <ion-icon name="print-outline" style={{ color: "#00ccff" }}></ion-icon>
+                <ion-icon
+                  name="print-outline"
+                  style={{ color: "#00ccff" }}
+                ></ion-icon>
               </button>
-              <Divider className="VerticalDivider" orientation="vertical" flexItem />
+              <Divider
+                className="VerticalDivider"
+                orientation="vertical"
+                flexItem
+              />
             </>
           )}
           <button onClick={createdGrn ? handleCloseAfterCreate : handleClose}>
@@ -1099,52 +1160,56 @@ const NewGoodReceiptNote = ({
                   fullWidth
                 />
 
-                <Autocomplete
-                  value={value}
-                  onChange={(e, newValue) => {
-                    handleSelectPart(newValue);
-                    setValue(null);
-                    setInputValue("");
-                  }}
-                  inputValue={inputValue}
-                  onInputChange={(e, newInputValue) =>
-                    setInputValue(newInputValue)
-                  }
-                  options={availableParts}
-                  loading={loadingPartsData}
-                  loadingText="Loading Parts..."
-                  getOptionLabel={(option) =>
-                    option
-                      ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}${option.poLineItemId ? ` - PO Qty ${option.orderedQuantity || 0} - Pending ${option.pendingQuantity || 0}` : ""}`
-                      : ""
-                  }
-                  isOptionEqualToValue={(option, value) =>
-                    (option.poLineItemId || option.id) ===
-                    (value?.poLineItemId || value?.id)
-                  }
-                  renderInput={(params) => (
-                    <TextField {...params} label="Select Part" fullWidth />
-                  )}
-                  renderOption={(props, option) => (
-                    <li {...props} key={option.poLineItemId || option.id}>
-                      <div>
-                        <strong>{option.name}</strong>
-                        <div style={{ fontSize: "0.85rem" }}>
-                          Part No: {option.partNumber}
-                        </div>
-                        <div style={{ fontSize: "0.85rem" }}>
-                          Manf. Part No: {option.manufacturingPartNumber}
-                        </div>
-                        {option.poLineItemId ? (
+                {!selectedPO ? (
+                  <Autocomplete
+                    value={value}
+                    onChange={(e, newValue) => {
+                      handleSelectPart(newValue);
+                      setValue(null);
+                      setInputValue("");
+                    }}
+                    inputValue={inputValue}
+                    onInputChange={(e, newInputValue) =>
+                      setInputValue(newInputValue)
+                    }
+                    options={availableParts}
+                    loading={loadingPartsData}
+                    loadingText="Loading Parts..."
+                    getOptionLabel={(option) =>
+                      option
+                        ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}${option.poLineItemId ? ` - PO Qty ${option.orderedQuantity || 0} - Pending ${option.pendingQuantity || 0}` : ""}`
+                        : ""
+                    }
+                    isOptionEqualToValue={(option, value) =>
+                      (option.poLineItemId || option.id) ===
+                      (value?.poLineItemId || value?.id)
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Select Part" fullWidth />
+                    )}
+                    renderOption={(props, option) => (
+                      <li {...props} key={option.poLineItemId || option.id}>
+                        <div>
+                          <strong>{option.name}</strong>
                           <div style={{ fontSize: "0.85rem" }}>
-                            Ordered: {option.orderedQuantity || 0} | Pending:{" "}
-                            {option.pendingQuantity || 0}
+                            Part No: {option.partNumber}
                           </div>
-                        ) : null}
-                      </div>
-                    </li>
-                  )}
-                />
+                          <div style={{ fontSize: "0.85rem" }}>
+                            Manf. Part No: {option.manufacturingPartNumber}
+                          </div>
+                          {option.poLineItemId ? (
+                            <div style={{ fontSize: "0.85rem" }}>
+                              Ordered: {option.orderedQuantity || 0} | Pending:{" "}
+                              {option.pendingQuantity || 0}
+                            </div>
+                          ) : null}
+                        </div>
+                      </li>
+                    )}
+                  />
+                ) : (
+                  ""
+                )}
 
                 <div className="GrnDataGridDiv">
                   <StyledDataGrid
@@ -1164,7 +1229,9 @@ const NewGoodReceiptNote = ({
                 <Button onClick={handleCancel} className="CancelButton">
                   Cancel
                 </Button>
-                <Button onClick={handleCreateGRN} disabled={!!createdGrn}>Create</Button>
+                <Button onClick={handleCreateGRN} disabled={!!createdGrn}>
+                  Create
+                </Button>
               </div>
             </TabPanel>
             <TabPanel value="2" className="GrnNewFlyoutTabPanelDocuments">
@@ -1186,7 +1253,9 @@ const NewGoodReceiptNote = ({
                 <Button onClick={handleCancel} className="CancelButton">
                   Cancel
                 </Button>
-                <Button onClick={handleCreateGRN} disabled={!!createdGrn}>Create</Button>
+                <Button onClick={handleCreateGRN} disabled={!!createdGrn}>
+                  Create
+                </Button>
               </div>
             </TabPanel>
           </>

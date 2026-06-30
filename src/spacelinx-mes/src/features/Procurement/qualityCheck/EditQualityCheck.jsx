@@ -70,8 +70,7 @@ const EditQualityCheck = ({ selectedGRN, handleClose, handleRefresh }) => {
     const payLoad = lineItems.map((item) => ({
       id: item.id,
       qcStatus: item.qcStatus,
-      manufacturingDate: item.manufacturingDate,
-      expiryDate: item.expiryDate,
+      dateCode: item.dateCode ?? item.DateCode ?? "",
       remark: item.remark,
     }));
 
@@ -94,18 +93,10 @@ const EditQualityCheck = ({ selectedGRN, handleClose, handleRefresh }) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleManufacturingDateChange = (id, value) => {
+  const handleDateCodeChange = (id, value) => {
     setLineItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, manufacturingDate: value } : item,
-      ),
-    );
-  };
-
-  const handleExpiryDateChange = (id, value) => {
-    setLineItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, expiryDate: value } : item,
+        item.id === id ? { ...item, dateCode: value } : item,
       ),
     );
   };
@@ -265,47 +256,15 @@ const EditQualityCheck = ({ selectedGRN, handleClose, handleRefresh }) => {
       },
     },
     {
-      field: "manufacturingDate",
-      headerName: "Manufacturing Date",
+      field: "dateCode",
+      headerName: "Date Code",
       flex: 1,
       filterable: false,
       renderCell: ({ row }) => (
         <TextField
-          type="date"
           fullWidth
-          value={row.manufacturingDate || ""}
-          onChange={(e) =>
-            handleManufacturingDateChange(row.id, e.target.value)
-          }
-          inputProps={{
-            readOnly: !canEditLineItem(row),
-          }}
-          sx={{
-            "& .MuiInputBase-root": {
-              height: 40,
-              padding: "0 10px",
-              borderRadius: "6px",
-              marginTop: "4px",
-            },
-            "& input": {
-              padding: "4px 6px !important",
-              fontSize: "14px",
-            },
-          }}
-        />
-      ),
-    },
-    {
-      field: "expiryDate",
-      headerName: "Expiry Date",
-      flex: 1,
-      filterable: false,
-      renderCell: ({ row }) => (
-        <TextField
-          type="date"
-          fullWidth
-          value={row.expiryDate || ""}
-          onChange={(e) => handleExpiryDateChange(row.id, e.target.value)}
+          value={row.dateCode ?? row.DateCode ?? ""}
+          onChange={(e) => handleDateCodeChange(row.id, e.target.value)}
           inputProps={{
             readOnly: !canEditLineItem(row),
           }}

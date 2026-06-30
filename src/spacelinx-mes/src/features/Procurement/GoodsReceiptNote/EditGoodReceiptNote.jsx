@@ -171,6 +171,18 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       },
     },
     {
+      field: "orderedQuantity",
+      headerName: "Ordered Quantity",
+      flex: 1,
+      type: "number",
+      renderCell: ({ row }) =>
+        row.orderedQuantity ??
+        row.OrderedQuantity ??
+        row.poLineItem?.orderedQuantity ??
+        row.poLineItem?.OrderedQuantity ??
+        "-",
+    },
+    {
       field: "receivedQuantity",
       headerName: "Received Qty",
       flex: 1,
@@ -296,7 +308,10 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
             flexItem
           />
           <button onClick={handlePrintGRN} title="Print GRN">
-            <ion-icon name="print-outline" style={{ color: "#00ccff" }}></ion-icon>
+            <ion-icon
+              name="print-outline"
+              style={{ color: "#00ccff" }}
+            ></ion-icon>
           </button>
           {selectedGRN?.status === "In Process" && (
             <>
