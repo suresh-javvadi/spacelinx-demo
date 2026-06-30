@@ -256,14 +256,40 @@ public sealed class SpaceLinxAuditInterceptor : SaveChangesInterceptor
     private static bool ShouldRedact(Type type, string propertyName)
         => RedactCache.GetOrAdd((type, propertyName), key =>
         {
-            var prop = key.Item1.GetProperty(
-                key.Item2, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            var prop = GetPropertySafe(key.Item1, key.Item2);
             if (prop?.GetCustomAttribute<AuditRedactAttribute>() is not null)
             {
                 return true;
             }
             return SensitiveName.IsMatch(key.Item2);
         });
+
+    private const BindingFlags PropertyFlags =
+        BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
+
+    // Entities may hide a BaseModel property with `new` (e.g. PartLevel re-declares CreatedAt as
+    // nullable). That leaves two properties of the same name on the type, so the plain
+    // GetProperty(name, flags) overload throws AmbiguousMatchException. Fall back to walking the
+    // hierarchy from the most-derived type up and returning the first (i.e. the shadowing) match.
+    private static PropertyInfo? GetPropertySafe(Type type, string propertyName)
+    {
+        try
+        {
+            return type.GetProperty(propertyName, PropertyFlags);
+        }
+        catch (AmbiguousMatchException)
+        {
+            for (var t = type; t is not null; t = t.BaseType)
+            {
+                var prop = t.GetProperty(propertyName, PropertyFlags | BindingFlags.DeclaredOnly);
+                if (prop is not null)
+                {
+                    return prop;
+                }
+            }
+            return null;
+        }
+    }
 
     private static bool IsExcluded(Type type, EntityState state)
     {
