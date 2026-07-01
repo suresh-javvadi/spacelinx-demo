@@ -19,6 +19,7 @@ import { fetchUserLookup } from "../../../services/userService";
 import Popover from "@mui/material/Popover";
 import { fetchOptionSetByName } from "../../../services/optionSetService";
 import { fetchProjectsLookup } from "../../../services/projectService";
+import { fetchSubProjectsByProject } from "../../../services/subProjectService";
 import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
 import { fetchFullBOMConsolidated } from "../../../services/childPartService";
 
@@ -36,7 +37,6 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
   const [formData, setFormData] = useState({
     movementType: null,
     fromLocation: null,
-    bin: null,
     responsiblePerson: null,
     movementDate: new Date().toISOString().split("T")[0],
     expectedReturnDate: "",
@@ -44,9 +44,9 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     reason: "",
     department: "",
     project: null,
+    subProject: null,
   });
   const [formErrors, setFormErrors] = useState({});
-  const [binsData, setBinsData] = useState([]);
   const [staffData, setStaffData] = useState([]);
   const [loadingStaffData, setLoadingStaffData] = useState(true);
   const [stockData, setStockData] = useState([]);
@@ -88,6 +88,8 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [subProjects, setSubProjects] = useState([]);
+  const [loadingSubProjects, setLoadingSubProjects] = useState(false);
   const [trackingOptionsMap, setTrackingOptionsMap] = useState({});
 
   const adjustmentTypes = ["Increase", "Decrease"];
@@ -136,6 +138,23 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       Alert("Failed to fetch projects data. Please try again...!", "error");
     } finally {
       setLoadingProjects(false);
+    }
+  };
+
+  const fetchSubProjectsData = async (projectId) => {
+    if (!projectId) {
+      setSubProjects([]);
+      return;
+    }
+    setLoadingSubProjects(true);
+    try {
+      const data = await fetchSubProjectsByProject(projectId);
+      setSubProjects(data || []);
+    } catch (error) {
+      console.error("Failed to fetch sub-projects:", error);
+      Alert("Failed to fetch sub-projects. Please try again...!", "error");
+    } finally {
+      setLoadingSubProjects(false);
     }
   };
 
@@ -188,7 +207,11 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
   const validateTrackingNumber = (item, allItems) => {
     const value = item.trackingNumber;
-    const trackingType = item.trackingType?.value || (typeof item.trackingType === 'string' ? item.trackingType.toLowerCase() : "");
+    const trackingType =
+      item.trackingType?.value ||
+      (typeof item.trackingType === "string"
+        ? item.trackingType.toLowerCase()
+        : "");
 
     // If no quantity is being issued, tracking number is not required
     if (item.issueQuantity === "" || Number(item.issueQuantity) === 0) {
@@ -220,8 +243,6 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
     return "";
   };
-
-
 
   const validateAdjustmentType = (item) => {
     if (!item.adjustmentType) {
@@ -312,8 +333,6 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     updateLineItemError(uniqueId, "trackingNumber", error);
   };
 
-
-
   const handleRemarksPopoverOpen = (row, event) => {
     setActiveRowId(row.uniqueId);
     setTempRemarks(row.remarks || "");
@@ -351,13 +370,28 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     const stockMatch = stockData.find((item) => item.partId === part.partId);
 
     let trackingTypeStr = "None";
-    const rawTrackingType = part.trackingType || part.part?.trackingType || stockMatch?.trackingType;
+    const rawTrackingType =
+      part.trackingType || part.part?.trackingType || stockMatch?.trackingType;
     if (rawTrackingType) {
-      trackingTypeStr = typeof rawTrackingType === 'object' ? (rawTrackingType.label || rawTrackingType.value || "None") : rawTrackingType;
-    } else if (part.isSerialNumberRequired || part.part?.isSerialNumberRequired || stockMatch?.isSerialNumberRequired) {
+      trackingTypeStr =
+        typeof rawTrackingType === "object"
+          ? rawTrackingType.label || rawTrackingType.value || "None"
+          : rawTrackingType;
+    } else if (
+      part.isSerialNumberRequired ||
+      part.part?.isSerialNumberRequired ||
+      stockMatch?.isSerialNumberRequired
+    ) {
       trackingTypeStr = "Serial";
-    } else if (part.trackingMethod || part.part?.trackingMethod || stockMatch?.trackingMethod) {
-      trackingTypeStr = part.trackingMethod || part.part?.trackingMethod || stockMatch?.trackingMethod;
+    } else if (
+      part.trackingMethod ||
+      part.part?.trackingMethod ||
+      stockMatch?.trackingMethod
+    ) {
+      trackingTypeStr =
+        part.trackingMethod ||
+        part.part?.trackingMethod ||
+        stockMatch?.trackingMethod;
     }
 
     if (trackingTypeStr.toLowerCase() === "serial") {
@@ -379,17 +413,22 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     localHistoryMap[part.partId] = parentHistory;
 
     // Resolve PO/GRN for parent part — check trackingNumber, trackingId, or stockMatch.trackingId (fallback to first history record)
-    const trackingNo = part.trackingNumber || part.trackingId || stockMatch?.trackingId || "";
-    const parentMatch = (trackingNo
-      ? parentHistory.find((x) => x.trackingId === trackingNo) ?? null
-      : null) || (parentHistory && parentHistory.length > 0 ? parentHistory[0] : null);
+    const trackingNo =
+      part.trackingNumber || part.trackingId || stockMatch?.trackingId || "";
+    const parentMatch =
+      (trackingNo
+        ? (parentHistory.find((x) => x.trackingId === trackingNo) ?? null)
+        : null) ||
+      (parentHistory && parentHistory.length > 0 ? parentHistory[0] : null);
 
-    const parentQtyAvailable = stockMatch ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0) : 0;
+    const parentQtyAvailable = stockMatch
+      ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0)
+      : 0;
 
     const newEntry = {
       ...part,
       uniqueId: uniqueId,
-      issueQuantity: (isSerial && parentQtyAvailable > 0) ? 1 : "",
+      issueQuantity: isSerial && parentQtyAvailable > 0 ? 1 : "",
       trackingType: trackingTypeStr,
       trackingNumber: parentMatch?.trackingId || trackingNo || "",
       poNumber: parentMatch?.poNumber || "---",
@@ -398,8 +437,8 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       remarks: "",
       qtyAvailable: parentQtyAvailable,
       quantity: stockMatch ? (stockMatch.qtyOnhand ?? 0) : 0,
-      binId: stockMatch ? stockMatch.binId : (formData?.bin?.binId || null),
-      binCode: stockMatch ? stockMatch.binCode : (formData?.bin?.binCode || ""),
+      binId: stockMatch ? stockMatch.binId : formData?.bin?.binId || null,
+      binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
     };
 
     let allNewItems = [newEntry];
@@ -409,34 +448,49 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       const bomData = await fetchFullBOMConsolidated(part.partId);
       if (bomData && bomData.length > 0) {
         // Filter out parent part if it is returned in the consolidated list
-        const filteredBomData = bomData.filter((item) => item.id !== part.partId);
+        const filteredBomData = bomData.filter(
+          (item) => item.id !== part.partId,
+        );
 
         // Fetch histories for all child parts in parallel
         const childHistories = await Promise.all(
-          filteredBomData.map((childPart) => getPurchaseHistoryForPart(childPart.id))
+          filteredBomData.map((childPart) =>
+            getPurchaseHistoryForPart(childPart.id),
+          ),
         );
 
         const childEntries = filteredBomData.map((childPart, idx) => {
           const childHistory = childHistories[idx] || [];
           localHistoryMap[childPart.id] = childHistory;
 
-          const stockMatch = stockData.find((item) => item.partId === childPart.id);
+          const stockMatch = stockData.find(
+            (item) => item.partId === childPart.id,
+          );
 
           // Only match by actual tracking ID — fallback to first history item if not found or empty
-          const childMatch = (stockMatch?.trackingId
-            ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
-            : null) || (childHistory && childHistory.length > 0 ? childHistory[0] : null);
+          const childMatch =
+            (stockMatch?.trackingId
+              ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
+              : null) ||
+            (childHistory && childHistory.length > 0 ? childHistory[0] : null);
 
-          const trackingTypeStr = (childPart.isSerialNumberRequired || childPart.part?.isSerialNumberRequired) ? "Serial" : "None";
+          const trackingTypeStr =
+            childPart.isSerialNumberRequired ||
+            childPart.part?.isSerialNumberRequired
+              ? "Serial"
+              : "None";
 
           if (stockMatch) {
-            const childQtyAvailable = stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0;
-            const isChildSerial = stockMatch.trackingType?.toLowerCase() === "serial";
+            const childQtyAvailable =
+              stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0;
+            const isChildSerial =
+              stockMatch.trackingType?.toLowerCase() === "serial";
             let childTrackingTypeStr = "None";
             if (stockMatch.trackingType) {
-              childTrackingTypeStr = typeof stockMatch.trackingType === 'object'
-                ? (stockMatch.trackingType.label || "None")
-                : stockMatch.trackingType;
+              childTrackingTypeStr =
+                typeof stockMatch.trackingType === "object"
+                  ? stockMatch.trackingType.label || "None"
+                  : stockMatch.trackingType;
             }
             if (childTrackingTypeStr.toLowerCase() === "serial") {
               childTrackingTypeStr = "Serial";
@@ -448,12 +502,14 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
             return {
               ...stockMatch,
-              partNumber: stockMatch.part?.partNumber || childPart.partNumber || "",
+              partNumber:
+                stockMatch.part?.partNumber || childPart.partNumber || "",
               partName: stockMatch.part?.name || childPart.name || "",
               uniqueId: `${stockMatch.partId}-${Date.now()}-${Math.random()}`,
-              issueQuantity: (isChildSerial && childQtyAvailable > 0) ? 1 : "",
+              issueQuantity: isChildSerial && childQtyAvailable > 0 ? 1 : "",
               trackingType: childTrackingTypeStr,
-              trackingNumber: childMatch?.trackingId || stockMatch.trackingId || "",
+              trackingNumber:
+                childMatch?.trackingId || stockMatch.trackingId || "",
               poNumber: childMatch?.poNumber || "---",
               poQty: childMatch?.receivedQuantity ?? null,
               grnNumber: childMatch?.grnNumber || "---",
@@ -490,13 +546,17 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
     // Deduplicate: skip parts whose partId is already in selectedStockItems
     const existingPartIds = new Set(selectedStockItems.map((i) => i.partId));
-    const dedupedNewItems = allNewItems.filter((i) => !existingPartIds.has(i.partId));
+    const dedupedNewItems = allNewItems.filter(
+      (i) => !existingPartIds.has(i.partId),
+    );
 
     setSelectedStockItems((prev) => [...prev, ...dedupedNewItems]);
 
     // Fetch tracking options for all items (parent + children) that require tracking and were actually added, in parallel
     const itemsToFetch = dedupedNewItems.filter(
-      (item) => item.trackingType?.toLowerCase() !== "none" && item.trackingType !== "None"
+      (item) =>
+        item.trackingType?.toLowerCase() !== "none" &&
+        item.trackingType !== "None",
     );
 
     if (itemsToFetch.length > 0) {
@@ -523,12 +583,17 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
               }));
               return { uniqueId: item.uniqueId, options };
             } catch (err) {
-              console.error(`Failed to fetch tracking IDs for part ${item.partId}:`, err);
+              console.error(
+                `Failed to fetch tracking IDs for part ${item.partId}:`,
+                err,
+              );
               const stockTrackingId = item.trackingNumber || item.trackingId;
-              const options = stockTrackingId ? [{ label: stockTrackingId, value: stockTrackingId }] : [];
+              const options = stockTrackingId
+                ? [{ label: stockTrackingId, value: stockTrackingId }]
+                : [];
               return { uniqueId: item.uniqueId, options };
             }
-          })
+          }),
         );
 
         // Update trackingOptionsMap state for all fetched items
@@ -550,7 +615,9 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
             if (match && match.options.length > 0 && !item.trackingNumber) {
               const selectedValue = match.options[0].value;
               const history = localHistoryMap[item.partId] || [];
-              const histMatch = history.find((x) => x.trackingId === selectedValue);
+              const histMatch = history.find(
+                (x) => x.trackingId === selectedValue,
+              );
               return {
                 ...item,
                 trackingNumber: selectedValue,
@@ -560,7 +627,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
               };
             }
             return item;
-          })
+          }),
         );
       } catch (err) {
         console.error("Error fetching tracking IDs for selection:", err);
@@ -583,21 +650,6 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     fetchParts();
   }, []);
 
-  const extractBins = (stockData = []) => {
-    const map = new Map();
-
-    stockData.forEach((item) => {
-      if (item.binId && item.binCode) {
-        map.set(item.binId, {
-          binId: item.binId,
-          binCode: item.binCode,
-        });
-      }
-    });
-
-    return Array.from(map.values());
-  };
-
   const extractParts = (stockData = []) => {
     const map = new Map();
 
@@ -614,7 +666,8 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
         binId: item.binId,
         binCode: item.binCode,
         trackingType: item.trackingType || item.part?.trackingType,
-        isSerialNumberRequired: item.isSerialNumberRequired ?? item.part?.isSerialNumberRequired,
+        isSerialNumberRequired:
+          item.isSerialNumberRequired ?? item.part?.isSerialNumberRequired,
         trackingMethod: item.trackingMethod || item.part?.trackingMethod,
         qtyAvailable: item.qtyAvailable || item.qtyOnhand || 0,
       });
@@ -636,8 +689,6 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
 
       const stock = data || [];
       setStockData(stock);
-
-      setBinsData(extractBins(stock));
     } catch (err) {
       Alert("Failed to fetch locations", "error");
     } finally {
@@ -716,6 +767,11 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       movementDate: "Movement Date is required",
       reason: "Reason is required",
     };
+
+    if (key === "project") {
+      setFormData((prev) => ({ ...prev, subProject: null }));
+      fetchSubProjectsData(value?.id || null);
+    }
 
     setFormData((prev) => {
       const updatedData = {
@@ -804,7 +860,9 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       return "Select at least one item";
     }
 
-    const hasPositiveQty = selectedStockItems.some((item) => Number(item.issueQuantity) > 0);
+    const hasPositiveQty = selectedStockItems.some(
+      (item) => Number(item.issueQuantity) > 0,
+    );
     if (!hasPositiveQty) {
       return "At least one item must have a quantity greater than 0";
     }
@@ -840,13 +898,13 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     movementType: formData.movementType?.name,
     movementDate: formData.movementDate,
     fromLocationId: formData.fromLocation?.id,
-    fromBinId: formData.bin?.binId,
     assignedUserId: formData.responsiblePerson?.id,
     expectedReturnDate: formData.expectedReturnDate || null,
     movementReason: formData.reason || "",
     notes: formData.description || "",
     department: formData?.department?.name,
     projectId: formData?.project?.id,
+    subProjectId: formData?.subProject?.id,
     lineItems: selectedStockItems
       .filter((item) => {
         const qty = Number(item.issueQuantity);
@@ -932,7 +990,8 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       headerName: "PO Qty",
       flex: 0.5,
       type: "number",
-      valueGetter: (_, row) => (row.poQty !== undefined && row.poQty !== null ? row.poQty : null),
+      valueGetter: (_, row) =>
+        row.poQty !== undefined && row.poQty !== null ? row.poQty : null,
     },
     {
       field: "grnNumber",
@@ -959,7 +1018,8 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
       flex: 1,
       renderCell: ({ row }) => {
         const errorMsg = lineItemErrors[row.uniqueId];
-        const trackingType = row.trackingType?.value || row.trackingType?.toLowerCase();
+        const trackingType =
+          row.trackingType?.value || row.trackingType?.toLowerCase();
 
         if (trackingType === "none") {
           return <div>---</div>;
@@ -968,12 +1028,21 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
         const allOptions = trackingOptionsMap[row.uniqueId] || [];
 
         const finalOptions = [...allOptions];
-        if (row.trackingNumber && !finalOptions.some((opt) => opt.value === row.trackingNumber)) {
-          finalOptions.push({ label: row.trackingNumber, value: row.trackingNumber });
+        if (
+          row.trackingNumber &&
+          !finalOptions.some((opt) => opt.value === row.trackingNumber)
+        ) {
+          finalOptions.push({
+            label: row.trackingNumber,
+            value: row.trackingNumber,
+          });
         }
 
         const selectedForPart = selectedStockItems
-          .filter((item) => item.partId === row.partId && item.uniqueId !== row.uniqueId)
+          .filter(
+            (item) =>
+              item.partId === row.partId && item.uniqueId !== row.uniqueId,
+          )
           .map((item) => item.trackingNumber)
           .filter(Boolean);
 
@@ -1220,14 +1289,6 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
             </div>
             <div className="GrnNewFlyoutContentTop">
               <Autocomplete
-                options={binsData}
-                value={formData?.bin}
-                getOptionLabel={(o) => o.binCode || ""}
-                onChange={(_, v) => handleUpdateField("bin", v)}
-                readOnly={binsData.length === 0}
-                renderInput={(p) => <TextField {...p} label="Bin" fullWidth />}
-              />
-              <Autocomplete
                 options={projects}
                 value={formData?.project}
                 loading={loadingProjects}
@@ -1236,6 +1297,19 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
                 onChange={(_, v) => handleUpdateField("project", v)}
                 renderInput={(p) => (
                   <TextField {...p} label="Project" fullWidth />
+                )}
+              />
+              <Autocomplete
+                options={subProjects}
+                value={formData?.subProject}
+                loading={loadingSubProjects}
+                loadingText="Loading Sub-Projects..."
+                disabled={!formData?.project}
+                getOptionLabel={(o) => o.name || ""}
+                isOptionEqualToValue={(o, v) => o.id === v.id}
+                onChange={(_, v) => handleUpdateField("subProject", v)}
+                renderInput={(p) => (
+                  <TextField {...p} label="Sub Project" fullWidth />
                 )}
               />
             </div>
@@ -1360,7 +1434,9 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
                 }
                 readOnly={items.length === 0 || !formData?.movementType}
                 options={items.filter((item) => {
-                  const isSelected = selectedStockItems.some((i) => i.partId === item.partId);
+                  const isSelected = selectedStockItems.some(
+                    (i) => i.partId === item.partId,
+                  );
                   return !isSelected;
                 })}
                 loading={loadingStockData}

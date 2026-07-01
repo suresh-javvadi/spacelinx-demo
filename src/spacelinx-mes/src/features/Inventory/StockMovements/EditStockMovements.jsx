@@ -28,6 +28,7 @@ import { fetchUserLookup } from "../../../services/userService";
 import Popover from "@mui/material/Popover";
 import { fetchOptionSetByName } from "../../../services/optionSetService";
 import { fetchProjectsLookup } from "../../../services/projectService";
+import { fetchSubProjectsByProject } from "../../../services/subProjectService";
 import { useUserContext } from "../../userContext/UserContext";
 import { PERMISSIONS } from "../../../constants/PagePermissions";
 import dayjs from "dayjs";
@@ -59,6 +60,7 @@ const EditStockMovements = ({
     reason: "",
     department: "",
     project: null,
+    subProject: null,
   });
   const [formErrors, setFormErrors] = useState({});
   const [userData, setUserData] = useState([]);
@@ -101,6 +103,8 @@ const EditStockMovements = ({
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [subProjects, setSubProjects] = useState([]);
+  const [loadingSubProjects, setLoadingSubProjects] = useState(false);
 
   const trackingTypes = [
     { value: "serial", label: "Serial" },
@@ -161,7 +165,11 @@ const EditStockMovements = ({
         description: data.notes || "",
         reason: data.movementReason || "",
         department: data.department ? { name: data.department } : "",
-        project: data.projectId ? { id: data.projectId } : null,
+        project:
+          data.project || (data.projectId ? { id: data.projectId } : null),
+        subProject:
+          data.subProject ||
+          (data.subProjectId ? { id: data.subProjectId } : null),
       });
 
       // Load stock data for the location
@@ -279,6 +287,22 @@ const EditStockMovements = ({
     }
   };
 
+  const fetchSubProjectsData = async (projectId) => {
+    if (!projectId) {
+      setSubProjects([]);
+      return;
+    }
+    setLoadingSubProjects(true);
+    try {
+      const data = await fetchSubProjectsByProject(projectId);
+      setSubProjects(data || []);
+    } catch {
+      Alert("Failed to fetch sub-projects", "error");
+    } finally {
+      setLoadingSubProjects(false);
+    }
+  };
+
   const fetchStockLocations = async (id) => {
     if (!id) return;
     setLoadingStockData(true);
@@ -314,6 +338,21 @@ const EditStockMovements = ({
       }
     }
   }, [projects, formData.project?.id]);
+
+  // Fetch sub-projects when project changes
+  useEffect(() => {
+    fetchSubProjectsData(formData.project?.id || null);
+  }, [formData.project?.id]);
+
+  // Resolve subProject once subProjects are loaded
+  useEffect(() => {
+    if (subProjects.length > 0 && formData.subProject?.id) {
+      const match = subProjects.find((s) => s.id === formData.subProject.id);
+      if (match && formData.subProject !== match) {
+        setFormData((prev) => ({ ...prev, subProject: match }));
+      }
+    }
+  }, [subProjects, formData.subProject?.id]);
 
   // Resolve department once departments are loaded
   useEffect(() => {
@@ -354,8 +393,6 @@ const EditStockMovements = ({
     fetchParts();
   }, []);
 
-
-
   const extractParts = (stockData = []) => {
     const map = new Map();
     stockData.forEach((item) => {
@@ -371,7 +408,8 @@ const EditStockMovements = ({
         binId: item.binId,
         binCode: item.binCode,
         trackingType: item.trackingType || item.part?.trackingType,
-        isSerialNumberRequired: item.isSerialNumberRequired ?? item.part?.isSerialNumberRequired,
+        isSerialNumberRequired:
+          item.isSerialNumberRequired ?? item.part?.isSerialNumberRequired,
         trackingMethod: item.trackingMethod || item.part?.trackingMethod,
         qtyAvailable: item.qtyAvailable || item.qtyOnhand || 0,
       });
@@ -446,19 +484,37 @@ const EditStockMovements = ({
     const stockMatch = stockData.find((item) => item.partId === part.partId);
 
     // Resolve PO/GRN for parent part — check trackingNumber, trackingId, or stockMatch.trackingId (fallback to first history record)
-    const trackingNo = part.trackingNumber || part.trackingId || stockMatch?.trackingId || "";
-    const parentMatch = (trackingNo
-      ? parentHistory.find((x) => x.trackingId === trackingNo) ?? null
-      : null) || (parentHistory && parentHistory.length > 0 ? parentHistory[0] : null);
+    const trackingNo =
+      part.trackingNumber || part.trackingId || stockMatch?.trackingId || "";
+    const parentMatch =
+      (trackingNo
+        ? (parentHistory.find((x) => x.trackingId === trackingNo) ?? null)
+        : null) ||
+      (parentHistory && parentHistory.length > 0 ? parentHistory[0] : null);
 
     let trackingTypeStr = "None";
-    const rawTrackingType = part.trackingType || part.part?.trackingType || stockMatch?.trackingType;
+    const rawTrackingType =
+      part.trackingType || part.part?.trackingType || stockMatch?.trackingType;
     if (rawTrackingType) {
-      trackingTypeStr = typeof rawTrackingType === 'object' ? (rawTrackingType.label || rawTrackingType.value || "None") : rawTrackingType;
-    } else if (part.isSerialNumberRequired || part.part?.isSerialNumberRequired || stockMatch?.isSerialNumberRequired) {
+      trackingTypeStr =
+        typeof rawTrackingType === "object"
+          ? rawTrackingType.label || rawTrackingType.value || "None"
+          : rawTrackingType;
+    } else if (
+      part.isSerialNumberRequired ||
+      part.part?.isSerialNumberRequired ||
+      stockMatch?.isSerialNumberRequired
+    ) {
       trackingTypeStr = "Serial";
-    } else if (part.trackingMethod || part.part?.trackingMethod || stockMatch?.trackingMethod) {
-      trackingTypeStr = part.trackingMethod || part.part?.trackingMethod || stockMatch?.trackingMethod;
+    } else if (
+      part.trackingMethod ||
+      part.part?.trackingMethod ||
+      stockMatch?.trackingMethod
+    ) {
+      trackingTypeStr =
+        part.trackingMethod ||
+        part.part?.trackingMethod ||
+        stockMatch?.trackingMethod;
     }
 
     if (trackingTypeStr.toLowerCase() === "serial") {
@@ -470,17 +526,19 @@ const EditStockMovements = ({
     }
 
     const trackingTypeObj = trackingTypes.find(
-      (t) => t.value === trackingTypeStr.toLowerCase()
+      (t) => t.value === trackingTypeStr.toLowerCase(),
     ) || { value: "none", label: "None" };
 
     const isSerial = trackingTypeStr === "Serial";
-    const parentQtyAvailable = stockMatch ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0) : 0;
+    const parentQtyAvailable = stockMatch
+      ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0)
+      : 0;
 
     const newEntry = {
       ...part,
       uniqueId: `${part.partId}-${Date.now()}`,
       trackingType: trackingTypeObj,
-      issueQuantity: (isSerial && parentQtyAvailable > 0) ? 1 : "",
+      issueQuantity: isSerial && parentQtyAvailable > 0 ? 1 : "",
       trackingNumber: parentMatch?.trackingId || trackingNo || "",
       poNumber: parentMatch?.poNumber || "---",
       poQty: parentMatch?.receivedQuantity ?? null,
@@ -488,8 +546,8 @@ const EditStockMovements = ({
       remarks: "",
       qtyAvailable: parentQtyAvailable,
       quantity: stockMatch ? (stockMatch.qtyOnhand ?? 0) : 0,
-      binId: stockMatch ? stockMatch.binId : (formData?.bin?.binId || null),
-      binCode: stockMatch ? stockMatch.binCode : (formData?.bin?.binCode || ""),
+      binId: stockMatch ? stockMatch.binId : formData?.bin?.binId || null,
+      binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
     };
 
     let allNewItems = [newEntry];
@@ -499,7 +557,9 @@ const EditStockMovements = ({
       const bomData = await fetchFullBOMConsolidated(part.partId);
       if (bomData && bomData.length > 0) {
         // Filter out parent part if it is returned in the consolidated list
-        const filteredBomData = bomData.filter((item) => item.id !== part.partId);
+        const filteredBomData = bomData.filter(
+          (item) => item.id !== part.partId,
+        );
 
         // Fetch histories for all child parts in parallel
         const childHistories = await Promise.all(
@@ -516,42 +576,66 @@ const EditStockMovements = ({
           );
 
           // Only match by actual tracking ID — fallback to first history item if not found or empty
-          const childMatch = (stockMatch?.trackingId
-            ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
-            : null) || (childHistory && childHistory.length > 0 ? childHistory[0] : null);
+          const childMatch =
+            (stockMatch?.trackingId
+              ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
+              : null) ||
+            (childHistory && childHistory.length > 0 ? childHistory[0] : null);
 
-          const trackingTypeStr = (childPart.isSerialNumberRequired || childPart.part?.isSerialNumberRequired) ? "Serial" : "None";
+          const trackingTypeStr =
+            childPart.isSerialNumberRequired ||
+            childPart.part?.isSerialNumberRequired
+              ? "Serial"
+              : "None";
           const trackingTypeObj = trackingTypes.find(
-            (t) => t.value === trackingTypeStr.toLowerCase()
+            (t) => t.value === trackingTypeStr.toLowerCase(),
           ) || { value: "none", label: "None" };
 
           if (stockMatch) {
-            const childQtyAvailable = stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0;
-            const isChildSerial = stockMatch.trackingType?.toLowerCase() === "serial";
-            const childStockTrackingTypeStr = typeof stockMatch.trackingType === 'object'
-              ? (stockMatch.trackingType.value || "none")
-              : (stockMatch.trackingType || "none");
+            const childQtyAvailable =
+              stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0;
+            const isChildSerial =
+              stockMatch.trackingType?.toLowerCase() === "serial";
+            const childStockTrackingTypeStr =
+              typeof stockMatch.trackingType === "object"
+                ? stockMatch.trackingType.value || "none"
+                : stockMatch.trackingType || "none";
             const childStockTrackingTypeObj = trackingTypes.find(
-              (t) => t.value === childStockTrackingTypeStr.toLowerCase()
+              (t) => t.value === childStockTrackingTypeStr.toLowerCase(),
             ) || { value: "none", label: "None" };
 
             return {
               ...stockMatch,
               uniqueId: `${stockMatch.partId}-${Date.now()}-${Math.random()}`,
               trackingType: childStockTrackingTypeObj,
-              issueQuantity: (isChildSerial && childQtyAvailable > 0) ? 1 : "",
-              trackingNumber: childMatch?.trackingId || stockMatch.trackingId || "",
+              issueQuantity: isChildSerial && childQtyAvailable > 0 ? 1 : "",
+              trackingNumber:
+                childMatch?.trackingId || stockMatch.trackingId || "",
               poNumber: childMatch?.poNumber || "---",
               poQty: childMatch?.receivedQuantity ?? null,
               grnNumber: childMatch?.grnNumber || "---",
               remarks: `BOM item of ${part.partName || part.name || ""}`,
               partNumber:
-                stockMatch.part?.partNumber || stockMatch.partNumber || childPart.partNumber || "",
-              partName: stockMatch.part?.name || stockMatch.partName || childPart.name || "",
+                stockMatch.part?.partNumber ||
+                stockMatch.partNumber ||
+                childPart.partNumber ||
+                "",
+              partName:
+                stockMatch.part?.name ||
+                stockMatch.partName ||
+                childPart.name ||
+                "",
               part: {
                 partNumber:
-                  stockMatch.part?.partNumber || stockMatch.partNumber || childPart.partNumber || "",
-                name: stockMatch.part?.name || stockMatch.partName || childPart.name || "",
+                  stockMatch.part?.partNumber ||
+                  stockMatch.partNumber ||
+                  childPart.partNumber ||
+                  "",
+                name:
+                  stockMatch.part?.name ||
+                  stockMatch.partName ||
+                  childPart.name ||
+                  "",
               },
               quantity: stockMatch.qtyOnhand || stockMatch.quantity || 0,
             };
@@ -636,8 +720,6 @@ const EditStockMovements = ({
     updateLineItemError(uniqueId, "trackingNumber", error);
   };
 
-
-
   const handleRemarksPopoverOpen = (row, event) => {
     setActiveRowId(row.uniqueId);
     setTempRemarks(row.remarks || "");
@@ -690,7 +772,11 @@ const EditStockMovements = ({
 
   const validateTrackingNumber = (item, allItems) => {
     const value = item.trackingNumber;
-    const trackingType = item.trackingType?.value || (typeof item.trackingType === 'string' ? item.trackingType.toLowerCase() : "");
+    const trackingType =
+      item.trackingType?.value ||
+      (typeof item.trackingType === "string"
+        ? item.trackingType.toLowerCase()
+        : "");
 
     // If no quantity is being issued, tracking number is not required
     if (item.issueQuantity === "" || Number(item.issueQuantity) === 0) {
@@ -773,6 +859,7 @@ const EditStockMovements = ({
       notes: formData.description || "",
       department: formData?.department?.name,
       projectId: formData?.project?.id,
+      subProjectId: formData?.subProject?.id,
       lineItems: selectedStockItems
         .filter((item) => {
           const qty = Number(item.issueQuantity);
@@ -795,7 +882,10 @@ const EditStockMovements = ({
   const handleSaveDraft = async () => {
     const payload = buildPayload();
     if (!payload.lineItems || payload.lineItems.length === 0) {
-      Alert("At least one item must have a quantity greater than 0 to save draft", "error");
+      Alert(
+        "At least one item must have a quantity greater than 0 to save draft",
+        "error",
+      );
       return;
     }
 
@@ -836,9 +926,14 @@ const EditStockMovements = ({
       return;
     }
 
-    const hasPositiveQty = selectedStockItems.some((item) => Number(item.issueQuantity) > 0);
+    const hasPositiveQty = selectedStockItems.some(
+      (item) => Number(item.issueQuantity) > 0,
+    );
     if (!hasPositiveQty) {
-      Alert("At least one item must have a quantity greater than 0 to submit", "error");
+      Alert(
+        "At least one item must have a quantity greater than 0 to submit",
+        "error",
+      );
       return;
     }
 
@@ -968,7 +1063,8 @@ const EditStockMovements = ({
       field: "trackingType",
       headerName: "Tracking Type",
       flex: 1,
-      valueGetter: (_, row) => row.trackingType?.label || row.trackingType || "",
+      valueGetter: (_, row) =>
+        row.trackingType?.label || row.trackingType || "",
     },
     {
       field: "trackingNumber",
@@ -1176,6 +1272,10 @@ const EditStockMovements = ({
         : null,
     },
     {
+      label: "Sub Project",
+      value: formData.subProject?.name || null,
+    },
+    {
       label: "Responsible Person",
       value: formData.responsiblePerson?.firstName
         ? `${formData.responsiblePerson.firstName} ${formData.responsiblePerson.lastName}`
@@ -1325,6 +1425,20 @@ const EditStockMovements = ({
                 <p className="detailLabel">Bin</p>
                 <p className="detailValue">{formData.bin?.binCode || "---"}</p>
               </div>
+              <div className="detailItem">
+                <p className="detailLabel">Project</p>
+                <p className="detailValue">
+                  {formData.project?.name
+                    ? `${formData.project.projectCode ? formData.project.projectCode + " - " : ""}${formData.project.name}`
+                    : "---"}
+                </p>
+              </div>
+              <div className="detailItem">
+                <p className="detailLabel">Sub Project</p>
+                <p className="detailValue">
+                  {formData.subProject?.name || "---"}
+                </p>
+              </div>
             </div>
 
             {/* <div className="stock-form-grid"> */}
@@ -1383,24 +1497,6 @@ const EditStockMovements = ({
                 }
               />
             </div>
-            <div className="GrnNewFlyoutContentTop">
-              <Autocomplete
-                options={projects}
-                value={formData?.project}
-                loading={loadingProjects}
-                loadingText="Loading Projects..."
-                getOptionLabel={(o) =>
-                  o ? `${o.projectCode} - ${o.name}` : ""
-                }
-                readOnly={readOnlyMode}
-                isOptionEqualToValue={(o, v) => o.id === v.id}
-                onChange={(_, v) => handleUpdateField("project", v)}
-                renderInput={(p) => (
-                  <TextField {...p} label="Project" fullWidth />
-                )}
-              />
-            </div>
-
             <div className="stock-or-required-group">
               <label
                 className={`stock-or-required-label ${
@@ -1477,7 +1573,9 @@ const EditStockMovements = ({
                 }
                 readOnly={readOnlyMode || items.length === 0}
                 options={items.filter((item) => {
-                  const isSelected = selectedStockItems.some((i) => i.partId === item.partId);
+                  const isSelected = selectedStockItems.some(
+                    (i) => i.partId === item.partId,
+                  );
                   return !isSelected;
                 })}
                 loading={loadingStockData}
