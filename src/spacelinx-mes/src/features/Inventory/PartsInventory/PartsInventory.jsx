@@ -258,24 +258,35 @@ const PartsInventory = () => {
           <p className="PageHeader">Parts Inventory</p>
           <div className="PageHeaderRight">
             <Button
+              size="small"
               onClick={() => {
                 if (selectedParts.length === 0) {
-                  Alert(
-                    "Please select at least one part to create a PO",
-                    "warning",
-                  );
+                  Alert("Please select at least one part to create a PO", "warning");
                   return;
                 }
-                navigate("/procurement/purchaseorders/new", {
-                  state: {
-                    selectedParts,
-                  },
-                });
+                navigate("/procurement/purchaseorders/new", { state: { selectedParts } });
               }}
             >
               Create PO
+              {selectedParts.length > 0 && (
+                <Chip label={selectedParts.length} size="small" className="parts-btn-badge" />
+              )}
             </Button>
-
+            <Button
+              size="small"
+              onClick={() => {
+                if (selectedParts.length === 0) {
+                  Alert("Please select at least one part to create a Stock Movement", "warning");
+                  return;
+                }
+                navigate("/inventory/stockMovements", { state: { preSelectedParts: selectedParts } });
+              }}
+            >
+              Move Stock
+              {selectedParts.length > 0 && (
+                <Chip label={selectedParts.length} size="small" className="parts-btn-badge" />
+              )}
+            </Button>
             {hasPermission(PERMISSIONS.PARTS.INVENTORY.PRICE) && (
               <div>
                 <CurrencyConverter totalAmount={totalAmount} />

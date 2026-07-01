@@ -12,21 +12,42 @@ import NewStockMovements from "./NewStockMovements";
 import EditStockMovements from "./EditStockMovements";
 import { Button } from "@mui/material";
 import { Add } from "@mui/icons-material";
+import { useLocation } from "react-router-dom";
 
 const MOVEMENT_TABS = ["All", "Reserved", "Issued", "Consumed", "Adjustment"];
 
 const StockMovements = () => {
   const { Alert } = useContext(AlertsContext);
   const { hasPermission } = useUserContext();
+  const location = useLocation();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [selectedMovement, setSelectedMovement] = useState(null);
+  const [preSelectedParts, setPreSelectedParts] = useState(
+    () => location.state?.preSelectedParts || [],
+  );
 
   useEffect(() => {
     fetchStockMovements();
+  }, []);
+
+  useEffect(() => {
+    if (preSelectedParts.length > 0) {
+      if (!hasPermission(PERMISSIONS.STOCKMOVEMENTS.MODIFY)) {
+        Alert(
+          "You don't have permission to create stock movements",
+          "warning",
+        );
+        setPreSelectedParts([]);
+        return;
+      }
+      setDrawerOpen(true);
+      window.history.replaceState({}, document.title);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchStockMovements = async () => {
@@ -147,12 +168,19 @@ const StockMovements = () => {
       <ResizableDrawer
         anchor="right"
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => {
+          setDrawerOpen(false);
+          setPreSelectedParts([]);
+        }}
         defaultWidth={75}
       >
         <NewStockMovements
-          handleCloseClick={() => setDrawerOpen(false)}
+          handleCloseClick={() => {
+            setDrawerOpen(false);
+            setPreSelectedParts([]);
+          }}
           handleRefresh={fetchStockMovements}
+          initialParts={preSelectedParts}
         />
       </ResizableDrawer>
 

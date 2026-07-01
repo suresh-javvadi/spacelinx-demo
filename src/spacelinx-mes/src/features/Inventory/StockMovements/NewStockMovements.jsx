@@ -23,7 +23,7 @@ import { fetchSubProjectsByProject } from "../../../services/subProjectService";
 import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
 import { fetchFullBOMConsolidated } from "../../../services/childPartService";
 
-const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
+const NewStockMovements = ({ handleCloseClick, handleRefresh, initialParts = [] }) => {
   const { Alert } = useContext(AlertsContext);
   const [loadingData, setLoadingData] = useState(false);
   const [loadingLocationData, setLoadingLocationData] = useState(false);
@@ -57,6 +57,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
   const [purchaseHistoryCache, setPurchaseHistoryCache] = useState({});
   // In-flight request map to avoid redundant concurrent fetches for the same partId
   const purchaseHistoryInFlight = React.useRef({});
+  const prePopulatedRef = React.useRef(false);
 
   const getPurchaseHistoryForPart = async (partId) => {
     if (purchaseHistoryCache[partId]) return purchaseHistoryCache[partId];
@@ -700,6 +701,27 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     fetchLocations();
   }, []);
 
+  // Pre-populate line items when initialParts are passed (e.g. from Parts Inventory page).
+  // Waits until movement type is selected, location stock data is ready, then calls handleSelectItem for each part.
+  useEffect(() => {
+    if (
+      initialParts.length > 0 &&
+      formData.movementType !== null &&
+      !loadingStockData &&
+      formData.fromLocation !== null &&
+      !prePopulatedRef.current
+    ) {
+      prePopulatedRef.current = true;
+      const populate = async () => {
+        for (const part of initialParts) {
+          await handleSelectItem(part);
+        }
+      };
+      populate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialParts, formData.movementType, loadingStockData, formData.fromLocation]);
+
   const fetchLocations = async () => {
     setLoadingLocationData(true);
     try {
@@ -747,18 +769,26 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
     );
 
     if (hasLineItems && isRestrictedKey) {
-      const fieldLabel = RESTRICTED_KEYS[key];
+      // If parts were auto-populated from inventory and user is just changing movement type,
+      // skip confirmation — the parts will re-populate automatically with the new type.
+      const skipConfirmation = key === "movementType" && initialParts.length > 0 && prePopulatedRef.current;
 
-      const confirmed = await showConfirmation(
-        `Change ${fieldLabel}?`,
-        "This will clear all selected stock items.",
-        "Yes, Clear & Continue",
-      );
-
-      if (!confirmed) return;
+      if (!skipConfirmation) {
+        const fieldLabel = RESTRICTED_KEYS[key];
+        const confirmed = await showConfirmation(
+          `Change ${fieldLabel}?`,
+          "This will clear all selected stock items.",
+          "Yes, Clear & Continue",
+        );
+        if (!confirmed) return;
+      }
 
       setSelectedStockItems([]);
       setTrackingOptionsMap({});
+      if (key === "movementType" && initialParts.length > 0) {
+        prePopulatedRef.current = false;
+        Alert("Parts cleared. Select a new Movement Type to re-populate them.", "info");
+      }
     }
 
     const REQUIRED_FIELDS = {
@@ -1249,6 +1279,23 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh }) => {
         <>
           <div className="CreateFlyoutBody">
             <h3>Enter The Details</h3>
+
+            {initialParts.length > 0 && formData.movementType === null && (
+              <div className="sm-preselect-callout">
+                <ion-icon name="layers-outline" class="sm-preselect-icon" />
+                <div className="sm-preselect-text">
+                  <span className="sm-preselect-count">
+                    {initialParts.length} part
+                    {initialParts.length > 1 ? "s" : ""}
+                  </span>
+                  <span className="sm-preselect-hint">
+                    {" "}
+                    from inventory ready to add. Select a{" "}
+                    <strong>Movement Type</strong> to continue.
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* <div className="stock-form-grid"> */}
             <div className="GrnNewFlyoutContentTop">
