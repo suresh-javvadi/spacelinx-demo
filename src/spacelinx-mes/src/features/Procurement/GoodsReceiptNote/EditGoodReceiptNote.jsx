@@ -151,6 +151,12 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       valueGetter: (_value, row) => row.part?.name || row.name || "",
     },
     {
+      field: "hsnCode",
+      headerName: "HSN Code",
+      flex: 0.8,
+      valueGetter: (_value, row) => row.part?.hsnCode || row.hsnCode || "---",
+    },
+    {
       field: "trackingMethod",
       headerName: "Tracking Method",
       flex: 0.8,
@@ -158,16 +164,6 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
         const isPart = !row.part?.itemType || row.part?.itemType === "Part";
 
         return isPart ? row.trackingMethod || "---" : "---";
-      },
-    },
-    {
-      field: "trackingId",
-      headerName: "Tracking ID",
-      flex: 1,
-      renderCell: ({ row }) => {
-        const isPart = !row.part?.itemType || row.part?.itemType === "Part";
-
-        return isPart ? row.trackingId || "---" : "---";
       },
     },
     {
@@ -181,6 +177,16 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
         row.poLineItem?.orderedQuantity ??
         row.poLineItem?.OrderedQuantity ??
         "-",
+    },
+    {
+      field: "trackingId",
+      headerName: "Tracking ID",
+      flex: 1,
+      renderCell: ({ row }) => {
+        const isPart = !row.part?.itemType || row.part?.itemType === "Part";
+
+        return isPart ? row.trackingId || "---" : "---";
+      },
     },
     {
       field: "receivedQuantity",

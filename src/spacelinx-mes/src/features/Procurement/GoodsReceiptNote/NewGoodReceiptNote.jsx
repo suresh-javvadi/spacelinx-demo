@@ -230,6 +230,7 @@ const NewGoodReceiptNote = ({
           expectedDeliveryDate: item.expectedDeliveryDate ?? null,
           actualDeliveryDate: item.actualDeliveryDate ?? null,
           unitPrice: item.unitPrice ?? null,
+          hsnCode: matchedPart.hsnCode || item.hsn || "",
         };
       })
       .filter(Boolean);
@@ -725,10 +726,42 @@ const NewGoodReceiptNote = ({
       });
       handleRefresh();
     } catch (error) {
-      Alert(
-        `Failed to create GRN as ${error.response?.data?.message}`,
-        "error",
+      const message = error.response?.data?.message || "";
+      const trackingMismatch = message.match(
+        /Part ([a-f0-9-]+) already has Tracking Type as (\w+)/i,
       );
+
+      if (trackingMismatch) {
+        const partId = trackingMismatch[1];
+        const correctType = trackingMismatch[2].toLowerCase();
+        const correctTrackingTypeObj = trackingTypes.find(
+          (t) => t.value === correctType,
+        );
+
+        setSelectedParts((prev) =>
+          prev.map((p) =>
+            p.id === partId && correctTrackingTypeObj
+              ? { ...p, trackingType: correctTrackingTypeObj }
+              : p,
+          ),
+        );
+
+        const affectedPart = selectedParts.find((p) => p.id === partId);
+        if (affectedPart) {
+          updateLineItemError(
+            affectedPart.uniqueId,
+            "trackingType",
+            `Tracking type corrected to "${correctTrackingTypeObj?.label || correctType}". Please resubmit.`,
+          );
+        }
+
+        Alert(
+          `Tracking type mismatch detected. The affected row has been highlighted — please review and resubmit.`,
+          "warning",
+        );
+      } else {
+        Alert(`Failed to create GRN: ${message}`, "error");
+      }
     } finally {
       setLoadingData(false);
     }
@@ -797,6 +830,12 @@ const NewGoodReceiptNote = ({
       flex: 1,
     },
     {
+      field: "hsnCode",
+      headerName: "HSN Code",
+      flex: 0.8,
+      renderCell: ({ row }) => row.hsnCode || "---",
+    },
+    {
       field: "trackingType",
       headerName: "Tracking Type",
       flex: 1,
@@ -816,7 +855,6 @@ const NewGoodReceiptNote = ({
                 ) || null
               }
               disableClearable
-              disabled={!isPart}
               onChange={(_, newValue) =>
                 handleTrackingTypeChange(row.uniqueId, newValue || "")
               }
@@ -851,6 +889,15 @@ const NewGoodReceiptNote = ({
           </div>
         );
       },
+    },
+    {
+      field: "orderedQuantity",
+      headerName: "Ordered Quantity",
+      flex: 0.8,
+      minWidth: 100,
+      renderCell: ({ row }) => (
+        <span>{row.orderedQuantity ?? row.OrderedQuantity ?? "-"}</span>
+      ),
     },
     {
       field: "trackingNumber",
@@ -891,15 +938,7 @@ const NewGoodReceiptNote = ({
         );
       },
     },
-    {
-      field: "orderedQuantity",
-      headerName: "Ordered Quantity",
-      flex: 0.8,
-      minWidth: 100,
-      renderCell: ({ row }) => (
-        <span>{row.orderedQuantity ?? row.OrderedQuantity ?? "-"}</span>
-      ),
-    },
+
     {
       field: "receivedQuantity",
       headerName: "Received Qty",
@@ -1011,13 +1050,23 @@ const NewGoodReceiptNote = ({
             <Tab label="Documents" value="2" />
           </TabList>
         </div>
-        {loadingData ? (
-          <div className="loading-container">
-            <Cliploader loading={loadingData} />
-          </div>
-        ) : (
-          <>
-            <TabPanel value="1" className="GrnNewFlyoutTabPanel">
+        <div style={{ position: "relative", flex: 1, minHeight: 0 }}>
+          {loadingData && (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(255,255,255,0.6)",
+              }}
+            >
+              <Cliploader loading={loadingData} />
+            </div>
+          )}
+          <TabPanel value="1" className="GrnNewFlyoutTabPanel">
               <div className="GrnNewFlyoutContent">
                 <div className="GrnNewFlyoutContentTop">
                   <Autocomplete
@@ -1221,6 +1270,19 @@ const NewGoodReceiptNote = ({
                       const errorMsg = lineItemErrors[params.id];
                       return errorMsg ? "auto" : null;
                     }}
+                    getRowClassName={(params) =>
+                      lineItemErrors[params.id]?.trackingType
+                        ? "row-tracking-error"
+                        : ""
+                    }
+                    sx={{
+                      "& .row-tracking-error": {
+                        backgroundColor: "rgba(211, 47, 47, 0.08)",
+                        "&:hover": {
+                          backgroundColor: "rgba(211, 47, 47, 0.14)",
+                        },
+                      },
+                    }}
                   />
                 </div>
               </div>
@@ -1234,7 +1296,13 @@ const NewGoodReceiptNote = ({
                 </Button>
               </div>
             </TabPanel>
-            <TabPanel value="2" className="GrnNewFlyoutTabPanelDocuments">
+            <div
+              className="GrnNewFlyoutTabPanelDocuments"
+              style={{
+                display: editFlyOutTabsValue === "2" ? "flex" : "none",
+                flexDirection: "column",
+              }}
+            >
               <PODocuments
                 onDocumentsChange={setDocumentFiles}
                 showExistingDocuments={false}
@@ -1257,9 +1325,8 @@ const NewGoodReceiptNote = ({
                   Create
                 </Button>
               </div>
-            </TabPanel>
-          </>
-        )}
+            </div>
+        </div>
       </TabContext>
 
       <Popover
