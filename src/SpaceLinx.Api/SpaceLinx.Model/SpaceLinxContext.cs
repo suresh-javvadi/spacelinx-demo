@@ -119,6 +119,8 @@ public partial class SpaceLinxContext : DbContext
 
     public virtual DbSet<InventoryStock> InventoryStocks { get; set; }
 
+    public virtual DbSet<InventoryStockReportRow> InventoryStockReportRows { get; set; }
+
     public virtual DbSet<InventoryTransaction> InventoryTransactions { get; set; }
 
     public virtual DbSet<InventoryTransactionVw> InventoryTransactionVws { get; set; }
@@ -3285,6 +3287,26 @@ public partial class SpaceLinxContext : DbContext
                 .HasForeignKey(d => d.ToLocationId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_inventory_transaction_to_location");
+        });
+
+        modelBuilder.Entity<InventoryStockReportRow>(entity =>
+        {
+            entity.HasNoKey();
+
+            // Rows are produced only via FromSqlRaw("SELECT * FROM sc.inventory_stock_report(...)").
+            // The function lives in database/procedures/ (not EF-managed), so exclude this type from
+            // migrations — otherwise EF scaffolds a phantom CREATE TABLE. Mirrors the ChangeLog
+            // read-only mapping in SpaceLinxContext.Audit.cs.
+            entity.ToTable("inventory_stock_report_row", "sc", t => t.ExcludeFromMigrations());
+
+            entity.Property(e => e.PartNo).HasColumnName("part_no");
+            entity.Property(e => e.PartName).HasColumnName("part_name");
+            entity.Property(e => e.OpeningQty).HasColumnName("opening_qty");
+            entity.Property(e => e.PurchaseQty).HasColumnName("purchase_qty");
+            entity.Property(e => e.ConsumptionQty).HasColumnName("consumption_qty");
+            entity.Property(e => e.ClosingQty).HasColumnName("closing_qty");
+            entity.Property(e => e.ConsumptionAmount).HasColumnName("consumption_amount");
+            entity.Property(e => e.ClosingBalance).HasColumnName("closing_balance");
         });
 
         modelBuilder.Entity<InventoryTransactionVw>(entity =>

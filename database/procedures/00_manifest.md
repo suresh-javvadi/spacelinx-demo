@@ -46,6 +46,7 @@ The 14/15 `generate_*` baseline functions are NOT here — they are already embe
 - 38_sc_generate_tender_number.sql  (FUNCTION)
 - 39_mes_part_number_trigger.sql  (TRIGGER)
 - 40_mes_trg_update_has_bom_flag.sql  (TRIGGER)
+- 41_sc_inventory_stock_report.sql  (FUNCTION)
 
 ## Ordering notes
 

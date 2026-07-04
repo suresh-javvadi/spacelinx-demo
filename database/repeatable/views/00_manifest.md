@@ -29,6 +29,7 @@ Numbering guarantees every view is created AFTER any view it depends on.
 - 21_sc_scrap_request_with_user_vw.sql
 - 22_sc_stock_movement_with_user_vw.sql
 - 23_sc_vendor_return_request_with_user_vw.sql
+- 24_sc_inventory_stock_ledger_vw.sql
 
 ## View dependency edges
 
