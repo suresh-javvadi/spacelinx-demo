@@ -2034,6 +2034,7 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
+            entity.Property(e => e.HsnCode).HasColumnName("hsn_code");
             entity.Property(e => e.CheckedById).HasColumnName("checked_by_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -2820,6 +2821,7 @@ public partial class SpaceLinxContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("inventory_created_by");
             entity.Property(e => e.InventoryId).HasColumnName("inventory_id");
+            entity.Property(e => e.HsnCode).HasColumnName("hsn_code");
             entity.Property(e => e.InventoryIsActive).HasColumnName("inventory_is_active");
             entity.Property(e => e.InventoryPartId).HasColumnName("inventory_part_id");
             entity.Property(e => e.InventoryUnitPrice)
@@ -2881,6 +2883,7 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
+            entity.Property(e => e.HsnCode).HasColumnName("hsn_code");
             entity.Property(e => e.ConsumedQuantity)
                 .HasDefaultValue(0)
                 .HasColumnName("consumed_quantity");
@@ -3088,6 +3091,7 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
+            entity.Property(e => e.HsnCode).HasColumnName("hsn_code");
             entity.Property(e => e.AssignedUserId).HasColumnName("assigned_user_id");
             entity.Property(e => e.AvailablePrice)
                 .HasPrecision(18, 4)

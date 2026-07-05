@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model
+namespace SpaceLinx.Model
 {
     public class InventoryStockDetailsReadModel : BaseReadModel
     {
@@ -9,6 +9,7 @@
         public string? BinCode { get; set; }
         public string? TrackingType { get; set; }
         public string? TrackingId { get; set; }
+        public string? HsnCode { get; set; }
         public int QtyOnhand { get; set; }
         public int QtyAvailable { get; set; }
         public int? QtyIssued { get; set; }

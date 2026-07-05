@@ -113,6 +113,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                     ManufacturingDate = item.ManufacturingDate,
                     ExpiryDate = item.ExpiryDate,
                     DateCode = item.DateCode,
+                    HsnCode = item.HsnCode,
                     Remark = item.Remark,
                     CreatedBy = UserEmail,
                     CreatedAt = DateTime.UtcNow,
@@ -142,6 +143,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
 
                 if (stock != null)
                 {
+                    stock.HsnCode = item.HsnCode;
                     stock.QtyQcPending = (stock.QtyQcPending) + qty;
                     stock.QtyOnhand += qty;
                     stock.UpdatedBy = UserEmail;
@@ -157,6 +159,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                         QtyQcPending = qty,
                         TrackingType = item.TrackingMethod,
                         TrackingId = item.TrackingId,
+                        HsnCode = item.HsnCode,
                         UnitPrice = poLineItem?.UnitPrice,
                         ConversionRate = poLineItem?.ConversionRate,
                         Currency = poLineItem?.Currency,
@@ -169,6 +172,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
 
                 if (part != null)
                 {
+                    part.HsnCode = item.HsnCode;
                     part.QtyQcPending += qty;
                     if (item.TrackingMethod != null && part.TrackingType != item.TrackingMethod)
                     {
@@ -188,6 +192,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                         QtyQcPending = qty,
                         TrackingType = item.TrackingMethod,
                         QtyOnhand = qty,
+                        HsnCode = item.HsnCode,
                         CreatedBy = UserEmail,
                         CreatedAt = DateTime.UtcNow,
                         IsActive = true

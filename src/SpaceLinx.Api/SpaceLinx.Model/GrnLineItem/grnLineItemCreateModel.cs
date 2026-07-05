@@ -11,4 +11,5 @@ public class GrnLineItemCreateModel : BaseWriteModel
     public DateOnly? ExpiryDate { get; set; }
     public string? DateCode { get; set; }
     public string? Remark { get; set; }
+    public string? HsnCode { get; set; }
 }

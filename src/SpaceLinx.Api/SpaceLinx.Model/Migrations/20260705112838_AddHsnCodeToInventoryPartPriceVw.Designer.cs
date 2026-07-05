@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SpaceLinx.Model;
@@ -12,9 +13,11 @@ using SpaceLinx.Model;
 namespace SpaceLinx.Model.Migrations
 {
     [DbContext(typeof(SpaceLinxContext))]
-    partial class SpaceLinxContextModelSnapshot : ModelSnapshot
+    [Migration("20260705112838_AddHsnCodeToInventoryPartPriceVw")]
+    partial class AddHsnCodeToInventoryPartPriceVw
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3557,8 +3560,7 @@ namespace SpaceLinx.Model.Migrations
                         .HasColumnName("grn_id");
 
                     b.Property<string>("HsnCode")
-                        .HasColumnType("text")
-                        .HasColumnName("hsn_code");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -4977,8 +4979,7 @@ namespace SpaceLinx.Model.Migrations
                         .HasColumnName("deleted_by");
 
                     b.Property<string>("HsnCode")
-                        .HasColumnType("text")
-                        .HasColumnName("hsn_code");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -5103,8 +5104,7 @@ namespace SpaceLinx.Model.Migrations
                         .HasColumnName("description");
 
                     b.Property<string>("HsnCode")
-                        .HasColumnType("text")
-                        .HasColumnName("hsn_code");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("InventoryCreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -5615,8 +5615,7 @@ namespace SpaceLinx.Model.Migrations
                         .HasColumnName("department");
 
                     b.Property<string>("HsnCode")
-                        .HasColumnType("text")
-                        .HasColumnName("hsn_code");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()

@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model
+namespace SpaceLinx.Model
 {
     public partial class InventoryStock : BaseModel
     {
@@ -7,6 +7,7 @@
         public Guid? LocationId { get; set; }
         public string? TrackingType { get; set; }
         public string? TrackingId { get; set; }
+        public string? HsnCode { get; set; }
         public int QtyOnhand { get; set; }
         public decimal? QtyAvailable { get; set; }
         public int? QtyReserved { get; set; }

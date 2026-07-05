@@ -1,10 +1,11 @@
-﻿CREATE OR REPLACE VIEW sc.inventory_part_price_vw
+CREATE OR REPLACE VIEW sc.inventory_part_price_vw
  AS
  SELECT i.id AS inventory_id,
     i.id AS inventory_part_id,
     i.location_id,
     i.bin_id,
     i.sku_code,
+    i.hsn_code,
     i.reorder_level,
     i.unit_price AS inventory_unit_price,
     sum(ins.qty_onhand) AS qty_onhand,
@@ -44,4 +45,4 @@
      LEFT JOIN mes.part p ON i.part_id = p.id
      LEFT JOIN sc.inventory_stock ins ON ins.part_id = i.part_id AND ins.is_active = true
   WHERE i.deleted_at IS NULL AND p.item_type IS NULL
-  GROUP BY i.id, i.location_id, i.bin_id, i.sku_code, i.reorder_level, i.unit_price, i.consumed_quantity, i.is_active, i.created_at, i.created_by, i.updated_at, i.updated_by, p.id, p.part_number, p.part_type_id, p.part_number_suffix, p.version, p.name, p.description, p.weight, p.unit_price, p.status, p.manufacturing_part_number, p.is_serial_number_required, p.is_active;
+  GROUP BY i.id, i.location_id, i.bin_id, i.sku_code, i.hsn_code, i.reorder_level, i.unit_price, i.consumed_quantity, i.is_active, i.created_at, i.created_by, i.updated_at, i.updated_by, p.id, p.part_number, p.part_type_id, p.part_number_suffix, p.version, p.name, p.description, p.weight, p.unit_price, p.status, p.manufacturing_part_number, p.is_serial_number_required, p.is_active;

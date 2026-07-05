@@ -5871,6 +5871,7 @@ CREATE TABLE sc.grn_line_item (
     disposition character varying(50),
     qc_remark text,
     po_line_item_id uuid,
+    hsn_code text,
     CONSTRAINT grn_line_item_disposition_check CHECK (((disposition)::text = ANY (ARRAY[('Accepted'::character varying)::text, ('Return'::character varying)::text, ('Scrap'::character varying)::text, ('Rework'::character varying)::text, ('Quarantine'::character varying)::text]))),
     CONSTRAINT grn_line_item_qc_status_check CHECK (((qc_status)::text = ANY (ARRAY[('Pending'::character varying)::text, ('Pass'::character varying)::text, ('Fail'::character varying)::text, ('Accepted'::character varying)::text]))),
     CONSTRAINT grn_line_item_tracking_method_check CHECK (((tracking_method IS NULL) OR ((tracking_method)::text = ANY (ARRAY[('None'::character varying)::text, ('Batch'::character varying)::text, ('Serial'::character varying)::text]))))
@@ -6063,7 +6064,8 @@ CREATE TABLE sc.inventory_part (
     location_id uuid,
     qty_returned integer DEFAULT 0,
     qty_available integer GENERATED ALWAYS AS (((((qty_onhand - qty_reserved) - qty_issued) - qty_qc_failed) - qty_qc_pending)) STORED,
-    tracking_type character varying(20)
+    tracking_type character varying(20),
+    hsn_code text
 );
 
 
@@ -6143,7 +6145,8 @@ CREATE TABLE sc.inventory_stock (
     available_price numeric(18,4) GENERATED ALWAYS AS (((((((((qty_onhand - qty_reserved) - qty_issued) - qty_qc_pending) - qty_qc_failed))::numeric * unit_price) * conversion_rate))::numeric(18,4)) STORED,
     total_price numeric(18,4) GENERATED ALWAYS AS (((((((qty_issued)::numeric * unit_price) * conversion_rate) + (((qty_reserved)::numeric * unit_price) * conversion_rate)) + (((((((qty_onhand - qty_reserved) - qty_issued) - qty_qc_pending) - qty_qc_failed))::numeric * unit_price) * conversion_rate)))::numeric(18,4)) STORED,
     opening_qty integer DEFAULT 0 NOT NULL,
-    opening_price numeric(18,4) DEFAULT 0
+    opening_price numeric(18,4) DEFAULT 0,
+    hsn_code text
 );
 
 
@@ -6157,6 +6160,7 @@ CREATE VIEW sc.inventory_part_price_vw AS
     i.location_id,
     i.bin_id,
     i.sku_code,
+    i.hsn_code,
     i.reorder_level,
     i.unit_price AS inventory_unit_price,
     sum(ins.qty_onhand) AS qty_onhand,
@@ -6194,7 +6198,7 @@ CREATE VIEW sc.inventory_part_price_vw AS
      LEFT JOIN mes.part p ON ((i.part_id = p.id)))
      LEFT JOIN sc.inventory_stock ins ON (((ins.part_id = i.part_id) AND (ins.is_active = true))))
   WHERE ((i.deleted_at IS NULL) AND (p.item_type IS NULL))
-  GROUP BY i.id, i.location_id, i.bin_id, i.sku_code, i.reorder_level, i.unit_price, i.consumed_quantity, i.is_active, i.created_at, i.created_by, i.updated_at, i.updated_by, p.id, p.part_number, p.part_type_id, p.part_number_suffix, p.version, p.name, p.description, p.weight, p.unit_price, p.status, p.manufacturing_part_number, p.is_serial_number_required, p.is_active;
+  GROUP BY i.id, i.location_id, i.bin_id, i.sku_code, i.hsn_code, i.reorder_level, i.unit_price, i.consumed_quantity, i.is_active, i.created_at, i.created_by, i.updated_at, i.updated_by, p.id, p.part_number, p.part_type_id, p.part_number_suffix, p.version, p.name, p.description, p.weight, p.unit_price, p.status, p.manufacturing_part_number, p.is_serial_number_required, p.is_active;
 
 
 --

@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model
+namespace SpaceLinx.Model
 {
     public partial class InventoryPartPriceVw
     {
@@ -7,6 +7,7 @@
         public Guid? LocationId { get; set; }
         public Guid? BinId { get; set; }
         public string? SkuCode { get; set; }
+        public string? HsnCode { get; set; }
         public int? ReorderLevel { get; set; }
         public decimal? InventoryUnitPrice { get; set; }
         public long? QtyOnhand { get; set; }

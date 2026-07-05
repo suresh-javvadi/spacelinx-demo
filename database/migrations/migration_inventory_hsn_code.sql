@@ -1,3 +1,24 @@
+-- Migration: Add hsn_code to sc.grn_line_item, sc.inventory_stock, sc.inventory_part
+-- Date: 2026-07-04
+-- HSN (Harmonized System of Nomenclature) tax classification code used on invoices/GST.
+-- Nullable / optional. Idempotent — safe to re-run.
+ 
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='sc' AND table_name='grn_line_item' AND column_name='hsn_code') THEN
+        ALTER TABLE sc.grn_line_item ADD COLUMN hsn_code VARCHAR(50);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='sc' AND table_name='inventory_stock' AND column_name='hsn_code') THEN
+        ALTER TABLE sc.inventory_stock ADD COLUMN hsn_code VARCHAR(50);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='sc' AND table_name='inventory_part' AND column_name='hsn_code') THEN
+        ALTER TABLE sc.inventory_part ADD COLUMN hsn_code VARCHAR(50);
+    END IF;
+END
+$$;
+
 DROP VIEW IF EXISTS sc.inventory_part_price_vw CASCADE;
 
 CREATE VIEW sc.inventory_part_price_vw AS
