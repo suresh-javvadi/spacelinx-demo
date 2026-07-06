@@ -319,7 +319,7 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
                   {item?.receivedQuantity ?? "N/A"}
                 </Text>
                 <Text style={[styles.tableCol, styles.flexHsn]}>
-                  {item?.part?.hsnCode || item?.hsn || "N/A"}
+                  {item?.hsnCode || item?.part?.hsnCode || "N/A"}
                 </Text>
                 <Text style={[styles.tableCol, styles.flexStatus]}>
                   {item?.qcStatus || "N/A"}

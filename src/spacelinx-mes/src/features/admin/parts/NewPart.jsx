@@ -61,7 +61,6 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
     radiationTolerance: "",
     tempRange: "",
     tempCoefficient: "",
-    hsnCode: "",
   });
   const fileInputRef = useRef(null);
 
@@ -417,7 +416,6 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
       grade: showCustomGrade
         ? formValues.customGrade
         : formValues.grade?.name || null,
-      hsnCode: formValues.hsnCode || null,
       specification: formValues.specification || null,
       package: formValues.package || null,
       qualification: formValues.qualification || null,
@@ -865,14 +863,6 @@ const NewPart = ({ handleCloseClick, handleRefresh }) => {
                         }
                       />
                     )}
-                    <TextField
-                      label="HSN Code"
-                      name="hsnCode"
-                      className="AdminTextFeilds"
-                      value={formValues.hsnCode || ""}
-                      onChange={handleTextFieldChange}
-                      fullWidth
-                    />
                   </div>
 
                   <div className="GrnNewFlyoutContentTop radioRow">

@@ -430,7 +430,7 @@ const EditQualityCheck = ({ selectedGRN, handleClose, handleRefresh }) => {
                 </div>
 
                 <div className="refDescCard">
-                  <h4 className="cardTitle">Description</h4>
+                  <h4 className="cardTitle">Remarks(Excess/Shortage/Damage)</h4>
                   <div className="detailItem">
                     <p className="detailValue">{formData.description || "-"}</p>
                   </div>
