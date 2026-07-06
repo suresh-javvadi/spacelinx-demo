@@ -472,6 +472,12 @@ const PartInventory = ({ selectedPartId, onInventoryFetchError }) => {
                 fullWidth
               />
               <TextField
+                label="HSN Code"
+                value={partMeta.hsnCode || ""}
+                InputProps={{ readOnly: true }}
+                fullWidth
+              />
+              <TextField
                 label="Reorder Level"
                 type="number"
                 value={partMeta.reorderLevel || 0}

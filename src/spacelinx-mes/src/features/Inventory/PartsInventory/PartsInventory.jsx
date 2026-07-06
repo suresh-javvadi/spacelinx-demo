@@ -129,6 +129,12 @@ const PartsInventory = () => {
       flex: 1,
     },
     {
+      field: "hsnCode",
+      headerName: "HSN Code",
+      flex: 1,
+      renderCell: ({ row }) => <p>{row?.hsnCode || "---"}</p>,
+    },
+    {
       field: "openingQty",
       headerName: "Opening Qty",
       flex: 1,
@@ -261,30 +267,48 @@ const PartsInventory = () => {
               size="small"
               onClick={() => {
                 if (selectedParts.length === 0) {
-                  Alert("Please select at least one part to create a PO", "warning");
+                  Alert(
+                    "Please select at least one part to create a PO",
+                    "warning",
+                  );
                   return;
                 }
-                navigate("/procurement/purchaseorders/new", { state: { selectedParts } });
+                navigate("/procurement/purchaseorders/new", {
+                  state: { selectedParts },
+                });
               }}
             >
               Create PO
               {selectedParts.length > 0 && (
-                <Chip label={selectedParts.length} size="small" className="parts-btn-badge" />
+                <Chip
+                  label={selectedParts.length}
+                  size="small"
+                  className="parts-btn-badge"
+                />
               )}
             </Button>
             <Button
               size="small"
               onClick={() => {
                 if (selectedParts.length === 0) {
-                  Alert("Please select at least one part to create a Stock Movement", "warning");
+                  Alert(
+                    "Please select at least one part to create a Stock Movement",
+                    "warning",
+                  );
                   return;
                 }
-                navigate("/inventory/stockMovements", { state: { preSelectedParts: selectedParts } });
+                navigate("/inventory/stockMovements", {
+                  state: { preSelectedParts: selectedParts },
+                });
               }}
             >
               Move Stock
               {selectedParts.length > 0 && (
-                <Chip label={selectedParts.length} size="small" className="parts-btn-badge" />
+                <Chip
+                  label={selectedParts.length}
+                  size="small"
+                  className="parts-btn-badge"
+                />
               )}
             </Button>
             {hasPermission(PERMISSIONS.PARTS.INVENTORY.PRICE) && (

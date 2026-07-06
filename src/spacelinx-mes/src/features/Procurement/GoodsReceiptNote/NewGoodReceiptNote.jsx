@@ -483,6 +483,14 @@ const NewGoodReceiptNote = ({
     updateLineItemError(uniqueId, "trackingNumber", error);
   };
 
+  const handleHsnCodeChange = (uniqueId, value) => {
+    setSelectedParts((prev) =>
+      prev.map((item) =>
+        item.uniqueId === uniqueId ? { ...item, hsnCode: value } : item,
+      ),
+    );
+  };
+
   const handleTrackingTypeChange = (uniqueId, value) => {
     const isSerial = value.value === "serial";
 
@@ -683,6 +691,7 @@ const NewGoodReceiptNote = ({
       }
 
       formDataPayload.append(`LineItems[${index}].remark`, item.remarks || "");
+      formDataPayload.append(`LineItems[${index}].hsnCode`, item.hsnCode || "");
     });
 
     documentFiles.forEach((doc, index) => {
@@ -833,7 +842,27 @@ const NewGoodReceiptNote = ({
       field: "hsnCode",
       headerName: "HSN Code",
       flex: 0.8,
-      renderCell: ({ row }) => row.hsnCode || "---",
+      renderCell: ({ row }) => (
+        <TextField
+          size="small"
+          fullWidth
+          placeholder="HSN Code"
+          value={row.hsnCode || ""}
+          onChange={(e) => handleHsnCodeChange(row.uniqueId, e.target.value)}
+          sx={{
+            "& .MuiInputBase-root": {
+              height: 40,
+              padding: "0 10px",
+              borderRadius: "6px",
+              marginTop: "4px",
+            },
+            "& input": {
+              padding: "4px 6px !important",
+              fontSize: "14px",
+            },
+          }}
+        />
+      ),
     },
     {
       field: "trackingType",
@@ -1067,265 +1096,263 @@ const NewGoodReceiptNote = ({
             </div>
           )}
           <TabPanel value="1" className="GrnNewFlyoutTabPanel">
-              <div className="GrnNewFlyoutContent">
-                <div className="GrnNewFlyoutContentTop">
-                  <Autocomplete
-                    options={locationsData}
-                    getOptionLabel={(option) => option.name || ""}
-                    value={
-                      locationsData.find(
-                        (loc) => loc.id === formData.locationId,
-                      ) || null
-                    }
-                    onChange={(event, newValue) => {
-                      const newLocationId = newValue?.id || "";
+            <div className="GrnNewFlyoutContent">
+              <div className="GrnNewFlyoutContentTop">
+                <Autocomplete
+                  options={locationsData}
+                  getOptionLabel={(option) => option.name || ""}
+                  value={
+                    locationsData.find(
+                      (loc) => loc.id === formData.locationId,
+                    ) || null
+                  }
+                  onChange={(event, newValue) => {
+                    const newLocationId = newValue?.id || "";
 
-                      setFormData((prev) => ({
-                        ...prev,
-                        locationId: newLocationId,
-                      }));
+                    setFormData((prev) => ({
+                      ...prev,
+                      locationId: newLocationId,
+                    }));
 
-                      setLocationError(newLocationId === "");
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Select Location"
-                        fullWidth
-                        required
-                        error={locationError}
-                        helperText={
-                          locationError ? "Please select a location" : ""
-                        }
-                      />
-                    )}
-                  />
-
-                  <TextField
-                    label="Received Date"
-                    type="date"
-                    name="receivedDate"
-                    value={formData.receivedDate}
-                    onChange={handleInputChange}
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                    required
-                    error={receivedDateError}
-                    helperText={
-                      receivedDateError ? "Received Date is required" : ""
-                    }
-                  />
-                </div>
-
-                <div className="GrnNewFlyoutContentTop">
-                  <TextField
-                    label="Invoice Number"
-                    name="invoiceNumber"
-                    className="AdminTextFeilds"
-                    value={formData.invoiceNumber}
-                    onChange={handleInputChange}
-                    required
-                    error={invoiceNumberError}
-                    helperText={
-                      invoiceNumberError ? "Invoice number is required" : ""
-                    }
-                  />
-                  <TextField
-                    label="Invoice Date"
-                    type="date"
-                    name="invoiceDate"
-                    value={formData.invoiceDate}
-                    onChange={handleInputChange}
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                    required
-                    error={invoiceDateError}
-                    helperText={
-                      invoiceDateError ? "Received Date is required" : ""
-                    }
-                  />
-                </div>
-
-                <div className="GrnNewFlyoutContentTop">
-                  <Autocomplete
-                    options={purchaseOrders}
-                    getOptionLabel={(option) => option.number || ""}
-                    loading={loadingPoData}
-                    loadingText="Loading POs..."
-                    value={selectedPO}
-                    onChange={(event, newValue) =>
-                      handlePurchaseOrderChange(newValue)
-                    }
-                    isOptionEqualToValue={(option, value) =>
-                      option.id === value.id
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Select Purchase Order"
-                        fullWidth
-                      />
-                    )}
-                  />
-
-                  <Autocomplete
-                    value={formData.vendor || null}
-                    onChange={(event, newValue) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        vendor: newValue || null,
-                      }));
-                    }}
-                    options={vendorsData}
-                    getOptionLabel={(option) =>
-                      `${option.vendorCode} - ${option.name}` || ""
-                    }
-                    readOnly={Boolean(selectedPO)}
-                    loading={loadingVendorsData}
-                    loadingText="Loading Vendors..."
-                    renderInput={(params) => (
-                      <TextField {...params} label="Select Vendor" fullWidth />
-                    )}
-                  />
-                </div>
+                    setLocationError(newLocationId === "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Location"
+                      fullWidth
+                      required
+                      error={locationError}
+                      helperText={
+                        locationError ? "Please select a location" : ""
+                      }
+                    />
+                  )}
+                />
 
                 <TextField
-                  label="Reference"
-                  name="reference"
+                  label="Received Date"
+                  type="date"
+                  name="receivedDate"
+                  value={formData.receivedDate}
+                  onChange={handleInputChange}
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  required
+                  error={receivedDateError}
+                  helperText={
+                    receivedDateError ? "Received Date is required" : ""
+                  }
+                />
+              </div>
+
+              <div className="GrnNewFlyoutContentTop">
+                <TextField
+                  label="Invoice Number"
+                  name="invoiceNumber"
                   className="AdminTextFeilds"
-                  value={formData.reference}
+                  value={formData.invoiceNumber}
                   onChange={handleInputChange}
-                  fullWidth
+                  required
+                  error={invoiceNumberError}
+                  helperText={
+                    invoiceNumberError ? "Invoice number is required" : ""
+                  }
                 />
-
                 <TextField
-                  label="Description"
-                  name="description"
-                  className="AdminTextFeilds full-width"
-                  value={formData.description}
+                  label="Invoice Date"
+                  type="date"
+                  name="invoiceDate"
+                  value={formData.invoiceDate}
                   onChange={handleInputChange}
-                  multiline
-                  rows={3}
+                  InputLabelProps={{ shrink: true }}
                   fullWidth
+                  required
+                  error={invoiceDateError}
+                  helperText={
+                    invoiceDateError ? "Received Date is required" : ""
+                  }
+                />
+              </div>
+
+              <div className="GrnNewFlyoutContentTop">
+                <Autocomplete
+                  options={purchaseOrders}
+                  getOptionLabel={(option) => option.number || ""}
+                  loading={loadingPoData}
+                  loadingText="Loading POs..."
+                  value={selectedPO}
+                  onChange={(event, newValue) =>
+                    handlePurchaseOrderChange(newValue)
+                  }
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Purchase Order"
+                      fullWidth
+                    />
+                  )}
                 />
 
-                {!selectedPO ? (
-                  <Autocomplete
-                    value={value}
-                    onChange={(e, newValue) => {
-                      handleSelectPart(newValue);
-                      setValue(null);
-                      setInputValue("");
-                    }}
-                    inputValue={inputValue}
-                    onInputChange={(e, newInputValue) =>
-                      setInputValue(newInputValue)
-                    }
-                    options={availableParts}
-                    loading={loadingPartsData}
-                    loadingText="Loading Parts..."
-                    getOptionLabel={(option) =>
-                      option
-                        ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}${option.poLineItemId ? ` - PO Qty ${option.orderedQuantity || 0} - Pending ${option.pendingQuantity || 0}` : ""}`
-                        : ""
-                    }
-                    isOptionEqualToValue={(option, value) =>
-                      (option.poLineItemId || option.id) ===
-                      (value?.poLineItemId || value?.id)
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Select Part" fullWidth />
-                    )}
-                    renderOption={(props, option) => (
-                      <li {...props} key={option.poLineItemId || option.id}>
-                        <div>
-                          <strong>{option.name}</strong>
-                          <div style={{ fontSize: "0.85rem" }}>
-                            Part No: {option.partNumber}
-                          </div>
-                          <div style={{ fontSize: "0.85rem" }}>
-                            Manf. Part No: {option.manufacturingPartNumber}
-                          </div>
-                          {option.poLineItemId ? (
-                            <div style={{ fontSize: "0.85rem" }}>
-                              Ordered: {option.orderedQuantity || 0} | Pending:{" "}
-                              {option.pendingQuantity || 0}
-                            </div>
-                          ) : null}
-                        </div>
-                      </li>
-                    )}
-                  />
-                ) : (
-                  ""
-                )}
-
-                <div className="GrnDataGridDiv">
-                  <StyledDataGrid
-                    rows={selectedParts}
-                    columns={columns}
-                    getRowId={(row) => row.uniqueId}
-                    disableRowSelectionOnClick
-                    getRowHeight={(params) => {
-                      const errorMsg = lineItemErrors[params.id];
-                      return errorMsg ? "auto" : null;
-                    }}
-                    getRowClassName={(params) =>
-                      lineItemErrors[params.id]?.trackingType
-                        ? "row-tracking-error"
-                        : ""
-                    }
-                    sx={{
-                      "& .row-tracking-error": {
-                        backgroundColor: "rgba(211, 47, 47, 0.08)",
-                        "&:hover": {
-                          backgroundColor: "rgba(211, 47, 47, 0.14)",
-                        },
-                      },
-                    }}
-                  />
-                </div>
+                <Autocomplete
+                  value={formData.vendor || null}
+                  onChange={(event, newValue) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      vendor: newValue || null,
+                    }));
+                  }}
+                  options={vendorsData}
+                  getOptionLabel={(option) =>
+                    `${option.vendorCode} - ${option.name}` || ""
+                  }
+                  readOnly={Boolean(selectedPO)}
+                  loading={loadingVendorsData}
+                  loadingText="Loading Vendors..."
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Vendor" fullWidth />
+                  )}
+                />
               </div>
 
-              <div className="GrnCreateFlyoutFooter">
-                <Button onClick={handleCancel} className="CancelButton">
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateGRN} disabled={!!createdGrn}>
-                  Create
-                </Button>
-              </div>
-            </TabPanel>
-            <div
-              className="GrnNewFlyoutTabPanelDocuments"
-              style={{
-                display: editFlyOutTabsValue === "2" ? "flex" : "none",
-                flexDirection: "column",
-              }}
-            >
-              <PODocuments
-                onDocumentsChange={setDocumentFiles}
-                showExistingDocuments={false}
-                canView={hasPermission(
-                  PERMISSIONS.GOODSRECEIPTS.DOCUMENTS.VIEW,
-                )}
-                canUpload={hasPermission(
-                  PERMISSIONS.GOODSRECEIPTS.DOCUMENTS.MODIFY,
-                )}
-                canDelete={
-                  hasPermission(PERMISSIONS.GOODSRECEIPTS.DOCUMENTS.DELETE) &&
-                  hasPermission(PERMISSIONS.GOODSRECEIPTS.DOCUMENTS.MODIFY)
-                }
+              <TextField
+                label="Reference"
+                name="reference"
+                className="AdminTextFeilds"
+                value={formData.reference}
+                onChange={handleInputChange}
+                fullWidth
               />
-              <div className="GrnCreateFlyoutFooter">
-                <Button onClick={handleCancel} className="CancelButton">
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateGRN} disabled={!!createdGrn}>
-                  Create
-                </Button>
+
+              <TextField
+                label="Description"
+                name="description"
+                className="AdminTextFeilds full-width"
+                value={formData.description}
+                onChange={handleInputChange}
+                multiline
+                rows={3}
+                fullWidth
+              />
+
+              {!selectedPO ? (
+                <Autocomplete
+                  value={value}
+                  onChange={(e, newValue) => {
+                    handleSelectPart(newValue);
+                    setValue(null);
+                    setInputValue("");
+                  }}
+                  inputValue={inputValue}
+                  onInputChange={(e, newInputValue) =>
+                    setInputValue(newInputValue)
+                  }
+                  options={availableParts}
+                  loading={loadingPartsData}
+                  loadingText="Loading Parts..."
+                  getOptionLabel={(option) =>
+                    option
+                      ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}${option.poLineItemId ? ` - PO Qty ${option.orderedQuantity || 0} - Pending ${option.pendingQuantity || 0}` : ""}`
+                      : ""
+                  }
+                  isOptionEqualToValue={(option, value) =>
+                    (option.poLineItemId || option.id) ===
+                    (value?.poLineItemId || value?.id)
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Part" fullWidth />
+                  )}
+                  renderOption={(props, option) => (
+                    <li {...props} key={option.poLineItemId || option.id}>
+                      <div>
+                        <strong>{option.name}</strong>
+                        <div style={{ fontSize: "0.85rem" }}>
+                          Part No: {option.partNumber}
+                        </div>
+                        <div style={{ fontSize: "0.85rem" }}>
+                          Manf. Part No: {option.manufacturingPartNumber}
+                        </div>
+                        {option.poLineItemId ? (
+                          <div style={{ fontSize: "0.85rem" }}>
+                            Ordered: {option.orderedQuantity || 0} | Pending:{" "}
+                            {option.pendingQuantity || 0}
+                          </div>
+                        ) : null}
+                      </div>
+                    </li>
+                  )}
+                />
+              ) : (
+                ""
+              )}
+
+              <div className="GrnDataGridDiv">
+                <StyledDataGrid
+                  rows={selectedParts}
+                  columns={columns}
+                  getRowId={(row) => row.uniqueId}
+                  disableRowSelectionOnClick
+                  getRowHeight={(params) => {
+                    const errorMsg = lineItemErrors[params.id];
+                    return errorMsg ? "auto" : null;
+                  }}
+                  getRowClassName={(params) =>
+                    lineItemErrors[params.id]?.trackingType
+                      ? "row-tracking-error"
+                      : ""
+                  }
+                  sx={{
+                    "& .row-tracking-error": {
+                      backgroundColor: "rgba(211, 47, 47, 0.08)",
+                      "&:hover": {
+                        backgroundColor: "rgba(211, 47, 47, 0.14)",
+                      },
+                    },
+                  }}
+                />
               </div>
             </div>
+
+            <div className="GrnCreateFlyoutFooter">
+              <Button onClick={handleCancel} className="CancelButton">
+                Cancel
+              </Button>
+              <Button onClick={handleCreateGRN} disabled={!!createdGrn}>
+                Create
+              </Button>
+            </div>
+          </TabPanel>
+          <div
+            className="GrnNewFlyoutTabPanelDocuments"
+            style={{
+              display: editFlyOutTabsValue === "2" ? "flex" : "none",
+              flexDirection: "column",
+            }}
+          >
+            <PODocuments
+              onDocumentsChange={setDocumentFiles}
+              showExistingDocuments={false}
+              canView={hasPermission(PERMISSIONS.GOODSRECEIPTS.DOCUMENTS.VIEW)}
+              canUpload={hasPermission(
+                PERMISSIONS.GOODSRECEIPTS.DOCUMENTS.MODIFY,
+              )}
+              canDelete={
+                hasPermission(PERMISSIONS.GOODSRECEIPTS.DOCUMENTS.DELETE) &&
+                hasPermission(PERMISSIONS.GOODSRECEIPTS.DOCUMENTS.MODIFY)
+              }
+            />
+            <div className="GrnCreateFlyoutFooter">
+              <Button onClick={handleCancel} className="CancelButton">
+                Cancel
+              </Button>
+              <Button onClick={handleCreateGRN} disabled={!!createdGrn}>
+                Create
+              </Button>
+            </div>
+          </div>
         </div>
       </TabContext>
 

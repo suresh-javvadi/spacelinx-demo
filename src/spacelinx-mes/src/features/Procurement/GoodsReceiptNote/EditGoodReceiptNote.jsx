@@ -154,7 +154,6 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       field: "hsnCode",
       headerName: "HSN Code",
       flex: 0.8,
-      valueGetter: (_value, row) => row.part?.hsnCode || row.hsnCode || "---",
     },
     {
       field: "trackingMethod",
