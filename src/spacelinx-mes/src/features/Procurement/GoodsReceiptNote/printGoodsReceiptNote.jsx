@@ -255,9 +255,7 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
             </View>
             <View style={styles.metaRow}>
               <Text style={styles.metaLabel}>PO NO:</Text>
-              <Text style={styles.metaValue}>
-                {grnData?.poNumber || "N/A"}
-              </Text>
+              <Text style={styles.metaValue}>{grnData?.poNumber || "N/A"}</Text>
             </View>
           </View>
         </View>
@@ -299,7 +297,13 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
                 <Text style={[styles.tableCol, styles.flexPartNo]}>
                   {item?.part?.partNumber || item?.partNumber || "N/A"}
                 </Text>
-                <Text style={[styles.tableCol, styles.flexMfgPartNo, { wordBreak: "break-all" }]}>
+                <Text
+                  style={[
+                    styles.tableCol,
+                    styles.flexMfgPartNo,
+                    { wordBreak: "break-all" },
+                  ]}
+                >
                   {item?.part?.manufacturingPartNumber || "N/A"}
                 </Text>
                 <Text style={[styles.tableCol, styles.flexDescription]}>
@@ -324,9 +328,7 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
             ))
           ) : (
             <View style={styles.tableRow}>
-              <Text
-                style={[styles.tableCol, { flex: 1, textAlign: "center" }]}
-              >
+              <Text style={[styles.tableCol, { flex: 1, textAlign: "center" }]}>
                 No line items available
               </Text>
             </View>
@@ -336,7 +338,6 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
         <View style={styles.authSection}>
           <Text style={styles.authTitle}>Authorization</Text>
           <View style={styles.authGrid}>
-
             {/* Prepared By (Stores) — GRN created by */}
             <View style={styles.authColumn}>
               <Text style={styles.authRole}>Prepared By (Stores)</Text>
@@ -344,7 +345,14 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
                 <Text style={styles.authLabel}>Name:</Text>
                 <View style={[styles.authLine, { position: "relative" }]}>
                   {preparedByName ? (
-                    <Text style={{ fontSize: 9, position: "absolute", bottom: 2, left: 2 }}>
+                    <Text
+                      style={{
+                        fontSize: 9,
+                        position: "absolute",
+                        bottom: 2,
+                        left: 2,
+                      }}
+                    >
                       {preparedByName}
                     </Text>
                   ) : null}
@@ -358,7 +366,14 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
                 <Text style={styles.authLabel}>Date:</Text>
                 <View style={[styles.authLine, { position: "relative" }]}>
                   {grnData?.createdAt ? (
-                    <Text style={{ fontSize: 9, position: "absolute", bottom: 2, left: 2 }}>
+                    <Text
+                      style={{
+                        fontSize: 9,
+                        position: "absolute",
+                        bottom: 2,
+                        left: 2,
+                      }}
+                    >
                       {formatDate(grnData.createdAt)}
                     </Text>
                   ) : null}
@@ -380,58 +395,82 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
             {/* Approved By — PO approved persons */}
             <View style={styles.authColumn}>
               <Text style={styles.authRole}>Approved By</Text>
-              {poApprovedPersons.length > 0 ? (
-                poApprovedPersons.map((approval, idx) => {
-                  const name = `${approval.approver?.firstName || ""} ${approval.approver?.lastName || ""}`.trim();
-                  const date = approval.actedAt ? formatDate(approval.actedAt) : "";
-                  return (
-                    <View key={idx} style={{ marginBottom: idx < poApprovedPersons.length - 1 ? 8 : 0 }}>
-                      <View style={styles.authRow}>
-                        <Text style={styles.authLabel}>Name:</Text>
-                        <View style={[styles.authLine, { position: "relative" }]}>
-                          {name ? (
-                            <Text style={{ fontSize: 9, position: "absolute", bottom: 2, left: 2 }}>
-                              {name}
-                            </Text>
-                          ) : null}
+              {poApprovedPersons.length > 0
+                ? poApprovedPersons.map((approval, idx) => {
+                    const name =
+                      `${approval.approver?.firstName || ""} ${approval.approver?.lastName || ""}`.trim();
+                    const date = approval.actedAt
+                      ? formatDate(approval.actedAt)
+                      : "";
+                    return (
+                      <View
+                        key={idx}
+                        style={{
+                          marginBottom:
+                            idx < poApprovedPersons.length - 1 ? 8 : 0,
+                        }}
+                      >
+                        <View style={styles.authRow}>
+                          <Text style={styles.authLabel}>Name:</Text>
+                          <View
+                            style={[styles.authLine, { position: "relative" }]}
+                          >
+                            {name ? (
+                              <Text
+                                style={{
+                                  fontSize: 9,
+                                  position: "absolute",
+                                  bottom: 2,
+                                  left: 2,
+                                }}
+                              >
+                                {name}
+                              </Text>
+                            ) : null}
+                          </View>
+                        </View>
+                        <View style={styles.authRow}>
+                          <Text style={styles.authLabel}>Signature:</Text>
+                          <View style={styles.authLine} />
+                        </View>
+                        <View style={styles.authRow}>
+                          <Text style={styles.authLabel}>Date:</Text>
+                          <View
+                            style={[styles.authLine, { position: "relative" }]}
+                          >
+                            {date ? (
+                              <Text
+                                style={{
+                                  fontSize: 9,
+                                  position: "absolute",
+                                  bottom: 2,
+                                  left: 2,
+                                }}
+                              >
+                                {date}
+                              </Text>
+                            ) : null}
+                          </View>
                         </View>
                       </View>
-                      <View style={styles.authRow}>
-                        <Text style={styles.authLabel}>Signature:</Text>
-                        <View style={styles.authLine} />
-                      </View>
-                      <View style={styles.authRow}>
-                        <Text style={styles.authLabel}>Date:</Text>
-                        <View style={[styles.authLine, { position: "relative" }]}>
-                          {date ? (
-                            <Text style={{ fontSize: 9, position: "absolute", bottom: 2, left: 2 }}>
-                              {date}
-                            </Text>
-                          ) : null}
-                        </View>
-                      </View>
+                    );
+                  })
+                : ["Name", "Signature", "Date"].map((field) => (
+                    <View key={field} style={styles.authRow}>
+                      <Text style={styles.authLabel}>{field}:</Text>
+                      <View style={styles.authLine} />
                     </View>
-                  );
-                })
-              ) : (
-                ["Name", "Signature", "Date"].map((field) => (
-                  <View key={field} style={styles.authRow}>
-                    <Text style={styles.authLabel}>{field}:</Text>
-                    <View style={styles.authLine} />
-                  </View>
-                ))
-              )}
+                  ))}
             </View>
-
           </View>
         </View>
         {/* Remarks section */}
         <View style={styles.remarksSection} wrap={false}>
-          <Text style={styles.remarksTitle}>Remarks</Text>
+          <Text style={styles.remarksTitle}>
+            Remarks(Excess/Shortage/Damage)
+          </Text>
           <View style={styles.remarksBox}>
-            <Text style={styles.remarksText}>
-              {grnData?.description || ""}
-            </Text>
+            <Text style={styles.remarksText}>{grnData?.description || ""}</Text>
           </View>
         </View>
       </Page>

@@ -1227,17 +1227,6 @@ const NewGoodReceiptNote = ({
                 fullWidth
               />
 
-              <TextField
-                label="Description"
-                name="description"
-                className="AdminTextFeilds full-width"
-                value={formData.description}
-                onChange={handleInputChange}
-                multiline
-                rows={3}
-                fullWidth
-              />
-
               {!selectedPO ? (
                 <Autocomplete
                   value={value}
@@ -1314,6 +1303,17 @@ const NewGoodReceiptNote = ({
                   }}
                 />
               </div>
+
+              <TextField
+                label="Remarks(Excess/Shortage/Damage)"
+                name="description"
+                className="AdminTextFeilds full-width"
+                value={formData.description}
+                onChange={handleInputChange}
+                multiline
+                rows={3}
+                fullWidth
+              />
             </div>
 
             <div className="GrnCreateFlyoutFooter">

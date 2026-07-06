@@ -221,7 +221,7 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
   async function handleEditSubmit() {
     const fd = new FormData();
 
-    fd.append("PurchaseOrderId", selectedGRN.purchaseOrderId);
+    fd.append("PurchaseOrderId", selectedGRN?.purchaseOrderId || "");
     fd.append("ReceivedDate", selectedGRN.receivedDate);
     fd.append("Description", formData.description);
     fd.append("ReceivedById", selectedGRN.receivedById);
@@ -252,8 +252,8 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       handleRefresh();
       handleClose();
     } catch (error) {
+      console.error("GRN Update Error:", error.response?.data || error.message);
       Alert("Failed to update GRN.", "error");
-      console.error("GRN Update Error:", error);
     }
   }
   const { activeRole } = useUserContext();
@@ -388,7 +388,7 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
                 </div>
               </div>
 
-              {/* Reference + Description */}
+              {/* Reference + Remarks */}
               <div className="refDescGrid">
                 <div className="refDescCard">
                   <h4 className="cardTitle">Reference</h4>
@@ -408,11 +408,11 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
                 </div>
 
                 <div className="refDescCard">
-                  <h4 className="cardTitle">Description</h4>
+                  <h4 className="cardTitle">Remarks</h4>
                   <TextField
                     fullWidth
                     size="small"
-                    label="Description"
+                    label="Remarks(Excess/Shortage/Damage)"
                     value={formData.description}
                     inputProps={{ readOnly: readOnlyMode }}
                     onChange={(e) =>
