@@ -1,12 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import {
-  TextField,
-  Autocomplete,
-  Box,
-  Tab,
-  Button,
-  Divider,
-} from "@mui/material";
+import { TextField, Autocomplete, Box, Tab, Button } from "@mui/material";
 import { AlertsContext } from "../../AlertsContext/Context";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
@@ -15,8 +8,6 @@ import {
   fetchPurchaseOrderwithId,
 } from "../../../services/purchaseOrders";
 import { createGoodReceiptNoteWithLineItems } from "../../../services/goodReceiptNoteService";
-import { pdf } from "@react-pdf/renderer";
-import PrintGoodsReceiptNote from "./printGoodsReceiptNote";
 import dayjs from "dayjs";
 import PODocuments from "../purchaseOrders/PODocuments";
 import { fetchLocationsLookUp } from "../../../services/locationService";
@@ -113,9 +104,6 @@ const NewGoodReceiptNote = ({
   const [activeRowId, setActiveRowId] = useState(null);
   const [tempRemarks, setTempRemarks] = useState("");
   const skipDraftSaveRef = useRef(false);
-  const [createdGrn, setCreatedGrn] = useState(null);
-  const [poApprovals, setPoApprovals] = useState([]);
-  const createdLineItemsRef = useRef([]);
 
   const clearDraft = () => {
     sessionStorage.removeItem(GRN_DRAFT_STORAGE_KEY);
@@ -404,7 +392,6 @@ const NewGoodReceiptNote = ({
         }));
 
       setLineItems(filteredItems);
-      setPoApprovals(data?.approvals || []);
       return filteredItems;
     } catch {
       Alert("Failed to fetch PO line items", "error");
@@ -719,21 +706,11 @@ const NewGoodReceiptNote = ({
 
     try {
       setLoadingData(true);
-      const created = await createGoodReceiptNoteWithLineItems(formDataPayload);
+      await createGoodReceiptNoteWithLineItems(formDataPayload);
       Alert("Goods Receipt Note created successfully", "success");
       clearDraft();
-      createdLineItemsRef.current = selectedParts;
-      setCreatedGrn({
-        ...created,
-        poNumber: selectedPO?.number,
-        orderDate: selectedPO?.orderDate,
-        companyName: formData.vendor?.name,
-        invoiceNumber: formData.invoiceNumber,
-        invoiceDate: formData.invoiceDate,
-        receivedDate: formData.receivedDate,
-        receivedByFullName: created?.receivedByFullName,
-      });
       handleRefresh();
+      handleClose();
     } catch (error) {
       const message = error.response?.data?.message || "";
       const trackingMismatch = message.match(
@@ -773,50 +750,6 @@ const NewGoodReceiptNote = ({
       }
     } finally {
       setLoadingData(false);
-    }
-  };
-
-  const handleCloseAfterCreate = () => {
-    setCreatedGrn(null);
-    createdLineItemsRef.current = [];
-    resetForm();
-    handleClose();
-  };
-
-  const handlePrintCreatedGRN = async () => {
-    try {
-      const lineItemsForPdf = createdLineItemsRef.current.map((p) => ({
-        part: {
-          partNumber: p.partNumber,
-          name: p.name,
-          manufacturingPartNumber: p.manufacturingPartNumber,
-          hsnCode: p.hsnCode,
-        },
-        trackingId: p.trackingNumber,
-        orderedQuantity: p.orderedQuantity,
-        receivedQuantity: p.receivedQuantity,
-        qcStatus: null,
-      }));
-
-      const doc = (
-        <PrintGoodsReceiptNote
-          grnData={createdGrn}
-          lineItems={lineItemsForPdf}
-          poApprovals={poApprovals}
-        />
-      );
-      const blob = await pdf(doc).toBlob();
-      const url = URL.createObjectURL(blob);
-      const newWindow = window.open(url, "_blank");
-      if (newWindow) {
-        newWindow.addEventListener("load", () => URL.revokeObjectURL(url));
-      } else {
-        Alert("Pop-ups are blocked. Please allow pop-ups to print.", "warning");
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-      }
-    } catch (error) {
-      console.error("Failed to generate GRN PDF:", error);
-      Alert("Failed to generate PDF. Please try again.", "error");
     }
   };
 
@@ -1051,22 +984,7 @@ const NewGoodReceiptNote = ({
       <div className="EditFlyoutHeader">
         <h3>Create Goods Receipt</h3>
         <div className="EditFlyoutHeaderIcons">
-          {createdGrn && (
-            <>
-              <button onClick={handlePrintCreatedGRN} title="Print GRN">
-                <ion-icon
-                  name="print-outline"
-                  style={{ color: "#00ccff" }}
-                ></ion-icon>
-              </button>
-              <Divider
-                className="VerticalDivider"
-                orientation="vertical"
-                flexItem
-              />
-            </>
-          )}
-          <button onClick={createdGrn ? handleCloseAfterCreate : handleClose}>
+          <button onClick={handleClose}>
             <ion-icon name="close-outline"></ion-icon>
           </button>
         </div>
@@ -1080,21 +998,7 @@ const NewGoodReceiptNote = ({
           </TabList>
         </div>
         <div style={{ position: "relative", flex: 1, minHeight: 0 }}>
-          {loadingData && (
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                zIndex: 10,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(255,255,255,0.6)",
-              }}
-            >
-              <Cliploader loading={loadingData} />
-            </div>
-          )}
+          {loadingData && <Cliploader loading={loadingData} />}
           <TabPanel value="1" className="GrnNewFlyoutTabPanel">
             <div className="GrnNewFlyoutContent">
               <div className="GrnNewFlyoutContentTop">
@@ -1320,7 +1224,7 @@ const NewGoodReceiptNote = ({
               <Button onClick={handleCancel} className="CancelButton">
                 Cancel
               </Button>
-              <Button onClick={handleCreateGRN} disabled={!!createdGrn}>
+              <Button onClick={handleCreateGRN} disabled={loadingData}>
                 Create
               </Button>
             </div>
@@ -1348,7 +1252,7 @@ const NewGoodReceiptNote = ({
               <Button onClick={handleCancel} className="CancelButton">
                 Cancel
               </Button>
-              <Button onClick={handleCreateGRN} disabled={!!createdGrn}>
+              <Button onClick={handleCreateGRN} disabled={loadingData}>
                 Create
               </Button>
             </div>
