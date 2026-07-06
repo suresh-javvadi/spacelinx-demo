@@ -19,6 +19,18 @@ const cardData = [
       },
     ],
   },
+  {
+    id: 2,
+    heading: "Inventory Reports",
+    icon: "InventoryOutlined",
+    links: [
+      {
+        text: "Stock Report",
+        to: "/reports/stockreport",
+        permission: PERMISSIONS.REPORTS.STOCKREPORT.VIEW,
+      },
+    ],
+  },
 ];
 
 const Reports = () => {

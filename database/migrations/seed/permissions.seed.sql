@@ -177,6 +177,7 @@ VALUES
   ('REPORTS.BOMCONSOLIDATED.VIEW', 'View the consolidated BOM report.', 'system-seed'),
   ('REPORTS.DELETE', 'Delete reports.', 'system-seed'),
   ('REPORTS.MODIFY', 'Modify reports.', 'system-seed'),
+  ('REPORTS.STOCKREPORT.VIEW', 'View the inventory stock report.', 'system-seed'),
   ('REPORTS.VIEW', 'View reports.', 'system-seed'),
   ('REQUISITIONS.APPROVER', 'Approve requisitions.', 'system-seed'),
   ('REQUISITIONS.DELETE', 'Delete requisitions.', 'system-seed'),

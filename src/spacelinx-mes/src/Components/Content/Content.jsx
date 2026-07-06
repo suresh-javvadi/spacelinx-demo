@@ -141,6 +141,9 @@ const WhereUsedHierarchy = lazy(
 const ConsolidatedBOMView = lazy(
   () => import("../../features/admin/parts/ConsolidatedBOMView"),
 );
+const StockReport = lazy(
+  () => import("../../features/Inventory/StockReport/StockReport"),
+);
 const PartTypeCategories = lazy(
   () => import("../../features/admin/PartTypeCategories/PartTypeCategories"),
 );
@@ -529,6 +532,13 @@ const Content = ({ status }) => {
             element={renderProtectedComponent(
               PERMISSIONS.REPORTS.BOMCONSOLIDATED,
               ConsolidatedBOMView,
+            )}
+          />
+          <Route
+            path="/reports/stockreport"
+            element={renderProtectedComponent(
+              PERMISSIONS.REPORTS.STOCKREPORT.VIEW,
+              StockReport,
             )}
           />
           <Route path="/settings" element={<Settings />} />

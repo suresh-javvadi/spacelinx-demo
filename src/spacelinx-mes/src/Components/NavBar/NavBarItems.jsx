@@ -287,6 +287,11 @@ const NavBarItems = [
         path: "/reports/bomconsolidated",
         permission: PERMISSIONS.REPORTS.BOMCONSOLIDATED.VIEW,
       },
+      {
+        label: "Stock Report",
+        path: "/reports/stockreport",
+        permission: PERMISSIONS.REPORTS.STOCKREPORT.VIEW,
+      },
     ],
   },
   {

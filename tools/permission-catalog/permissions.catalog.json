@@ -1348,6 +1348,14 @@
       "assigned": false
     },
     {
+      "key": "REPORTS.STOCKREPORT.VIEW",
+      "category": "REPORTS",
+      "description": "View the inventory stock report.",
+      "inFrontend": true,
+      "inDb": true,
+      "assigned": true
+    },
+    {
       "key": "REPORTS.DELETE",
       "category": "REPORTS",
       "description": "Delete reports.",

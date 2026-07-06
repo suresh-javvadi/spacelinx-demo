@@ -360,6 +360,10 @@ public static class Permissions
         }
         public const string Delete = "REPORTS.DELETE";
         public const string Modify = "REPORTS.MODIFY";
+        public static class Stockreport
+        {
+            public const string View = "REPORTS.STOCKREPORT.VIEW";
+        }
         public const string View = "REPORTS.VIEW";
     }
     public static class Requisitions
@@ -694,6 +698,7 @@ public static class Permissions
         "REPORTS.BOMCONSOLIDATED.VIEW",
         "REPORTS.DELETE",
         "REPORTS.MODIFY",
+        "REPORTS.STOCKREPORT.VIEW",
         "REPORTS.VIEW",
         "REQUISITIONS.APPROVER",
         "REQUISITIONS.DELETE",
