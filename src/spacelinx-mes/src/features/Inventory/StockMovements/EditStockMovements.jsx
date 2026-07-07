@@ -17,7 +17,6 @@ import {
   approveStockMovement,
   rejectStockMovement,
 } from "../../../services/stockMovementService";
-import { fetchFullBOMConsolidated } from "../../../services/childPartService";
 import { fetchInventoryStockByLocation } from "../../../services/inventoryStockService";
 import {
   fetchInventoryPartPurchaseHistory,
@@ -550,122 +549,9 @@ const EditStockMovements = ({
       binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
     };
 
-    let allNewItems = [newEntry];
+    const allNewItems = [newEntry];
 
     // Fetch and append BOM parts if any
-    try {
-      const bomData = await fetchFullBOMConsolidated(part.partId);
-      if (bomData && bomData.length > 0) {
-        // Filter out parent part if it is returned in the consolidated list
-        const filteredBomData = bomData.filter(
-          (item) => item.id !== part.partId,
-        );
-
-        // Fetch histories for all child parts in parallel
-        const childHistories = await Promise.all(
-          filteredBomData.map((childPart) =>
-            getPurchaseHistoryForPart(childPart.id),
-          ),
-        );
-
-        const childEntries = filteredBomData.map((childPart, idx) => {
-          const childHistory = childHistories[idx] || [];
-
-          const stockMatch = stockData.find(
-            (item) => item.partId === childPart.id,
-          );
-
-          // Only match by actual tracking ID — fallback to first history item if not found or empty
-          const childMatch =
-            (stockMatch?.trackingId
-              ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
-              : null) ||
-            (childHistory && childHistory.length > 0 ? childHistory[0] : null);
-
-          const trackingTypeStr =
-            childPart.isSerialNumberRequired ||
-            childPart.part?.isSerialNumberRequired
-              ? "Serial"
-              : "None";
-          const trackingTypeObj = trackingTypes.find(
-            (t) => t.value === trackingTypeStr.toLowerCase(),
-          ) || { value: "none", label: "None" };
-
-          if (stockMatch) {
-            const childQtyAvailable =
-              stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0;
-            const isChildSerial =
-              stockMatch.trackingType?.toLowerCase() === "serial";
-            const childStockTrackingTypeStr =
-              typeof stockMatch.trackingType === "object"
-                ? stockMatch.trackingType.value || "none"
-                : stockMatch.trackingType || "none";
-            const childStockTrackingTypeObj = trackingTypes.find(
-              (t) => t.value === childStockTrackingTypeStr.toLowerCase(),
-            ) || { value: "none", label: "None" };
-
-            return {
-              ...stockMatch,
-              uniqueId: `${stockMatch.partId}-${Date.now()}-${Math.random()}`,
-              trackingType: childStockTrackingTypeObj,
-              issueQuantity: isChildSerial && childQtyAvailable > 0 ? 1 : "",
-              trackingNumber:
-                childMatch?.trackingId || stockMatch.trackingId || "",
-              poNumber: childMatch?.poNumber || "---",
-              poQty: childMatch?.receivedQuantity ?? null,
-              grnNumber: childMatch?.grnNumber || "---",
-              remarks: `BOM item of ${part.partName || part.name || ""}`,
-              partNumber:
-                stockMatch.part?.partNumber ||
-                stockMatch.partNumber ||
-                childPart.partNumber ||
-                "",
-              partName:
-                stockMatch.part?.name ||
-                stockMatch.partName ||
-                childPart.name ||
-                "",
-              part: {
-                partNumber:
-                  stockMatch.part?.partNumber ||
-                  stockMatch.partNumber ||
-                  childPart.partNumber ||
-                  "",
-                name:
-                  stockMatch.part?.name ||
-                  stockMatch.partName ||
-                  childPart.name ||
-                  "",
-              },
-              quantity: stockMatch.qtyOnhand || stockMatch.quantity || 0,
-            };
-          } else {
-            return {
-              partId: childPart.id,
-              partNumber: childPart.partNumber || "",
-              partName: childPart.name || "",
-              part: {
-                partNumber: childPart.partNumber || "",
-                name: childPart.name || "",
-              },
-              quantity: 0,
-              trackingType: trackingTypeObj,
-              uniqueId: `${childPart.id}-${Date.now()}-${Math.random()}`,
-              issueQuantity: "",
-              trackingNumber: childMatch?.trackingId || "",
-              poNumber: childMatch?.poNumber || "---",
-              poQty: childMatch?.receivedQuantity ?? null,
-              grnNumber: childMatch?.grnNumber || "---",
-              remarks: `BOM item of ${part.partName || part.name || ""} (Out of Stock)`,
-            };
-          }
-        });
-
-        allNewItems = [...allNewItems, ...childEntries];
-      }
-    } catch (error) {
-      console.error("Failed to fetch BOM parts:", error);
-    }
 
     // Deduplicate: skip parts whose partId is already in selectedStockItems
     setSelectedStockItems((prev) => {

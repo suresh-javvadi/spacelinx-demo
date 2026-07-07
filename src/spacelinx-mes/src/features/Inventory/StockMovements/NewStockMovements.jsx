@@ -21,9 +21,12 @@ import { fetchOptionSetByName } from "../../../services/optionSetService";
 import { fetchProjectsLookup } from "../../../services/projectService";
 import { fetchSubProjectsByProject } from "../../../services/subProjectService";
 import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
-import { fetchFullBOMConsolidated } from "../../../services/childPartService";
 
-const NewStockMovements = ({ handleCloseClick, handleRefresh, initialParts = [] }) => {
+const NewStockMovements = ({
+  handleCloseClick,
+  handleRefresh,
+  initialParts = [],
+}) => {
   const { Alert } = useContext(AlertsContext);
   const [loadingData, setLoadingData] = useState(false);
   const [loadingLocationData, setLoadingLocationData] = useState(false);
@@ -442,108 +445,7 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh, initialParts = [] 
       binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
     };
 
-    let allNewItems = [newEntry];
-
-    // Fetch and append BOM parts if any
-    try {
-      const bomData = await fetchFullBOMConsolidated(part.partId);
-      if (bomData && bomData.length > 0) {
-        // Filter out parent part if it is returned in the consolidated list
-        const filteredBomData = bomData.filter(
-          (item) => item.id !== part.partId,
-        );
-
-        // Fetch histories for all child parts in parallel
-        const childHistories = await Promise.all(
-          filteredBomData.map((childPart) =>
-            getPurchaseHistoryForPart(childPart.id),
-          ),
-        );
-
-        const childEntries = filteredBomData.map((childPart, idx) => {
-          const childHistory = childHistories[idx] || [];
-          localHistoryMap[childPart.id] = childHistory;
-
-          const stockMatch = stockData.find(
-            (item) => item.partId === childPart.id,
-          );
-
-          // Only match by actual tracking ID — fallback to first history item if not found or empty
-          const childMatch =
-            (stockMatch?.trackingId
-              ? childHistory.find((x) => x.trackingId === stockMatch.trackingId)
-              : null) ||
-            (childHistory && childHistory.length > 0 ? childHistory[0] : null);
-
-          const trackingTypeStr =
-            childPart.isSerialNumberRequired ||
-            childPart.part?.isSerialNumberRequired
-              ? "Serial"
-              : "None";
-
-          if (stockMatch) {
-            const childQtyAvailable =
-              stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0;
-            const isChildSerial =
-              stockMatch.trackingType?.toLowerCase() === "serial";
-            let childTrackingTypeStr = "None";
-            if (stockMatch.trackingType) {
-              childTrackingTypeStr =
-                typeof stockMatch.trackingType === "object"
-                  ? stockMatch.trackingType.label || "None"
-                  : stockMatch.trackingType;
-            }
-            if (childTrackingTypeStr.toLowerCase() === "serial") {
-              childTrackingTypeStr = "Serial";
-            } else if (childTrackingTypeStr.toLowerCase() === "batch") {
-              childTrackingTypeStr = "Batch";
-            } else {
-              childTrackingTypeStr = "None";
-            }
-
-            return {
-              ...stockMatch,
-              partNumber:
-                stockMatch.part?.partNumber || childPart.partNumber || "",
-              partName: stockMatch.part?.name || childPart.name || "",
-              uniqueId: `${stockMatch.partId}-${Date.now()}-${Math.random()}`,
-              issueQuantity: isChildSerial && childQtyAvailable > 0 ? 1 : "",
-              trackingType: childTrackingTypeStr,
-              trackingNumber:
-                childMatch?.trackingId || stockMatch.trackingId || "",
-              poNumber: childMatch?.poNumber || "---",
-              poQty: childMatch?.receivedQuantity ?? null,
-              grnNumber: childMatch?.grnNumber || "---",
-              remarks: `BOM item of ${part.part?.name || part.name || ""}`,
-            };
-          } else {
-            return {
-              partId: childPart.id,
-              partNumber: childPart.partNumber || "",
-              partName: childPart.name || "",
-              part: {
-                partNumber: childPart.partNumber || "",
-                name: childPart.name || "",
-              },
-              qtyAvailable: 0,
-              quantity: 0,
-              trackingType: trackingTypeStr,
-              uniqueId: `${childPart.id}-${Date.now()}-${Math.random()}`,
-              issueQuantity: "",
-              trackingNumber: childMatch?.trackingId || "",
-              poNumber: childMatch?.poNumber || "---",
-              poQty: childMatch?.receivedQuantity ?? null,
-              grnNumber: childMatch?.grnNumber || "---",
-              remarks: `BOM item of ${part.part?.name || part.name || ""} (Out of Stock)`,
-            };
-          }
-        });
-
-        allNewItems = [...allNewItems, ...childEntries];
-      }
-    } catch (error) {
-      console.error("Failed to fetch BOM parts:", error);
-    }
+    const allNewItems = [newEntry];
 
     // Deduplicate: skip parts whose partId is already in selectedStockItems
     const existingPartIds = new Set(selectedStockItems.map((i) => i.partId));
@@ -720,7 +622,12 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh, initialParts = [] 
       populate();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialParts, formData.movementType, loadingStockData, formData.fromLocation]);
+  }, [
+    initialParts,
+    formData.movementType,
+    loadingStockData,
+    formData.fromLocation,
+  ]);
 
   const fetchLocations = async () => {
     setLoadingLocationData(true);
@@ -771,7 +678,10 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh, initialParts = [] 
     if (hasLineItems && isRestrictedKey) {
       // If parts were auto-populated from inventory and user is just changing movement type,
       // skip confirmation — the parts will re-populate automatically with the new type.
-      const skipConfirmation = key === "movementType" && initialParts.length > 0 && prePopulatedRef.current;
+      const skipConfirmation =
+        key === "movementType" &&
+        initialParts.length > 0 &&
+        prePopulatedRef.current;
 
       if (!skipConfirmation) {
         const fieldLabel = RESTRICTED_KEYS[key];
@@ -787,7 +697,10 @@ const NewStockMovements = ({ handleCloseClick, handleRefresh, initialParts = [] 
       setTrackingOptionsMap({});
       if (key === "movementType" && initialParts.length > 0) {
         prePopulatedRef.current = false;
-        Alert("Parts cleared. Select a new Movement Type to re-populate them.", "info");
+        Alert(
+          "Parts cleared. Select a new Movement Type to re-populate them.",
+          "info",
+        );
       }
     }
 
