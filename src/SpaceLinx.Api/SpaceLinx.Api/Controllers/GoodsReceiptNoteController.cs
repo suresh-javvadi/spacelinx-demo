@@ -45,6 +45,8 @@ public class GoodsReceiptNoteController(SpaceLinxContext spaceLinxContext, IMapp
                     .ThenInclude(li => li.Part)
                 .Include(g => g.GrnLineItems)
                     .ThenInclude(li => li.PoLineItem)
+                .Include(g => g.GrnLineItems)
+                    .ThenInclude(li => li.CheckedBy)
                 .FirstOrDefaultAsync(g => g.Id == id && g.DeletedBy == null);
 
         if (grnEntity == null)

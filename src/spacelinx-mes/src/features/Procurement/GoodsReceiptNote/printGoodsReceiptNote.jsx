@@ -9,6 +9,8 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import logo from "../../../Assest/Images/logos/xdlinxlogolightmode.png";
+import tarunSignature from "../../../Assest/Images/signatures/tarun-signature.png";
+import sudheerSignature from "../../../Assest/Images/signatures/sudheer-signature.png";
 import NotoSansRegular from "../../../Assest/Fonts/NotoSans-Regular.ttf";
 import NotoSansBold from "../../../Assest/Fonts/NotoSans-Bold.ttf";
 
@@ -148,6 +150,14 @@ const styles = StyleSheet.create({
     borderBottomColor: "#000",
     flex: 1,
   },
+  authSignatureImage: {
+    width: 65,
+    height: 24,
+    position: "absolute",
+    bottom: 0,
+    left: 2,
+    objectFit: "contain",
+  },
   remarksSection: {
     marginTop: 30,
     flexDirection: "column",
@@ -188,6 +198,20 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
     .sort((a, b) => (a.stageNumber || 0) - (b.stageNumber || 0));
 
   const preparedByName = grnData?.receivedByFullName || "";
+
+  const signatureByEmail = {
+    "tarun@xdlinx.space": tarunSignature,
+    "sudheer@xdlinx.space": sudheerSignature,
+  };
+
+  const qualityCheckedBy =
+    [...(lineItems || [])]
+      .filter((item) => item?.checkedByFullName && item?.qcDate)
+      .sort((a, b) => new Date(b.qcDate) - new Date(a.qcDate))[0] || null;
+  const checkedByName = qualityCheckedBy?.checkedByFullName || "";
+  const checkedByDate = qualityCheckedBy?.qcDate
+    ? formatDate(qualityCheckedBy.qcDate)
+    : "";
 
   return (
     <Document>
@@ -381,15 +405,47 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
               </View>
             </View>
 
-            {/* Checked By (Quality) — blank */}
+            {/* Checked By (Quality) — filled from the QC acceptance on the line items */}
             <View style={styles.authColumn}>
               <Text style={styles.authRole}>Checked By (Quality)</Text>
-              {["Name", "Signature", "Date"].map((field) => (
-                <View key={field} style={styles.authRow}>
-                  <Text style={styles.authLabel}>{field}:</Text>
-                  <View style={styles.authLine} />
+              <View style={styles.authRow}>
+                <Text style={styles.authLabel}>Name:</Text>
+                <View style={[styles.authLine, { position: "relative" }]}>
+                  {checkedByName ? (
+                    <Text
+                      style={{
+                        fontSize: 9,
+                        position: "absolute",
+                        bottom: 2,
+                        left: 2,
+                      }}
+                    >
+                      {checkedByName}
+                    </Text>
+                  ) : null}
                 </View>
-              ))}
+              </View>
+              <View style={styles.authRow}>
+                <Text style={styles.authLabel}>Signature:</Text>
+                <View style={styles.authLine} />
+              </View>
+              <View style={styles.authRow}>
+                <Text style={styles.authLabel}>Date:</Text>
+                <View style={[styles.authLine, { position: "relative" }]}>
+                  {checkedByDate ? (
+                    <Text
+                      style={{
+                        fontSize: 9,
+                        position: "absolute",
+                        bottom: 2,
+                        left: 2,
+                      }}
+                    >
+                      {checkedByDate}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
             </View>
 
             {/* Approved By — PO approved persons */}
@@ -402,6 +458,9 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
                     const date = approval.actedAt
                       ? formatDate(approval.actedAt)
                       : "";
+                    const approverEmail =
+                      approval.approver?.email?.toLowerCase() || "";
+                    const signatureImage = signatureByEmail[approverEmail];
                     return (
                       <View
                         key={idx}
@@ -431,7 +490,16 @@ const PrintGoodsReceiptNote = ({ grnData, lineItems, poApprovals = [] }) => {
                         </View>
                         <View style={styles.authRow}>
                           <Text style={styles.authLabel}>Signature:</Text>
-                          <View style={styles.authLine} />
+                          <View
+                            style={[styles.authLine, { position: "relative" }]}
+                          >
+                            {signatureImage && (
+                              <Image
+                                src={signatureImage}
+                                style={styles.authSignatureImage}
+                              />
+                            )}
+                          </View>
                         </View>
                         <View style={styles.authRow}>
                           <Text style={styles.authLabel}>Date:</Text>

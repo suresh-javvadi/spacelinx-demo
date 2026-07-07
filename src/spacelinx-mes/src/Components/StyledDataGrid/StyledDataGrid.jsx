@@ -202,6 +202,7 @@ export const StyledDataGrid = ({
         ...baseStyles(themeMode),
         ...sx,
       }}
+      keepNonExistentRowsSelected
       {...props}
       showToolbar
     />

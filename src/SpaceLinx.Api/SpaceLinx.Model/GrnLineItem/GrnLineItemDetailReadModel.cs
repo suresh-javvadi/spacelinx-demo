@@ -15,6 +15,7 @@ public partial class GrnLineItemDetailReadModel : BaseReadModel
     public string? QcStatus { get; set; }
     public DateTime? QcDate { get; set; }
     public Guid? CheckedById { get; set; }
+    public string? CheckedByFullName { get; set; }
     public string? Remark { get; set; }
     public string? Disposition { get; set; }
     public string? QcRemark { get; set; }

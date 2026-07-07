@@ -192,7 +192,8 @@ public class SpaceLinxAutoMapperProfile : Profile
         CreateMap<GrnLineItemWriteModel, GrnLineItem>();
         CreateMap<GrnLineItemUpdateModel, GrnLineItem>();
         CreateMap<GrnLineItem, GrnLineItemDetailReadModel>()
-            .ForMember(dest => dest.OrderedQuantity, opt => opt.MapFrom(src => src.PoLineItem != null ? src.PoLineItem.OrderedQuantity : (int?)null));
+            .ForMember(dest => dest.OrderedQuantity, opt => opt.MapFrom(src => src.PoLineItem != null ? src.PoLineItem.OrderedQuantity : (int?)null))
+            .ForMember(dest => dest.CheckedByFullName, opt => opt.MapFrom(src => src.CheckedBy != null ? (src.CheckedBy.FirstName + " " + src.CheckedBy.LastName).Trim() : null));
         
         //Guide
         CreateMap<Guide, GuideDetailReadModel>();
