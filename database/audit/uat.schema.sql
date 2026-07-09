@@ -6372,34 +6372,52 @@ CREATE VIEW sc.inventory_stock_ledger_vw AS
     it.reference_type,
     it.transacted_quantity,
         CASE
-            WHEN ((it.transaction_type)::text = 'Received'::text) THEN 'purchase'::text
-            WHEN ((it.transaction_type)::text = 'Consumed'::text) THEN 'consumption'::text
+            WHEN (((it.reference_type)::text = 'GRN'::text) AND ((it.transaction_type)::text <> 'QC Failed'::text)) THEN 'purchase'::text
+            WHEN (((it.reference_type)::text = 'StockMovement'::text) AND ((it.transaction_type)::text = ANY (ARRAY['Issued'::text, 'Consumed'::text]))) THEN 'consumption'::text
             ELSE NULL::text
         END AS movement_type,
         CASE
-            WHEN ((it.transaction_type)::text = 'Received'::text) THEN it.transacted_quantity
-            WHEN ((it.transaction_type)::text = 'Consumed'::text) THEN (- it.transacted_quantity)
+            WHEN (((it.reference_type)::text = 'GRN'::text) AND ((it.transaction_type)::text <> 'QC Failed'::text)) THEN it.transacted_quantity
+            WHEN (((it.reference_type)::text = 'StockMovement'::text) AND ((it.transaction_type)::text = ANY (ARRAY['Issued'::text, 'Consumed'::text]))) THEN (- it.transacted_quantity)
             ELSE 0
         END AS qty_delta
    FROM (sc.inventory_transaction it
      JOIN mes.part p ON (((it.part_id = p.id) AND (p.deleted_by IS NULL))))
-  WHERE ((it.deleted_by IS NULL) AND ((it.notes IS NULL) OR ((it.notes)::text !~~ '%pending Quality Check%'::text)));
+  WHERE ((it.deleted_by IS NULL) AND ((it.notes IS NULL) OR (it.notes !~~ '%pending Quality Check%'::text)));
 
 
 --
--- Name: inventory_stock_report(date, date, uuid); Type: FUNCTION; Schema: sc; Owner: -
+-- Name: inventory_stock_report(date, date, uuid, date); Type: FUNCTION; Schema: sc; Owner: -
 --
 
-CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uuid DEFAULT NULL::uuid) RETURNS TABLE(part_no text, part_name text, opening_qty numeric, purchase_qty numeric, consumption_qty numeric, closing_qty numeric, consumption_amount numeric, closing_balance numeric)
+CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uuid DEFAULT NULL::uuid, p_anchor date DEFAULT '2026-04-01'::date) RETURNS TABLE(part_no text, part_name text, opening_qty numeric, purchase_qty numeric, consumption_qty numeric, closing_qty numeric, consumption_amount numeric, closing_balance numeric)
     LANGUAGE sql STABLE
     AS $$
-    WITH agg AS (
+    WITH seed AS (
+        SELECT
+            s.part_id,
+            COALESCE(SUM(s.opening_qty), 0) AS seed_qty
+        FROM sc.inventory_stock s
+        WHERE s.deleted_by IS NULL
+          AND (p_part_id IS NULL OR s.part_id = p_part_id)
+        GROUP BY s.part_id
+    ),
+    movement AS (
         SELECT
             l.part_id,
-            MAX(l.part_number) AS part_number,
-            MAX(l.part_name)   AS part_name,
-            COALESCE(SUM(l.qty_delta)
-                FILTER (WHERE l.transaction_date < p_start), 0) AS opening_qty,
+            -- Net movement from the anchor up to (excluding) p_start: the carry-in
+            -- that turns the frozen seed into this window's opening balance.
+            COALESCE(SUM(l.transacted_quantity) FILTER (
+                WHERE l.movement_type = 'purchase'
+                  AND l.transaction_date >= p_anchor
+                  AND l.transaction_date <  p_start
+            ), 0) AS prior_purchase,
+            COALESCE(SUM(l.transacted_quantity) FILTER (
+                WHERE l.movement_type = 'consumption'
+                  AND l.transaction_date >= p_anchor
+                  AND l.transaction_date <  p_start
+            ), 0) AS prior_consumption,
+            -- Movement inside the reporting window [p_start, p_end] (end inclusive).
             COALESCE(SUM(l.transacted_quantity) FILTER (
                 WHERE l.movement_type = 'purchase'
                   AND l.transaction_date >= p_start
@@ -6412,7 +6430,20 @@ CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uu
             ), 0) AS consumption_qty
         FROM sc.inventory_stock_ledger_vw l
         WHERE (p_part_id IS NULL OR l.part_id = p_part_id)
+          AND l.transaction_date < p_end + INTERVAL '1 day'
         GROUP BY l.part_id
+    ),
+    agg AS (
+        SELECT
+            COALESCE(s.part_id, m.part_id) AS part_id,
+            -- opening = frozen seed + net carry-in from anchor to p_start-1
+            COALESCE(s.seed_qty, 0)
+                + COALESCE(m.prior_purchase, 0)
+                - COALESCE(m.prior_consumption, 0) AS opening_qty,
+            COALESCE(m.purchase_qty, 0)    AS purchase_qty,
+            COALESCE(m.consumption_qty, 0) AS consumption_qty
+        FROM seed s
+        FULL OUTER JOIN movement m ON m.part_id = s.part_id
     ),
     priced AS (
         SELECT part_id, MAX(unit_price) AS unit_price
@@ -6422,8 +6453,8 @@ CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uu
         GROUP BY part_id
     )
     SELECT
-        a.part_number AS part_no,
-        a.part_name,
+        p.part_number AS part_no,
+        p.name        AS part_name,
         a.opening_qty,
         a.purchase_qty,
         a.consumption_qty,
@@ -6432,8 +6463,9 @@ CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uu
         ROUND((a.opening_qty + a.purchase_qty - a.consumption_qty)
               * COALESCE(pr.unit_price, 0), 2) AS closing_balance
     FROM agg a
+    JOIN mes.part p ON p.id = a.part_id AND p.deleted_by IS NULL
     LEFT JOIN priced pr ON pr.part_id = a.part_id
-    ORDER BY a.part_number;
+    ORDER BY p.part_number;
 $$;
 
 

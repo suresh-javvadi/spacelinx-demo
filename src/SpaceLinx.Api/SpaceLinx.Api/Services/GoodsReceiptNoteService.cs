@@ -408,15 +408,14 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                 var poLineItem = grn.PurchaseOrder?.PoLineItems
                     .FirstOrDefault(l => l.Id == lineItem.PoLineItemId && l.DeletedBy == null);
 
-                // Opening figures accumulate only at acceptance (when stock enters usable
-                // inventory) and are never reduced thereafter. Value = accepted qty * PO unit price.
-                var openingValue = qty * (poLineItem?.UnitPrice ?? 0);
-
+                // opening_qty / opening_price hold the FROZEN fiscal-year opening balance
+                // (seeded once at the 2026-04-01 anchor), NOT a running receipt total. The GRN
+                // flow must not touch them: a post-anchor receipt already enters the report as a
+                // 'purchase' ledger movement, so accumulating it here too would double-count
+                // against the opening anchor in sc.inventory_stock_report.
                 if (stock != null)
                 {
                     stock.QtyQcPending = (stock.QtyQcPending) - qty;
-                    stock.OpeningQty += qty;
-                    stock.OpeningPrice = (stock.OpeningPrice ?? 0) + openingValue;
                     stock.TrackingType = lineItem.TrackingMethod;
                     stock.TrackingId = lineItem.TrackingId;
                     stock.ProjectId = request.ProjectId ?? stock.ProjectId;
@@ -429,10 +428,11 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                 {
                     spaceLinxContext.InventoryStocks.Add(new InventoryStock
                     {
+                        // A stock row first created by a post-anchor receipt has NO fiscal-year
+                        // opening balance: opening_qty defaults to 0 (opening_price to null). Its
+                        // quantity is reported as a 'purchase' movement, never as opening.
                         PartId = lineItem.PartId,
                         LocationId = grn.LocationId,
-                        OpeningQty = qty,
-                        OpeningPrice = openingValue,
                         TrackingType = lineItem.TrackingMethod,
                         TrackingId = lineItem.TrackingId,
                         UnitPrice = poLineItem?.UnitPrice,
