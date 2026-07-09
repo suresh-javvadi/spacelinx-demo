@@ -2124,6 +2124,8 @@ public partial class SpaceLinxContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("delivery_status");
             entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.ExpectedDeliveryDate).HasColumnName("expected_delivery_date");
+            entity.Property(e => e.ExpectedPaymentDate).HasColumnName("expected_payment_date");
             entity.Property(e => e.GrnId).HasColumnName("grn_id");
             entity.Property(e => e.GrnNumber)
                 .HasMaxLength(255)
@@ -2141,7 +2143,11 @@ public partial class SpaceLinxContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("location_number");
             entity.Property(e => e.OrderDate).HasColumnName("order_date");
+            entity.Property(e => e.PaymentTermDueDays).HasColumnName("payment_term_due_days");
             entity.Property(e => e.PaymentTermId).HasColumnName("payment_term_id");
+            entity.Property(e => e.PaymentTermName)
+                .HasMaxLength(255)
+                .HasColumnName("payment_term_name");
             entity.Property(e => e.PoId).HasColumnName("po_id");
             entity.Property(e => e.PoNumber)
                 .HasMaxLength(255)

@@ -180,6 +180,28 @@ const GoodsReceiptNote = () => {
         row.receivedDate ? new Date(row.receivedDate) : null,
     },
     {
+      field: "expectedDeliveryDate",
+      headerName: "Delivery Date",
+      flex: 1,
+      type: "date",
+      valueGetter: (_value, row) =>
+        row.expectedDeliveryDate ? new Date(row.expectedDeliveryDate) : null,
+    },
+    {
+      field: "paymentTermName",
+      headerName: "Payment Terms",
+      flex: 1,
+      renderCell: ({ row }) => row?.paymentTermName || "---",
+    },
+    {
+      field: "expectedPaymentDate",
+      headerName: "Expected Payment Date",
+      flex: 1,
+      type: "date",
+      valueGetter: (_value, row) =>
+        row.expectedPaymentDate ? new Date(row.expectedPaymentDate) : null,
+    },
+    {
       field: "createdAt",
       headerName: "Created Date",
       flex: 1,

@@ -33,6 +33,10 @@
         public Guid? CurrencyId { get; set; }
         public DateOnly? OrderDate { get; set; }
         public DateOnly? DeliveryDate { get; set; }
+        public DateOnly? ExpectedDeliveryDate { get; set; }
+        public string? PaymentTermName { get; set; }
+        public int? PaymentTermDueDays { get; set; }
+        public DateOnly? ExpectedPaymentDate { get; set; }
         public decimal? TotalAmount { get; set; }
         public string? PoStatus { get; set; }
         public string? RevisionHistory { get; set; }

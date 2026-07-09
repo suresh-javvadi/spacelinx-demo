@@ -5981,6 +5981,14 @@ CREATE VIEW sc.grn_with_user_vw AS
     po.currency_id,
     po.order_date,
     po.actual_delivery_date AS delivery_date,
+    po.expected_delivery_date,
+    pt.name AS payment_term_name,
+    pt.due_days AS payment_term_due_days,
+        CASE
+            WHEN (pt.id IS NULL) THEN NULL::date
+            WHEN ((pt.name)::text ~~* '%po issued%'::text) THEN po.order_date
+            ELSE (po.expected_delivery_date + COALESCE(pt.due_days, 0))
+        END AS expected_payment_date,
     po.total_amount,
     po.status AS po_status,
     po.revision_history,
@@ -5995,9 +6003,10 @@ CREATE VIEW sc.grn_with_user_vw AS
     loc.name AS location_name,
     vendor.vendor_code,
     vendor.name AS vendor_name
-   FROM ((((sc.goods_receipt_note grn
+   FROM (((((sc.goods_receipt_note grn
      LEFT JOIN application."user" u ON ((((grn.received_by_id = u.id) OR (lower((grn.created_by)::text) = lower((u.email)::text))) AND (u.deleted_by IS NULL))))
      LEFT JOIN sc.purchase_order po ON ((grn.purchase_order_id = po.id)))
+     LEFT JOIN sc.payment_term pt ON ((po.payment_term_id = pt.id)))
      LEFT JOIN mes.location loc ON ((grn.location_id = loc.id)))
      LEFT JOIN sc.company vendor ON ((grn.vendor_id = vendor.id)))
   WHERE (grn.deleted_by IS NULL);
