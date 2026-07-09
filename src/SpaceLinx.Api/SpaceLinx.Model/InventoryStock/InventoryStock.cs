@@ -19,6 +19,7 @@ namespace SpaceLinx.Model
         public int? QtyReturned { get; set; }
         public int OpeningQty { get; set; }
         public decimal? OpeningPrice { get; set; }
+        public DateTime? OpeningDate { get; set; }
         public decimal? UnitPrice { get; set; }
         public string? Currency { get; set; }
         public Guid? ProjectId { get; set; }

@@ -3133,6 +3133,7 @@ public partial class SpaceLinxContext : DbContext
                 .HasComputedColumnSql("((((qty_issued)::numeric * unit_price) * conversion_rate))::numeric(18,4)", true)
                 .HasColumnName("issued_price");
             entity.Property(e => e.LocationId).HasColumnName("location_id");
+            entity.Property(e => e.OpeningDate).HasColumnName("opening_date");
             entity.Property(e => e.OpeningPrice)
                 .HasPrecision(18, 4)
                 .HasDefaultValue(0m)

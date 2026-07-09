@@ -6155,7 +6155,8 @@ CREATE TABLE sc.inventory_stock (
     total_price numeric(18,4) GENERATED ALWAYS AS (((((((qty_issued)::numeric * unit_price) * conversion_rate) + (((qty_reserved)::numeric * unit_price) * conversion_rate)) + (((((((qty_onhand - qty_reserved) - qty_issued) - qty_qc_pending) - qty_qc_failed))::numeric * unit_price) * conversion_rate)))::numeric(18,4)) STORED,
     opening_qty integer DEFAULT 0 NOT NULL,
     opening_price numeric(18,4) DEFAULT 0,
-    hsn_code text
+    hsn_code text,
+    opening_date timestamp with time zone
 );
 
 
