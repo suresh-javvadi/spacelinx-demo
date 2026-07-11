@@ -6400,7 +6400,7 @@ CREATE VIEW sc.inventory_stock_ledger_vw AS
 -- Name: inventory_stock_report(date, date, uuid, date); Type: FUNCTION; Schema: sc; Owner: -
 --
 
-CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uuid DEFAULT NULL::uuid, p_anchor date DEFAULT '2026-04-01'::date) RETURNS TABLE(part_no text, part_name text, opening_qty numeric, purchase_qty numeric, consumption_qty numeric, closing_qty numeric, consumption_amount numeric, closing_balance numeric)
+CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uuid DEFAULT NULL::uuid, p_anchor date DEFAULT '2026-04-01'::date) RETURNS TABLE(part_no text, part_name text, opening_qty numeric, purchase_qty numeric, consumption_qty numeric, closing_qty numeric, consumption_amount numeric, closing_balance numeric, unit_price numeric, opening_balance numeric)
     LANGUAGE sql STABLE
     AS $$
     WITH seed AS (
@@ -6456,11 +6456,14 @@ CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uu
         FULL OUTER JOIN movement m ON m.part_id = s.part_id
     ),
     priced AS (
-        SELECT part_id, MAX(unit_price) AS unit_price
-        FROM sc.inventory_part
-        WHERE is_active = TRUE
-          AND deleted_by IS NULL
-        GROUP BY part_id
+        -- ip.* is qualified deliberately: unit_price is also a RETURNS TABLE output
+        -- column, so an unqualified `unit_price` here would collide with that
+        -- OUT parameter rather than read sc.inventory_part.
+        SELECT ip.part_id, MAX(ip.unit_price) AS unit_price
+        FROM sc.inventory_part ip
+        WHERE ip.is_active = TRUE
+          AND ip.deleted_by IS NULL
+        GROUP BY ip.part_id
     )
     SELECT
         p.part_number AS part_no,
@@ -6471,7 +6474,12 @@ CREATE FUNCTION sc.inventory_stock_report(p_start date, p_end date, p_part_id uu
         (a.opening_qty + a.purchase_qty - a.consumption_qty) AS closing_qty,
         ROUND(a.consumption_qty * COALESCE(pr.unit_price, 0), 2) AS consumption_amount,
         ROUND((a.opening_qty + a.purchase_qty - a.consumption_qty)
-              * COALESCE(pr.unit_price, 0), 2) AS closing_balance
+              * COALESCE(pr.unit_price, 0), 2) AS closing_balance,
+        -- Per-part current price (nullable: blank means no price on file, distinct
+        -- from a genuine 0). The value columns above coalesce; a raw price does not.
+        pr.unit_price AS unit_price,
+        -- Opening Balance mirrors Closing Balance / Consumption Amount: qty x price.
+        ROUND(a.opening_qty * COALESCE(pr.unit_price, 0), 2) AS opening_balance
     FROM agg a
     JOIN mes.part p ON p.id = a.part_id AND p.deleted_by IS NULL
     LEFT JOIN priced pr ON pr.part_id = a.part_id

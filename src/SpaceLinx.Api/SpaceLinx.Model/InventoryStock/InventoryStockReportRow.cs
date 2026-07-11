@@ -15,5 +15,7 @@ namespace SpaceLinx.Model
         public decimal? ClosingQty { get; set; }
         public decimal? ConsumptionAmount { get; set; }
         public decimal? ClosingBalance { get; set; }
+        public decimal? UnitPrice { get; set; }
+        public decimal? OpeningBalance { get; set; }
     }
 }

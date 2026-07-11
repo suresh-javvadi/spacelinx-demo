@@ -3318,6 +3318,8 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.ClosingQty).HasColumnName("closing_qty");
             entity.Property(e => e.ConsumptionAmount).HasColumnName("consumption_amount");
             entity.Property(e => e.ClosingBalance).HasColumnName("closing_balance");
+            entity.Property(e => e.UnitPrice).HasColumnName("unit_price");
+            entity.Property(e => e.OpeningBalance).HasColumnName("opening_balance");
         });
 
         modelBuilder.Entity<InventoryTransactionVw>(entity =>

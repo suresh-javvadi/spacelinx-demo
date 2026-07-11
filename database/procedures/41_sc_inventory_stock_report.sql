@@ -39,9 +39,22 @@
 -- p_part_id is optional: NULL = all parts, otherwise a single part.
 -- p_anchor is the fiscal-year opening date; callers may override for a different year.
 
+-- Atomic: psql autocommits per statement, so a bare DROP followed by a failing
+-- CREATE would leave this environment with NO function at all. Wrapping both in one
+-- transaction means a failed CREATE rolls the DROP back and the previous definition
+-- survives. Matters because db-migrate applies procedures with ON_ERROR_STOP=1.
+BEGIN;
+
 -- Drop the previous 3-arg signature so the new 4-arg overload is unambiguous when
 -- called with 3 args (p_anchor defaulted).
 DROP FUNCTION IF EXISTS sc.inventory_stock_report(date, date, uuid);
+
+-- Drop the current 4-arg signature too: CREATE OR REPLACE cannot change a function's
+-- return type, and this revision adds unit_price / opening_balance to RETURNS TABLE.
+-- Without this, re-running the repeatable proc on any environment that already has
+-- the function fails with "cannot change return type of existing function".
+-- The OWNER / GRANT at the bottom of this file re-apply the privileges DROP discards.
+DROP FUNCTION IF EXISTS sc.inventory_stock_report(date, date, uuid, date);
 
 CREATE OR REPLACE FUNCTION sc.inventory_stock_report(
     p_start   date,
@@ -57,7 +70,9 @@ RETURNS TABLE (
     consumption_qty    numeric,
     closing_qty        numeric,
     consumption_amount numeric,
-    closing_balance    numeric
+    closing_balance    numeric,
+    unit_price         numeric,
+    opening_balance    numeric
 )
 LANGUAGE sql
 STABLE
@@ -115,11 +130,14 @@ AS $$
         FULL OUTER JOIN movement m ON m.part_id = s.part_id
     ),
     priced AS (
-        SELECT part_id, MAX(unit_price) AS unit_price
-        FROM sc.inventory_part
-        WHERE is_active = TRUE
-          AND deleted_by IS NULL
-        GROUP BY part_id
+        -- ip.* is qualified deliberately: unit_price is also a RETURNS TABLE output
+        -- column, so an unqualified `unit_price` here would collide with that
+        -- OUT parameter rather than read sc.inventory_part.
+        SELECT ip.part_id, MAX(ip.unit_price) AS unit_price
+        FROM sc.inventory_part ip
+        WHERE ip.is_active = TRUE
+          AND ip.deleted_by IS NULL
+        GROUP BY ip.part_id
     )
     SELECT
         p.part_number AS part_no,
@@ -130,7 +148,12 @@ AS $$
         (a.opening_qty + a.purchase_qty - a.consumption_qty) AS closing_qty,
         ROUND(a.consumption_qty * COALESCE(pr.unit_price, 0), 2) AS consumption_amount,
         ROUND((a.opening_qty + a.purchase_qty - a.consumption_qty)
-              * COALESCE(pr.unit_price, 0), 2) AS closing_balance
+              * COALESCE(pr.unit_price, 0), 2) AS closing_balance,
+        -- Per-part current price (nullable: blank means no price on file, distinct
+        -- from a genuine 0). The value columns above coalesce; a raw price does not.
+        pr.unit_price AS unit_price,
+        -- Opening Balance mirrors Closing Balance / Consumption Amount: qty x price.
+        ROUND(a.opening_qty * COALESCE(pr.unit_price, 0), 2) AS opening_balance
     FROM agg a
     JOIN mes.part p ON p.id = a.part_id AND p.deleted_by IS NULL
     LEFT JOIN priced pr ON pr.part_id = a.part_id
@@ -139,3 +162,5 @@ $$;
 
 ALTER FUNCTION sc.inventory_stock_report(date, date, uuid, date) OWNER TO spacelinxadmin;
 GRANT EXECUTE ON FUNCTION sc.inventory_stock_report(date, date, uuid, date) TO spacelinxuser;
+
+COMMIT;
