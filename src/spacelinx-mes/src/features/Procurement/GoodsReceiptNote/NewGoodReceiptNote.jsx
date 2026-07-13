@@ -330,6 +330,10 @@ const NewGoodReceiptNote = ({
           return used < pending;
         });
 
+  const serialAvailableParts = selectedPO
+    ? availableParts.filter((p) => p.isSerialNumberRequired === true)
+    : [];
+
   const newFlyoutTabChange = (event, newValue) =>
     setEditFlyOutTabsValue(newValue);
 
@@ -1131,7 +1135,7 @@ const NewGoodReceiptNote = ({
                 fullWidth
               />
 
-              {!selectedPO ? (
+              {(!selectedPO || serialAvailableParts.length > 0) && (
                 <Autocomplete
                   value={value}
                   onChange={(e, newValue) => {
@@ -1143,7 +1147,7 @@ const NewGoodReceiptNote = ({
                   onInputChange={(e, newInputValue) =>
                     setInputValue(newInputValue)
                   }
-                  options={availableParts}
+                  options={selectedPO ? serialAvailableParts : availableParts}
                   loading={loadingPartsData}
                   loadingText="Loading Parts..."
                   getOptionLabel={(option) =>
@@ -1178,8 +1182,6 @@ const NewGoodReceiptNote = ({
                     </li>
                   )}
                 />
-              ) : (
-                ""
               )}
 
               <div className="GrnDataGridDiv">
