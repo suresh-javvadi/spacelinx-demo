@@ -425,9 +425,9 @@ const NewStockMovements = ({
         : null) ||
       (parentHistory && parentHistory.length > 0 ? parentHistory[0] : null);
 
-    const parentQtyAvailable = stockMatch
-      ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0)
-      : 0;
+    const parentQtyAvailable = stockData
+      .filter((s) => s.partId === part.partId)
+      .reduce((sum, s) => sum + (s.qtyAvailable ?? s.qtyOnhand ?? 0), 0);
 
     const newEntry = {
       ...part,
@@ -445,18 +445,10 @@ const NewStockMovements = ({
       binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
     };
 
-    const allNewItems = [newEntry];
-
-    // Deduplicate: skip parts whose partId is already in selectedStockItems
-    const existingPartIds = new Set(selectedStockItems.map((i) => i.partId));
-    const dedupedNewItems = allNewItems.filter(
-      (i) => !existingPartIds.has(i.partId),
-    );
-
-    setSelectedStockItems((prev) => [...prev, ...dedupedNewItems]);
+    setSelectedStockItems((prev) => [...prev, newEntry]);
 
     // Fetch tracking options for all items (parent + children) that require tracking and were actually added, in parallel
-    const itemsToFetch = dedupedNewItems.filter(
+    const itemsToFetch = [newEntry].filter(
       (item) =>
         item.trackingType?.toLowerCase() !== "none" &&
         item.trackingType !== "None",
@@ -1393,12 +1385,7 @@ const NewStockMovements = ({
                   setInputValue(newInputValue)
                 }
                 readOnly={items.length === 0 || !formData?.movementType}
-                options={items.filter((item) => {
-                  const isSelected = selectedStockItems.some(
-                    (i) => i.partId === item.partId,
-                  );
-                  return !isSelected;
-                })}
+                options={items}
                 loading={loadingStockData}
                 loadingText="Loading Inventory Parts..."
                 getOptionLabel={(option) =>

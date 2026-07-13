@@ -529,9 +529,9 @@ const EditStockMovements = ({
     ) || { value: "none", label: "None" };
 
     const isSerial = trackingTypeStr === "Serial";
-    const parentQtyAvailable = stockMatch
-      ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0)
-      : 0;
+    const parentQtyAvailable = stockData
+      .filter((s) => s.partId === part.partId)
+      .reduce((sum, s) => sum + (s.qtyAvailable ?? s.qtyOnhand ?? 0), 0);
 
     const newEntry = {
       ...part,
@@ -549,16 +549,7 @@ const EditStockMovements = ({
       binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
     };
 
-    const allNewItems = [newEntry];
-
-    // Fetch and append BOM parts if any
-
-    // Deduplicate: skip parts whose partId is already in selectedStockItems
-    setSelectedStockItems((prev) => {
-      const existingPartIds = new Set(prev.map((i) => i.partId));
-      const deduped = allNewItems.filter((i) => !existingPartIds.has(i.partId));
-      return [...prev, ...deduped];
-    });
+    setSelectedStockItems((prev) => [...prev, newEntry]);
   };
 
   const handleIssueQuantityChange = (uniqueId, value) => {
@@ -1458,12 +1449,7 @@ const EditStockMovements = ({
                   setInputValue(newInputValue)
                 }
                 readOnly={readOnlyMode || items.length === 0}
-                options={items.filter((item) => {
-                  const isSelected = selectedStockItems.some(
-                    (i) => i.partId === item.partId,
-                  );
-                  return !isSelected;
-                })}
+                options={items}
                 loading={loadingStockData}
                 loadingText="Loading Stock..."
                 getOptionLabel={(option) =>
