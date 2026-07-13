@@ -21,6 +21,12 @@ const columns = [
     flex: 1,
   },
   {
+    field: "unitPrice",
+    headerName: "Unit Price",
+    type: "number",
+    flex: 1,
+  },
+  {
     field: "consumptionQty",
     headerName: "Consumption Qty",
     type: "number",
@@ -30,6 +36,12 @@ const columns = [
   {
     field: "consumptionAmount",
     headerName: "Consumption Amount",
+    type: "number",
+    flex: 1,
+  },
+  {
+    field: "openingBalance",
+    headerName: "Opening Balance",
     type: "number",
     flex: 1,
   },
