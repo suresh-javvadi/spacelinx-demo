@@ -370,8 +370,19 @@ const NewStockMovements = ({
   const handleSelectItem = async (part) => {
     if (!part) return;
 
-    // Look up the part in the selected location/bin stockData
-    const stockMatch = stockData.find((item) => item.partId === part.partId);
+    const usedTrackingIds = new Set(
+      selectedStockItems
+        .filter((i) => i.partId === part.partId)
+        .map((i) => i.trackingNumber)
+        .filter(Boolean),
+    );
+    const partStockRows = stockData.filter(
+      (item) => item.partId === part.partId,
+    );
+    const stockMatch =
+      partStockRows.find(
+        (s) => s.trackingId && !usedTrackingIds.has(s.trackingId),
+      ) || partStockRows[0];
 
     let trackingTypeStr = "None";
     const rawTrackingType =
@@ -407,7 +418,7 @@ const NewStockMovements = ({
     }
 
     const isSerial = trackingTypeStr === "Serial";
-    const uniqueId = `${part.partId}-${Date.now()}`;
+    const uniqueId = `${part.partId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     // Local lookup map of partId -> purchase history to resolve PO/GRN during auto-selection
     const localHistoryMap = {};
@@ -416,9 +427,8 @@ const NewStockMovements = ({
     const parentHistory = await getPurchaseHistoryForPart(part.partId);
     localHistoryMap[part.partId] = parentHistory;
 
-    // Resolve PO/GRN for parent part — check trackingNumber, trackingId, or stockMatch.trackingId (fallback to first history record)
     const trackingNo =
-      part.trackingNumber || part.trackingId || stockMatch?.trackingId || "";
+      stockMatch?.trackingId || part.trackingNumber || part.trackingId || "";
     const parentMatch =
       (trackingNo
         ? (parentHistory.find((x) => x.trackingId === trackingNo) ?? null)
@@ -434,7 +444,9 @@ const NewStockMovements = ({
       uniqueId: uniqueId,
       issueQuantity: isSerial && parentQtyAvailable > 0 ? 1 : "",
       trackingType: trackingTypeStr,
-      trackingNumber: parentMatch?.trackingId || trackingNo || "",
+      trackingNumber: usedTrackingIds.has(parentMatch?.trackingId || trackingNo)
+        ? ""
+        : parentMatch?.trackingId || trackingNo || "",
       poNumber: parentMatch?.poNumber || "---",
       poQty: parentMatch?.receivedQuantity ?? null,
       grnNumber: parentMatch?.grnNumber || "---",

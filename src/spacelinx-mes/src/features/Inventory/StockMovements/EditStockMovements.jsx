@@ -479,12 +479,22 @@ const EditStockMovements = ({
     // Fetch purchase history for parent part
     const parentHistory = await getPurchaseHistoryForPart(part.partId);
 
-    // Look up the part in the selected location/bin stockData
-    const stockMatch = stockData.find((item) => item.partId === part.partId);
+    const usedTrackingIds = new Set(
+      selectedStockItems
+        .filter((i) => i.partId === part.partId)
+        .map((i) => i.trackingNumber)
+        .filter(Boolean),
+    );
+    const partStockRows = stockData.filter(
+      (item) => item.partId === part.partId,
+    );
+    const stockMatch =
+      partStockRows.find(
+        (s) => s.trackingId && !usedTrackingIds.has(s.trackingId),
+      ) || partStockRows[0];
 
-    // Resolve PO/GRN for parent part — check trackingNumber, trackingId, or stockMatch.trackingId (fallback to first history record)
     const trackingNo =
-      part.trackingNumber || part.trackingId || stockMatch?.trackingId || "";
+      stockMatch?.trackingId || part.trackingNumber || part.trackingId || "";
     const parentMatch =
       (trackingNo
         ? (parentHistory.find((x) => x.trackingId === trackingNo) ?? null)
@@ -535,10 +545,12 @@ const EditStockMovements = ({
 
     const newEntry = {
       ...part,
-      uniqueId: `${part.partId}-${Date.now()}`,
+      uniqueId: `${part.partId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       trackingType: trackingTypeObj,
       issueQuantity: isSerial && parentQtyAvailable > 0 ? 1 : "",
-      trackingNumber: parentMatch?.trackingId || trackingNo || "",
+      trackingNumber: usedTrackingIds.has(parentMatch?.trackingId || trackingNo)
+        ? ""
+        : parentMatch?.trackingId || trackingNo || "",
       poNumber: parentMatch?.poNumber || "---",
       poQty: parentMatch?.receivedQuantity ?? null,
       grnNumber: parentMatch?.grnNumber || "---",
