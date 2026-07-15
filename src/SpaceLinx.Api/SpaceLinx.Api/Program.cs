@@ -40,13 +40,21 @@ builder.Services.AddSpaceLinxAuthentication(builder.Configuration);
 builder.Services.AddSpaceLinxAuthorization(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(options =>
+ {
+        options.MaxModelBindingCollectionSize = 16384;
+    })
+
     .AddJsonOptions(
         options =>
         {
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         });
+        builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.ValueCountLimit = 16384;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(setup => builder.Services.SwaggerUISetup(builder.Environment.EnvironmentName, setup));
