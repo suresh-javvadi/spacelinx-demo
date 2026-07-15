@@ -653,6 +653,12 @@ const LineItems = ({ lineItems = [], setPoData, poData, lineItemsRef }) => {
       },
     },
     {
+      field: "manufacturerPartNumber",
+      headerName: "Manufacturer Part Number",
+      flex: 1,
+      valueGetter: (_value, row) => row.part?.manufacturingPartNumber || "",
+    },
+    {
       field: "hsn",
       headerName: "HSN Code",
       flex: 0.7,

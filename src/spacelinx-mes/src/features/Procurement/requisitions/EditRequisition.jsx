@@ -635,6 +635,12 @@ const EditRequisition = ({
       flex: 1,
     },
     {
+      field: "manufacturerPartNumber",
+      headerName: "Manufacturer Part Number",
+      flex: 1,
+      valueGetter: (_value, row) => row.part?.manufacturingPartNumber || "",
+    },
+    {
       field: "quantity",
       headerName: "Quantity",
       flex: 1,

@@ -463,6 +463,12 @@ const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
       valueGetter: (_value, row) => row.part?.name || "",
     },
     {
+      field: "manufacturerPartNumber",
+      headerName: "Manufacturer Part Number",
+      flex: 1,
+      valueGetter: (_value, row) => row.part?.manufacturingPartNumber || "",
+    },
+    {
       field: "quantity",
       headerName: "Quantity",
       flex: 0.3,

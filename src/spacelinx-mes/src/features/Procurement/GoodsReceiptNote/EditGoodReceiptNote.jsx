@@ -151,6 +151,13 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       valueGetter: (_value, row) => row.part?.name || row.name || "",
     },
     {
+      field: "manufacturingPartNumber",
+      headerName: "Manufacturer Part Number",
+      flex: 1,
+      valueGetter: (_value, row) =>
+        row.part?.manufacturingPartNumber || row.manufacturingPartNumber || "",
+    },
+    {
       field: "hsnCode",
       headerName: "HSN Code",
       flex: 0.8,
