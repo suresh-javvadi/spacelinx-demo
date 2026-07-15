@@ -20,5 +20,7 @@ public class StockMovementWithLineItemsWriteModel
     public Guid? SubProjectId { get; set; }
     public string? Department { get; set; }
     public Guid? AssignedUserId { get; set; }
+    public string? IssuePurpose { get; set; }
+    public Guid? CompanyId { get; set; }
     public List<StockMovementLineItemWriteModel> LineItems { get; set; } = new();
 }

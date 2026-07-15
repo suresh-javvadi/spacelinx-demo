@@ -6518,7 +6518,9 @@ CREATE TABLE sc.stock_movement (
     department character varying(255),
     project_id uuid,
     assigned_user_id uuid,
-    sub_project_id uuid
+    sub_project_id uuid,
+    company_id uuid,
+    issue_purpose character varying(255)
 );
 
 
@@ -9206,6 +9208,13 @@ CREATE INDEX idx_stock_movement_type ON sc.stock_movement USING btree (movement_
 
 
 --
+-- Name: IX_stock_movement_company_id; Type: INDEX; Schema: sc; Owner: -
+--
+
+CREATE INDEX "IX_stock_movement_company_id" ON sc.stock_movement USING btree (company_id);
+
+
+--
 -- Name: idx_tender_buyer_id; Type: INDEX; Schema: sc; Owner: -
 --
 
@@ -10521,6 +10530,14 @@ ALTER TABLE ONLY sc.stock_movement
 
 ALTER TABLE ONLY sc.stock_movement
     ADD CONSTRAINT fk_stock_movement_to_location FOREIGN KEY (to_location_id) REFERENCES mes.location(id) ON DELETE SET NULL;
+
+
+--
+-- Name: stock_movement stock_movement_company_id_fkey; Type: FK CONSTRAINT; Schema: sc; Owner: -
+--
+
+ALTER TABLE ONLY sc.stock_movement
+    ADD CONSTRAINT stock_movement_company_id_fkey FOREIGN KEY (company_id) REFERENCES sc.company(id) ON DELETE SET NULL;
 
 
 --

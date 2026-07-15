@@ -23,9 +23,12 @@ public partial class StockMovement : BaseModel
     public Guid? SubProjectId { get; set; }
     public string? Department { get; set; }
     public Guid? AssignedUserId { get; set; }
+    public string? IssuePurpose { get; set; }
+    public Guid? CompanyId { get; set; }
     public virtual Project? Project { get; set; }
     public virtual SubProject? SubProject { get; set; }
     public virtual User? AssignedUser { get; set; }
+    public virtual Company? Company { get; set; }
     public virtual Location? FromLocation { get; set; }
     public virtual Location? ToLocation { get; set; }
     public virtual BinManagement? FromBin { get; set; }

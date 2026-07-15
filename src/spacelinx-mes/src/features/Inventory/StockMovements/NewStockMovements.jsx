@@ -18,6 +18,7 @@ import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGri
 import { fetchUserLookup } from "../../../services/userService";
 import Popover from "@mui/material/Popover";
 import { fetchOptionSetByName } from "../../../services/optionSetService";
+import { fetchVendors } from "../../../services/companyService";
 import { fetchProjectsLookup } from "../../../services/projectService";
 import { fetchSubProjectsByProject } from "../../../services/subProjectService";
 import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
@@ -48,6 +49,8 @@ const NewStockMovements = ({
     department: "",
     project: null,
     subProject: null,
+    issuePurpose: null,
+    company: null,
   });
   const [formErrors, setFormErrors] = useState({});
   const [staffData, setStaffData] = useState([]);
@@ -95,6 +98,10 @@ const NewStockMovements = ({
   const [subProjects, setSubProjects] = useState([]);
   const [loadingSubProjects, setLoadingSubProjects] = useState(false);
   const [trackingOptionsMap, setTrackingOptionsMap] = useState({});
+  const [issuePurposes, setIssuePurposes] = useState([]);
+  const [loadingIssuePurposes, setLoadingIssuePurposes] = useState(true);
+  const [companies, setCompanies] = useState([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
 
   const adjustmentTypes = ["Increase", "Decrease"];
 
@@ -164,6 +171,8 @@ const NewStockMovements = ({
 
   useEffect(() => {
     fetchDepartments();
+    fetchIssuePurposes();
+    fetchCompanies();
   }, []);
 
   const fetchDepartments = async () => {
@@ -177,6 +186,33 @@ const NewStockMovements = ({
       console.error("Error fetching part_doc_types:", err);
     } finally {
       setLoadingDepartments(false);
+    }
+  };
+
+  const fetchIssuePurposes = async () => {
+    setLoadingIssuePurposes(true);
+    try {
+      const response = await fetchOptionSetByName("issue_purpose");
+      const parsed = response ? JSON.parse(response.values) : [];
+      setIssuePurposes(parsed);
+    } catch (err) {
+      Alert("Failed to load issue purposes.", "error");
+      console.error("Error fetching issue_purpose:", err);
+    } finally {
+      setLoadingIssuePurposes(false);
+    }
+  };
+
+  const fetchCompanies = async () => {
+    setLoadingCompanies(true);
+    try {
+      const data = await fetchVendors();
+      setCompanies(data || []);
+    } catch (err) {
+      Alert("Failed to load companies.", "error");
+      console.error("Error fetching vendors:", err);
+    } finally {
+      setLoadingCompanies(false);
     }
   };
 
@@ -852,6 +888,14 @@ const NewStockMovements = ({
     department: formData?.department?.name,
     projectId: formData?.project?.id,
     subProjectId: formData?.subProject?.id,
+    issuePurpose:
+      formData?.movementType?.name === "Issued"
+        ? formData?.issuePurpose?.name || null
+        : null,
+    companyId:
+      formData?.movementType?.name === "Issued"
+        ? formData?.company?.id || null
+        : null,
     lineItems: selectedStockItems
       .filter((item) => {
         const qty = Number(item.issueQuantity);
@@ -1277,6 +1321,34 @@ const NewStockMovements = ({
                 )}
               />
             </div>
+            {formData.movementType?.name === "Issued" && (
+              <div className="GrnNewFlyoutContentTop">
+                <Autocomplete
+                  options={issuePurposes}
+                  value={formData?.issuePurpose}
+                  loading={loadingIssuePurposes}
+                  loadingText="Loading Issue Purposes..."
+                  getOptionLabel={(o) => o.name || ""}
+                  isOptionEqualToValue={(o, v) => o.name === v?.name}
+                  onChange={(_, v) => handleUpdateField("issuePurpose", v)}
+                  renderInput={(p) => (
+                    <TextField {...p} label="Issue Purpose" fullWidth />
+                  )}
+                />
+                <Autocomplete
+                  options={companies}
+                  value={formData?.company}
+                  loading={loadingCompanies}
+                  loadingText="Loading Companies..."
+                  getOptionLabel={(o) => o.name || ""}
+                  isOptionEqualToValue={(o, v) => o.id === v?.id}
+                  onChange={(_, v) => handleUpdateField("company", v)}
+                  renderInput={(p) => (
+                    <TextField {...p} label="Company" fullWidth />
+                  )}
+                />
+              </div>
+            )}
             <div className="GrnNewFlyoutContentTop">
               <TextField
                 type="date"

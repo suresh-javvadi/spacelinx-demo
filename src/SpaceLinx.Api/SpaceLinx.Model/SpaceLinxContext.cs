@@ -5717,6 +5717,10 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.IssuePurpose)
+                .HasMaxLength(255)
+                .HasColumnName("issue_purpose");
+            entity.Property(e => e.CompanyId).HasColumnName("company_id");
             entity.Property(e => e.MovementDate).HasColumnName("movement_date");
             entity.Property(e => e.MovementNumber)
                 .HasMaxLength(255)
@@ -5755,6 +5759,11 @@ public partial class SpaceLinxContext : DbContext
                 .HasForeignKey(d => d.AssignedUserId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_stock_movement_assigned_user");
+
+            entity.HasOne(d => d.Company).WithMany()
+                .HasForeignKey(d => d.CompanyId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("stock_movement_company_id_fkey");
 
             entity.HasOne(d => d.FromBin).WithMany()
                 .HasForeignKey(d => d.FromBinId)

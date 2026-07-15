@@ -27,6 +27,8 @@
     updated_by varchar(255) NULL,
     deleted_at timestamptz NULL,
     deleted_by varchar(255) NULL,
+    issue_purpose varchar(255) NULL,
+    company_id uuid NULL,
     FOREIGN KEY (assigned_user_id) REFERENCES application."user"(id) ON DELETE SET NULL,
     FOREIGN KEY (department_id) REFERENCES common.department(id) ON DELETE SET NULL,
     FOREIGN KEY (project_id) REFERENCES pm.project(id) ON DELETE SET NULL,
@@ -35,5 +37,6 @@
     FOREIGN KEY (to_location_id) REFERENCES mes.location(id) ON DELETE SET NULL,
     FOREIGN KEY (from_bin_id) REFERENCES sc.bin_management(id) ON DELETE SET NULL,
     FOREIGN KEY (to_bin_id) REFERENCES sc.bin_management(id) ON DELETE SET NULL,
-    FOREIGN KEY (work_order_id) REFERENCES mes.work_order(id) ON DELETE SET NULL
+    FOREIGN KEY (work_order_id) REFERENCES mes.work_order(id) ON DELETE SET NULL,
+    FOREIGN KEY (company_id) REFERENCES sc.company(id) ON DELETE SET NULL
 );

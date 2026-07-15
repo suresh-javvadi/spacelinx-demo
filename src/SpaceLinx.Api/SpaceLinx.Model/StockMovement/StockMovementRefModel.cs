@@ -11,4 +11,5 @@ public partial class StockMovementRefModel : BaseRefModel
     public DateOnly? ProjectDate { get; set; }
     public Guid? ProjectId { get; set; }
     public string? Department { get; set; }
+    public string? IssuePurpose { get; set; }
 }

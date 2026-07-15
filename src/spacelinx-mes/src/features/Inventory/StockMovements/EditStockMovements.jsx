@@ -26,6 +26,7 @@ import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGri
 import { fetchUserLookup } from "../../../services/userService";
 import Popover from "@mui/material/Popover";
 import { fetchOptionSetByName } from "../../../services/optionSetService";
+import { fetchVendors } from "../../../services/companyService";
 import { fetchProjectsLookup } from "../../../services/projectService";
 import { fetchSubProjectsByProject } from "../../../services/subProjectService";
 import { useUserContext } from "../../userContext/UserContext";
@@ -60,6 +61,8 @@ const EditStockMovements = ({
     department: "",
     project: null,
     subProject: null,
+    issuePurpose: null,
+    company: null,
   });
   const [formErrors, setFormErrors] = useState({});
   const [userData, setUserData] = useState([]);
@@ -104,6 +107,10 @@ const EditStockMovements = ({
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [subProjects, setSubProjects] = useState([]);
   const [loadingSubProjects, setLoadingSubProjects] = useState(false);
+  const [issuePurposes, setIssuePurposes] = useState([]);
+  const [loadingIssuePurposes, setLoadingIssuePurposes] = useState(true);
+  const [companies, setCompanies] = useState([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
 
   const trackingTypes = [
     { value: "serial", label: "Serial" },
@@ -122,6 +129,8 @@ const EditStockMovements = ({
     fetchStaffData();
     fetchDepartments();
     fetchProjectsData();
+    fetchIssuePurposes();
+    fetchCompanies();
   }, []);
 
   // Fetch movement details when selectedMovement changes
@@ -169,6 +178,10 @@ const EditStockMovements = ({
         subProject:
           data.subProject ||
           (data.subProjectId ? { id: data.subProjectId } : null),
+        issuePurpose: data.issuePurpose ? { name: data.issuePurpose } : null,
+        company: data.companyId
+          ? { id: data.companyId, name: data.company?.name || "" }
+          : null,
       });
 
       // Load stock data for the location
@@ -286,6 +299,31 @@ const EditStockMovements = ({
     }
   };
 
+  const fetchIssuePurposes = async () => {
+    setLoadingIssuePurposes(true);
+    try {
+      const response = await fetchOptionSetByName("issue_purpose");
+      const parsed = response ? JSON.parse(response.values) : [];
+      setIssuePurposes(parsed);
+    } catch {
+      Alert("Failed to load issue purposes", "error");
+    } finally {
+      setLoadingIssuePurposes(false);
+    }
+  };
+
+  const fetchCompanies = async () => {
+    setLoadingCompanies(true);
+    try {
+      const data = await fetchVendors();
+      setCompanies(data || []);
+    } catch {
+      Alert("Failed to load companies", "error");
+    } finally {
+      setLoadingCompanies(false);
+    }
+  };
+
   const fetchSubProjectsData = async (projectId) => {
     if (!projectId) {
       setSubProjects([]);
@@ -376,6 +414,28 @@ const EditStockMovements = ({
       }
     }
   }, [locationsData, formData.fromLocation?.id]);
+
+  // Resolve issue purpose once issuePurposes are loaded
+  useEffect(() => {
+    if (issuePurposes.length > 0 && formData.issuePurpose?.name) {
+      const match = issuePurposes.find(
+        (p) => p.name === formData.issuePurpose.name,
+      );
+      if (match && formData.issuePurpose !== match) {
+        setFormData((prev) => ({ ...prev, issuePurpose: match }));
+      }
+    }
+  }, [issuePurposes, formData.issuePurpose?.name]);
+
+  // Resolve company once companies are loaded
+  useEffect(() => {
+    if (companies.length > 0 && formData.company?.id) {
+      const match = companies.find((c) => c.id === formData.company.id);
+      if (match && formData.company !== match) {
+        setFormData((prev) => ({ ...prev, company: match }));
+      }
+    }
+  }, [companies, formData.company?.id]);
 
   useEffect(() => {
     const fetchParts = async () => {
@@ -749,6 +809,14 @@ const EditStockMovements = ({
       department: formData?.department?.name,
       projectId: formData?.project?.id,
       subProjectId: formData?.subProject?.id,
+      issuePurpose:
+        formData?.movementType?.name === "Issued"
+          ? formData?.issuePurpose?.name || null
+          : null,
+      companyId:
+        formData?.movementType?.name === "Issued"
+          ? formData?.company?.id || null
+          : null,
       lineItems: selectedStockItems
         .filter((item) => {
           const qty = Number(item.issueQuantity);
@@ -1174,6 +1242,18 @@ const EditStockMovements = ({
       label: "Department",
       value: formData.department?.name,
     },
+    ...(formData.movementType?.name === "Issued"
+      ? [
+          {
+            label: "Issue Purpose",
+            value: formData.issuePurpose?.name,
+          },
+          {
+            label: "Company",
+            value: formData.company?.name,
+          },
+        ]
+      : []),
     {
       label: "Reason",
       value: formData.reason,
@@ -1446,6 +1526,35 @@ const EditStockMovements = ({
                 </FormHelperText>
               )}
             </div>
+
+            {formData.movementType?.name === "Issued" && (
+              <div className="GrnNewFlyoutContentTop">
+                <Autocomplete
+                  options={issuePurposes}
+                  value={formData?.issuePurpose}
+                  loading={loadingIssuePurposes}
+                  getOptionLabel={(o) => o.name || ""}
+                  isOptionEqualToValue={(o, v) => o.name === v?.name}
+                  readOnly={readOnlyMode}
+                  onChange={(_, v) => handleUpdateField("issuePurpose", v)}
+                  renderInput={(p) => (
+                    <TextField {...p} label="Issue Purpose" fullWidth />
+                  )}
+                />
+                <Autocomplete
+                  options={companies}
+                  value={formData?.company}
+                  loading={loadingCompanies}
+                  getOptionLabel={(o) => o.name || ""}
+                  isOptionEqualToValue={(o, v) => o.id === v?.id}
+                  readOnly={readOnlyMode}
+                  onChange={(_, v) => handleUpdateField("company", v)}
+                  renderInput={(p) => (
+                    <TextField {...p} label="Company" fullWidth />
+                  )}
+                />
+              </div>
+            )}
 
             <div className="LineItemsContainer">
               <Autocomplete
