@@ -188,42 +188,7 @@ const NewGoodReceiptNote = ({
     setLineItems([]);
     setLineItemErrors({});
 
-    const poLineItems = await loadPOLineItems(newValue.id);
-    const autoPopulatedParts = poLineItems
-      .map((item, index) => {
-        const matchedPart = partsData.find((part) => part.id === item.partId);
-
-        if (!matchedPart) {
-          return null;
-        }
-
-        const isPart = !matchedPart.itemType || matchedPart.itemType === "Part";
-        const isSerial = isPart && matchedPart.isSerialNumberRequired === true;
-        const trackingTypeObj = isPart
-          ? trackingTypes.find(
-              (t) => t.value === (isSerial ? "serial" : "batch"),
-            )
-          : null;
-
-        return {
-          ...matchedPart,
-          uniqueId: `${item.id || matchedPart.id}-${index}`,
-          poLineItemId: item.id,
-          pendingQuantity: item.pendingQuantity ?? 0,
-          orderedQuantity: item.orderedQuantity ?? 0,
-          receivedQuantity: isSerial ? 1 : "",
-          trackingType: trackingTypeObj,
-          trackingNumber: "",
-          remarks: "",
-          expectedDeliveryDate: item.expectedDeliveryDate ?? null,
-          actualDeliveryDate: item.actualDeliveryDate ?? null,
-          unitPrice: item.unitPrice ?? null,
-          hsnCode: matchedPart.hsnCode || item.hsn || "",
-        };
-      })
-      .filter(Boolean);
-
-    setSelectedParts(autoPopulatedParts);
+    await loadPOLineItems(newValue.id);
 
     const autoVendor = vendorsData.find((v) => v.id === newValue.companyId);
 
@@ -263,7 +228,27 @@ const NewGoodReceiptNote = ({
       }));
     }
   }, [locationsData, formData.locationId]);
+  const handleAddAllLineItems = () => {
+    const allParts = availableParts.map((part, index) => {
+      const isPart = !part.itemType || part.itemType === "Part";
+      const isSerial = isPart && part.isSerialNumberRequired === true;
 
+      const trackingTypeObj = isPart
+        ? trackingTypes.find((t) => t.value === (isSerial ? "serial" : "batch"))
+        : null;
+
+      return {
+        ...part,
+        uniqueId: `${part.poLineItemId || part.id}-${Date.now()}-${index}`,
+        trackingType: trackingTypeObj,
+        receivedQuantity: isSerial ? 1 : "",
+        trackingNumber: "",
+        remarks: "",
+      };
+    });
+
+    setSelectedParts((prev) => [...prev, ...allParts]);
+  };
   const handleSelectPart = (part) => {
     if (!part) return;
 
@@ -310,6 +295,7 @@ const NewGoodReceiptNote = ({
               expectedDeliveryDate: item.expectedDeliveryDate ?? null,
               actualDeliveryDate: item.actualDeliveryDate ?? null,
               unitPrice: item.unitPrice ?? null,
+              hsnCode: matchedPart.hsnCode || item.hsn || "",
             };
           })
           .filter(Boolean);
@@ -329,11 +315,6 @@ const NewGoodReceiptNote = ({
 
           return used < pending;
         });
-
-  const serialAvailableParts = selectedPO
-    ? availableParts.filter((p) => p.isSerialNumberRequired === true)
-    : [];
-
   const newFlyoutTabChange = (event, newValue) =>
     setEditFlyOutTabsValue(newValue);
 
@@ -1141,55 +1122,65 @@ const NewGoodReceiptNote = ({
                 fullWidth
               />
 
-              {(!selectedPO || serialAvailableParts.length > 0) && (
-                <Autocomplete
-                  value={value}
-                  onChange={(e, newValue) => {
-                    handleSelectPart(newValue);
-                    setValue(null);
-                    setInputValue("");
-                  }}
-                  inputValue={inputValue}
-                  onInputChange={(e, newInputValue) =>
-                    setInputValue(newInputValue)
-                  }
-                  options={selectedPO ? serialAvailableParts : availableParts}
-                  loading={loadingPartsData}
-                  loadingText="Loading Parts..."
-                  getOptionLabel={(option) =>
-                    option
-                      ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}${option.poLineItemId ? ` - PO Qty ${option.orderedQuantity || 0} - Pending ${option.pendingQuantity || 0}` : ""}`
-                      : ""
-                  }
-                  isOptionEqualToValue={(option, value) =>
-                    (option.poLineItemId || option.id) ===
-                    (value?.poLineItemId || value?.id)
-                  }
-                  renderInput={(params) => (
-                    <TextField {...params} label="Select Part" fullWidth />
-                  )}
-                  renderOption={(props, option) => (
-                    <li {...props} key={option.poLineItemId || option.id}>
-                      <div>
-                        <strong>{option.name}</strong>
-                        <div style={{ fontSize: "0.85rem" }}>
-                          Part No: {option.partNumber}
-                        </div>
-                        <div style={{ fontSize: "0.85rem" }}>
-                          Manf. Part No: {option.manufacturingPartNumber}
-                        </div>
-                        {option.poLineItemId ? (
-                          <div style={{ fontSize: "0.85rem" }}>
-                            Ordered: {option.orderedQuantity || 0} | Pending:{" "}
-                            {option.pendingQuantity || 0}
-                          </div>
-                        ) : null}
+              <Autocomplete
+                value={value}
+                onChange={(e, newValue) => {
+                  handleSelectPart(newValue);
+                  setValue(null);
+                  setInputValue("");
+                }}
+                inputValue={inputValue}
+                onInputChange={(e, newInputValue) =>
+                  setInputValue(newInputValue)
+                }
+                options={availableParts}
+                loading={loadingPartsData}
+                loadingText="Loading Parts..."
+                getOptionLabel={(option) =>
+                  option
+                    ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}${option.poLineItemId ? ` - PO Qty ${option.orderedQuantity || 0} - Pending ${option.pendingQuantity || 0}` : ""}`
+                    : ""
+                }
+                isOptionEqualToValue={(option, value) =>
+                  (option.poLineItemId || option.id) ===
+                  (value?.poLineItemId || value?.id)
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Select Part" fullWidth />
+                )}
+                renderOption={(props, option) => (
+                  <li {...props} key={option.poLineItemId || option.id}>
+                    <div>
+                      <strong>{option.name}</strong>
+                      <div style={{ fontSize: "0.85rem" }}>
+                        Part No: {option.partNumber}
                       </div>
-                    </li>
-                  )}
-                />
-              )}
-
+                      <div style={{ fontSize: "0.85rem" }}>
+                        Manf. Part No: {option.manufacturingPartNumber}
+                      </div>
+                      {option.poLineItemId ? (
+                        <div style={{ fontSize: "0.85rem" }}>
+                          Ordered: {option.orderedQuantity || 0} | Pending:{" "}
+                          {option.pendingQuantity || 0}
+                        </div>
+                      ) : null}
+                    </div>
+                  </li>
+                )}
+              />
+              <Box sx={{ mt: 1, mb: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleAddAllLineItems}
+                  disabled={
+                    !selectedPO ||
+                    availableParts.length === 0 ||
+                    selectedParts.length > 0
+                  }
+                >
+                  Add All Line Items
+                </Button>
+              </Box>
               <div className="GrnDataGridDiv">
                 <StyledDataGrid
                   rows={selectedParts}
