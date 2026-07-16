@@ -741,7 +741,7 @@ const NewGoodReceiptNote = ({
   const columns = [
     {
       field: "serialNumber",
-      headerName: "Item No.",
+      headerName: "Item Code",
       minWidth: 50,
       renderCell: (params) =>
         (params.api.getRowIndexRelativeToVisibleRows(params.id) + 1) * 10,
@@ -761,6 +761,64 @@ const NewGoodReceiptNote = ({
       headerName: "Manufacturer Part Number",
       flex: 1,
       valueGetter: (_value, row) => row.manufacturingPartNumber || "",
+    },
+    {
+      field: "orderedQuantity",
+      headerName: "Order Qty",
+      flex: 0.8,
+      minWidth: 100,
+      renderCell: ({ row }) => (
+        <span>{row.orderedQuantity ?? row.OrderedQuantity ?? "-"}</span>
+      ),
+    },
+    {
+      field: "receivedQuantity",
+      headerName: "Received Qty",
+      flex: 0.8,
+      minWidth: 100,
+      renderCell: ({ row }) => {
+        const isSerial = row.trackingType?.value === "serial";
+
+        return (
+          <TextField
+            size="small"
+            fullWidth
+            type="number"
+            InputProps={{ readOnly: isSerial }}
+            inputProps={{
+              min: isSerial ? 1 : 0,
+              max: row.pendingQuantity,
+            }}
+            value={isSerial ? 1 : row.receivedQuantity}
+            error={Boolean(lineItemErrors[row.uniqueId]?.receivedQuantity)}
+            helperText={lineItemErrors[row.uniqueId]?.receivedQuantity || ""}
+            onChange={(e) => {
+              if (!isSerial) {
+                handleReceivedQuantityChange(row.uniqueId, e.target.value);
+              }
+            }}
+            sx={{
+              "& .MuiInputBase-root": {
+                height: 40,
+                padding: "0 10px",
+                borderRadius: "6px",
+                marginTop: "4px",
+              },
+              "& input": {
+                padding: "4px 6px !important",
+                textAlign: "center",
+                fontSize: "14px",
+              },
+              "& .MuiFormHelperText-root": {
+                margin: 0,
+                fontSize: "10px",
+                whiteSpace: "normal",
+              },
+            }}
+            required
+          />
+        );
+      },
     },
     {
       field: "hsnCode",
@@ -787,6 +845,45 @@ const NewGoodReceiptNote = ({
           }}
         />
       ),
+    },
+    {
+      field: "trackingNumber",
+      headerName: "Tracking ID",
+      flex: 1,
+      renderCell: ({ row }) => {
+        const errorMsg = lineItemErrors[row.uniqueId];
+        const isPart = !row.itemType || row.itemType === "Part";
+        const trackingType = row.trackingType;
+        if (!isPart || !trackingType) {
+          return <span>---</span>; // ✅ empty block
+        }
+        return (
+          <TextField
+            size="small"
+            fullWidth
+            placeholder="Tracking ID"
+            value={row.trackingNumber || ""}
+            onChange={(e) =>
+              handleTrackingNumberChange(row.uniqueId, e.target.value)
+            }
+            error={Boolean(errorMsg?.trackingNumber)}
+            helperText={errorMsg?.trackingNumber || ""}
+            sx={{
+              "& .MuiInputBase-root": {
+                height: 40,
+                padding: "0 10px",
+                borderRadius: "6px",
+                marginTop: "4px",
+              },
+              "& input": {
+                padding: "4px 6px !important",
+                fontSize: "14px",
+              },
+            }}
+            required
+          />
+        );
+      },
     },
     {
       field: "trackingType",
@@ -840,104 +937,6 @@ const NewGoodReceiptNote = ({
               )}
             />
           </div>
-        );
-      },
-    },
-    {
-      field: "orderedQuantity",
-      headerName: "Ordered Quantity",
-      flex: 0.8,
-      minWidth: 100,
-      renderCell: ({ row }) => (
-        <span>{row.orderedQuantity ?? row.OrderedQuantity ?? "-"}</span>
-      ),
-    },
-    {
-      field: "trackingNumber",
-      headerName: "Tracking ID",
-      flex: 1,
-      renderCell: ({ row }) => {
-        const errorMsg = lineItemErrors[row.uniqueId];
-        const isPart = !row.itemType || row.itemType === "Part";
-        const trackingType = row.trackingType;
-        if (!isPart || !trackingType) {
-          return <span>---</span>; // ✅ empty block
-        }
-        return (
-          <TextField
-            size="small"
-            fullWidth
-            placeholder="Tracking ID"
-            value={row.trackingNumber || ""}
-            onChange={(e) =>
-              handleTrackingNumberChange(row.uniqueId, e.target.value)
-            }
-            error={Boolean(errorMsg?.trackingNumber)}
-            helperText={errorMsg?.trackingNumber || ""}
-            sx={{
-              "& .MuiInputBase-root": {
-                height: 40,
-                padding: "0 10px",
-                borderRadius: "6px",
-                marginTop: "4px",
-              },
-              "& input": {
-                padding: "4px 6px !important",
-                fontSize: "14px",
-              },
-            }}
-            required
-          />
-        );
-      },
-    },
-
-    {
-      field: "receivedQuantity",
-      headerName: "Received Qty",
-      flex: 0.8,
-      minWidth: 100,
-      renderCell: ({ row }) => {
-        const isSerial = row.trackingType?.value === "serial";
-
-        return (
-          <TextField
-            size="small"
-            fullWidth
-            type="number"
-            InputProps={{ readOnly: isSerial }}
-            inputProps={{
-              min: isSerial ? 1 : 0,
-              max: row.pendingQuantity,
-            }}
-            value={isSerial ? 1 : row.receivedQuantity}
-            error={Boolean(lineItemErrors[row.uniqueId]?.receivedQuantity)}
-            helperText={lineItemErrors[row.uniqueId]?.receivedQuantity || ""}
-            onChange={(e) => {
-              if (!isSerial) {
-                handleReceivedQuantityChange(row.uniqueId, e.target.value);
-              }
-            }}
-            sx={{
-              "& .MuiInputBase-root": {
-                height: 40,
-                padding: "0 10px",
-                borderRadius: "6px",
-                marginTop: "4px",
-              },
-              "& input": {
-                padding: "4px 6px !important",
-                textAlign: "center",
-                fontSize: "14px",
-              },
-              "& .MuiFormHelperText-root": {
-                margin: 0,
-                fontSize: "10px",
-                whiteSpace: "normal",
-              },
-            }}
-            required
-          />
         );
       },
     },

@@ -132,7 +132,7 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
   const lineItemColumns = [
     {
       field: "serialNumber",
-      headerName: "Item No.",
+      headerName: "Item Code",
       minWidth: 50,
       renderCell: (params) =>
         (params.api.getRowIndexRelativeToVisibleRows(params.id) + 1) * 10,
@@ -158,23 +158,8 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
         row.part?.manufacturingPartNumber || row.manufacturingPartNumber || "",
     },
     {
-      field: "hsnCode",
-      headerName: "HSN Code",
-      flex: 0.8,
-    },
-    {
-      field: "trackingMethod",
-      headerName: "Tracking Method",
-      flex: 0.8,
-      renderCell: ({ row }) => {
-        const isPart = !row.part?.itemType || row.part?.itemType === "Part";
-
-        return isPart ? row.trackingMethod || "---" : "---";
-      },
-    },
-    {
       field: "orderedQuantity",
-      headerName: "Ordered Quantity",
+      headerName: "Order Qty",
       flex: 1,
       type: "number",
       renderCell: ({ row }) =>
@@ -183,16 +168,6 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
         row.poLineItem?.orderedQuantity ??
         row.poLineItem?.OrderedQuantity ??
         "-",
-    },
-    {
-      field: "trackingId",
-      headerName: "Tracking ID",
-      flex: 1,
-      renderCell: ({ row }) => {
-        const isPart = !row.part?.itemType || row.part?.itemType === "Part";
-
-        return isPart ? row.trackingId || "---" : "---";
-      },
     },
     {
       field: "receivedQuantity",
@@ -212,6 +187,31 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
         ) : (
           row.receivedQuantity
         ),
+    },
+    {
+      field: "hsnCode",
+      headerName: "HSN Code",
+      flex: 0.8,
+    },
+    {
+      field: "trackingId",
+      headerName: "Tracking ID",
+      flex: 1,
+      renderCell: ({ row }) => {
+        const isPart = !row.part?.itemType || row.part?.itemType === "Part";
+
+        return isPart ? row.trackingId || "---" : "---";
+      },
+    },
+    {
+      field: "trackingMethod",
+      headerName: "Tracking Type",
+      flex: 0.8,
+      renderCell: ({ row }) => {
+        const isPart = !row.part?.itemType || row.part?.itemType === "Part";
+
+        return isPart ? row.trackingMethod || "---" : "---";
+      },
     },
     {
       field: "remark",

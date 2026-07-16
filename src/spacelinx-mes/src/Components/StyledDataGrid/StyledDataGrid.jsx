@@ -170,6 +170,7 @@ export const StyledDataGrid = ({
   showRefresh = false,
   enableDensitySelector = false,
   columns,
+  initialState,
   ...props
 }) => {
   const theme = useTheme();
@@ -179,6 +180,7 @@ export const StyledDataGrid = ({
     <DataGrid
       initialState={{
         density: "standard",
+        ...initialState,
       }}
       slots={{
         toolbar: CustomToolbar,

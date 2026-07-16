@@ -1550,6 +1550,9 @@ const LineItems = React.forwardRef(
             loading={loading || itemAutoCompleteLoading}
             getRowId={(row) => row.id}
             hideFooter={true}
+            initialState={{
+              pagination: { paginationModel: { pageSize: -1 } },
+            }}
             className="LineItemsDataGrid"
             slots={{
               noRowsOverlay: CustomDataGridOverlay,
