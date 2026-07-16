@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AlertsContext } from "../../AlertsContext/Context";
 import { HomeAlerts } from "../../AlertsContext/Alerts";
 import { fetchEcoWithUser } from "../../../services/ecoService";
-import { Button, Drawer } from "@mui/material";
+import { Button } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import NewEco from "./NewEco";
 import EditEco from "./EditEco";
@@ -193,6 +193,14 @@ const Eco = () => {
             return;
           }
 
+          if (row.status !== "Draft") {
+            Alert(
+              `ECOs in "${row.status}" status cannot be discarded. Only Draft ECOs can be discarded.`,
+              "warning",
+            );
+            return;
+          }
+
           const isConfirmed = await showConfirmation(
             "Are you sure?",
             "You won’t be able to undo this!",
@@ -204,15 +212,24 @@ const Eco = () => {
               showAlert("success", "Discarded!", "ECO discarded successfully!");
               fetchEcoData();
             } catch (error) {
-              showAlert("error", "Error", "Failed to discard ECO. Try again.");
+              const errorMsg =
+                error.response?.data?.message ||
+                "Failed to discard ECO. Try again.";
+              showAlert("error", "Error", errorMsg);
               console.error("Discard error:", error);
             }
           }
         };
 
-        return row.status === "Draft" ? (
-          <ion-icon name="trash-outline" onClick={handleDelete}></ion-icon>
-        ) : null;
+        return (
+          <ion-icon
+            name="trash-outline"
+            style={{
+              color: row.status === "Draft",
+            }}
+            onClick={handleDelete}
+          ></ion-icon>
+        );
       },
     },
   ];

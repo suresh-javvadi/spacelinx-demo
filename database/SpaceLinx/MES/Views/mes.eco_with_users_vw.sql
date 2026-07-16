@@ -1,4 +1,4 @@
-﻿-- View: mes.eco_with_users_vw
+-- View: mes.eco_with_users_vw
 
 -- DROP VIEW mes.eco_with_users_vw;
 
@@ -42,13 +42,13 @@ FROM mes.eco eco
 LEFT JOIN application."user" req_user
     ON eco.requestor::text = req_user.email::text
     AND req_user.deleted_by IS NULL
-LEFT JOIN application.approval appr
+LEFT JOIN common.approval appr
     ON appr.entity_id = eco.id
     AND appr.deleted_by IS NULL
 LEFT JOIN application."user" appr_user
     ON appr.approver_id = appr_user.id
     AND appr_user.deleted_by IS NULL
-WHERE eco.deleted_by IS NULL
+WHERE eco.deleted_by IS NULL AND eco.status <> 'Discarded'
 GROUP BY
     eco.id, eco.number, eco.name, eco.reason_for_change, eco.description,
     eco.change_type, eco.impact_analysis, eco.priority, eco.requestor, eco.approver,

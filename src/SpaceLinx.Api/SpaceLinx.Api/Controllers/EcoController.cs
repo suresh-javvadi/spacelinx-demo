@@ -399,7 +399,11 @@ public class EcoController(SpaceLinxContext spaceLinxContext, IMapper mapper, IH
 
         if (record.Status != "Draft")
         {
-            throw new ApplicationException("Eco must be in Draft status to Discard");
+            return BadRequest(new SpaceLinx.Api.Models.ApiErrorResponse
+            {
+                StatusCode = 400,
+                Message = "Eco must be in Draft status to Discard"
+            });
         }
 
         await spaceLinxContext.Database.ExecuteSqlRawAsync("CALL mes.discard_eco(@EcoId, @UserEmail)",

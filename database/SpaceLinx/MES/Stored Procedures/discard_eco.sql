@@ -1,4 +1,4 @@
-﻿-- PROCEDURE: mes.discard_eco(uuid, text)
+-- PROCEDURE: mes.discard_eco(uuid, text)
 
 -- DROP PROCEDURE IF EXISTS mes.discard_eco(uuid, text);
 
@@ -34,7 +34,7 @@ BEGIN
             updated_at = COALESCE(updated_at, NOW()),
             updated_by = user_email
         WHERE id = eco_entity_id;
-	   	UPDATE application.approval
+	   	UPDATE common.approval
 	    SET deleted_at = NOW(),
 	        deleted_by = 'System'
 	    WHERE entity_id = eco_entity_id AND deleted_by IS NULL;
