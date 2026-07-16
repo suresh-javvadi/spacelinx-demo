@@ -19,7 +19,7 @@ const InventoryTransaction = ({ partId }) => {
     } catch (error) {
       console.error(
         "Error fetching Inventory Transaction Data:",
-        error?.response?.data || error.message
+        error?.response?.data || error.message,
       );
       Alert("Error fetching Inventory Transaction Data", "error");
     } finally {
@@ -38,8 +38,7 @@ const InventoryTransaction = ({ partId }) => {
       field: "transactionDate",
       headerName: "Transaction Date",
       flex: 1,
-      valueGetter: (_value, row) =>
-        row?.value ? dayjs(row.value).format("DD-MM-YYYY") : "",
+      valueGetter: (value) => (value ? dayjs(value).format("DD-MM-YYYY") : ""),
     },
     {
       field: "transactionType",
@@ -91,7 +90,7 @@ const InventoryTransaction = ({ partId }) => {
               if (referenceId && referenceType === "PO") {
                 window.open(
                   `/procurement/purchaseorders/${referenceId}`,
-                  "_blank"
+                  "_blank",
                 );
               } else {
                 Alert("No valid reference found for this transaction", "info");
