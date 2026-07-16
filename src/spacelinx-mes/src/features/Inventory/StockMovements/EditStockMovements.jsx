@@ -476,13 +476,36 @@ const EditStockMovements = ({
     return Array.from(map.values());
   };
 
-  const getTotalIssuedQuantityForPart = (partId, excludeUniqueId = null) => {
+  // Sum the issue quantity across sibling rows that draw from the SAME stock pool
+  // — same part and same tracking ID. Movement is restricted per tracking ID, so
+  // rows with different tracking IDs draw from independent pools.
+  const getTotalIssuedQuantityForPart = (
+    partId,
+    trackingId = null,
+    excludeUniqueId = null,
+  ) => {
     return selectedStockItems.reduce((sum, item) => {
-      if (item.partId === partId && item.uniqueId !== excludeUniqueId) {
+      const sameTracking = (item.trackingNumber || "") === (trackingId || "");
+      if (
+        item.partId === partId &&
+        sameTracking &&
+        item.uniqueId !== excludeUniqueId
+      ) {
         return sum + (Number(item.issueQuantity) || 0);
       }
       return sum;
     }, 0);
+  };
+
+  // Available quantity for a specific tracking ID = that inventory_stock row's
+  // own quantity (NOT the part's aggregate across all tracking IDs). Untracked
+  // (None) rows use their stock row's quantity.
+  const getTrackingAvailableQty = (partId, trackingId) => {
+    const rows = stockData.filter((s) => s.partId === partId);
+    const row = trackingId
+      ? rows.find((s) => s.trackingId === trackingId)
+      : rows.find((s) => !s.trackingId) || rows[0];
+    return row ? (row.qtyAvailable ?? row.qtyOnhand ?? 0) : 0;
   };
 
   const handleUpdateField = (key, value) => {
@@ -599,9 +622,9 @@ const EditStockMovements = ({
     ) || { value: "none", label: "None" };
 
     const isSerial = trackingTypeStr === "Serial";
-    const parentQtyAvailable = stockData
-      .filter((s) => s.partId === part.partId)
-      .reduce((sum, s) => sum + (s.qtyAvailable ?? s.qtyOnhand ?? 0), 0);
+    const parentQtyAvailable = stockMatch
+      ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0)
+      : 0;
 
     const newEntry = {
       ...part,
@@ -616,7 +639,7 @@ const EditStockMovements = ({
       grnNumber: parentMatch?.grnNumber || "---",
       remarks: "",
       qtyAvailable: parentQtyAvailable,
-      quantity: stockMatch ? (stockMatch.qtyOnhand ?? 0) : 0,
+      quantity: parentQtyAvailable,
       binId: stockMatch ? stockMatch.binId : formData?.bin?.binId || null,
       binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
     };
@@ -646,6 +669,9 @@ const EditStockMovements = ({
     const item = selectedStockItems.find((i) => i.uniqueId === uniqueId);
     if (!item) return;
 
+    // Restrict the row to the newly selected tracking ID's own available quantity
+    const trackingQtyAvailable = getTrackingAvailableQty(item.partId, value);
+
     // Resolve PO/GRN for the new tracking number
     const history = await getPurchaseHistoryForPart(item.partId);
     const match = history.find((x) => x.trackingId === value);
@@ -657,6 +683,8 @@ const EditStockMovements = ({
               poNumber: match?.poNumber || "---",
               poQty: match?.receivedQuantity ?? null,
               grnNumber: match?.grnNumber || "---",
+              qtyAvailable: trackingQtyAvailable,
+              quantity: trackingQtyAvailable,
             }
           : i,
       ),
@@ -667,6 +695,14 @@ const EditStockMovements = ({
       selectedStockItems,
     );
     updateLineItemError(uniqueId, "trackingNumber", error);
+
+    const qtyError = validateIssueQuantity({
+      ...item,
+      trackingNumber: value,
+      poQty: match?.receivedQuantity ?? null,
+      quantity: trackingQtyAvailable,
+    });
+    updateLineItemError(uniqueId, "issueQuantity", qtyError);
   };
 
   const handleRemarksPopoverOpen = (row, event) => {
@@ -699,8 +735,11 @@ const EditStockMovements = ({
   };
 
   const validateIssueQuantity = (item) => {
+    const available = Number(item.quantity) || 0;
+    const poQty = Number(item.poQty) || 0;
+
     // If available quantity is 0, allow 0 or empty issue quantity
-    if (item.quantity === 0) {
+    if (available === 0) {
       if (item.issueQuantity === "" || Number(item.issueQuantity) === 0) {
         return "";
       }
@@ -709,12 +748,19 @@ const EditStockMovements = ({
     if (item.issueQuantity === "") return "Issue Quantity is required";
     if (item.issueQuantity <= 0)
       return "Issue Quantity must be greater than zero";
+
+    // Issue quantity must not exceed the PO (received) quantity for this line
+    if (poQty > 0 && Number(item.issueQuantity) > poQty)
+      return "Issue Quantity cannot exceed PO quantity";
+
+    // Restrict to the selected tracking ID's own available quantity
     const otherItemsQuantity = getTotalIssuedQuantityForPart(
       item.partId,
+      item.trackingNumber,
       item.uniqueId,
     );
     const totalQuantity = Number(item.issueQuantity) + otherItemsQuantity;
-    if (totalQuantity > item.quantity)
+    if (totalQuantity > available)
       return "Issue Quantity cannot exceed available quantity";
     return "";
   };
@@ -825,6 +871,7 @@ const EditStockMovements = ({
         .map((item) => ({
           partId: item.partId,
           quantity: Number(item.issueQuantity),
+          poQuantity: item.poQty ?? null,
           trackingType: item.trackingType?.label || item.trackingType || "",
           trackingId: item.trackingNumber,
           reason: item.remarks || "",

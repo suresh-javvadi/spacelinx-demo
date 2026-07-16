@@ -86,6 +86,14 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
                     throw new InvalidOperationException($"Quantity must be positive for Part ID {item.PartId}.");
             }
 
+                // Issue quantity must not exceed the PO (received) quantity for the line
+            if (request.MovementType == StockMovementType.Issued
+                && item.PoQuantity.HasValue && item.PoQuantity.Value > 0
+                && item.Quantity > item.PoQuantity.Value)
+            {
+                    throw new InvalidOperationException($"Issue quantity ({item.Quantity}) cannot exceed PO quantity ({item.PoQuantity.Value}) for Part ID {item.PartId}.");
+            }
+
                 // Create line item
             var lineItem = new StockMovementLineItem
             {
@@ -228,6 +236,18 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
     private async System.Threading.Tasks.Task ProcessIssue(StockMovementWithLineItemsWriteModel request, StockMovementLineItemWriteModel item,
         InventoryStock? sourceStock, InventoryPart? inventoryPart, int previousQty)
     {
+        if (sourceStock == null)
+        {
+            throw new InvalidOperationException($"InventoryStock not found for Part ID {item.PartId}");
+        }
+
+        // Restrict the issue to the selected tracking ID's own available quantity
+        var availableQty = sourceStock.QtyAvailable ?? sourceStock.QtyOnhand;
+        if (availableQty < item.Quantity)
+        {
+            throw new InvalidOperationException($"Insufficient available quantity to issue for Part ID {item.PartId} (tracking {item.TrackingId ?? "None"}). Available: {availableQty}, Requested: {item.Quantity}");
+        }
+
         if (sourceStock.QtyReserved >= item.Quantity)
         {
             sourceStock.QtyReserved -= item.Quantity;
@@ -395,6 +415,14 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             // Insert new line items from payload
         foreach (var item in request.LineItems)
         {
+                // Issue quantity must not exceed the PO (received) quantity for the line
+            if (request.MovementType == StockMovementType.Issued
+                && item.PoQuantity.HasValue && item.PoQuantity.Value > 0
+                && item.Quantity > item.PoQuantity.Value)
+            {
+                    throw new InvalidOperationException($"Issue quantity ({item.Quantity}) cannot exceed PO quantity ({item.PoQuantity.Value}) for Part ID {item.PartId}.");
+            }
+
             var lineItem = new StockMovementLineItem
             {
                 StockMovementId = request.Id.Value,
