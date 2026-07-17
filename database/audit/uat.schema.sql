@@ -6520,7 +6520,10 @@ CREATE TABLE sc.stock_movement (
     assigned_user_id uuid,
     sub_project_id uuid,
     company_id uuid,
-    issue_purpose character varying(255)
+    issue_purpose character varying(255),
+    classification character varying(50),
+    platform_payload_sdr character varying(100),
+    sub_system character varying(100)
 );
 
 

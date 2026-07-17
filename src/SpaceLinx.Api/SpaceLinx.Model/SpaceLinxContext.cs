@@ -5732,6 +5732,15 @@ public partial class SpaceLinxContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("issue_purpose");
             entity.Property(e => e.CompanyId).HasColumnName("company_id");
+            entity.Property(e => e.SubSystem)
+                .HasMaxLength(100)
+                .HasColumnName("sub_system");
+            entity.Property(e => e.Classification)
+                .HasMaxLength(50)
+                .HasColumnName("classification");
+            entity.Property(e => e.PlatformPayloadSdr)
+                .HasMaxLength(100)
+                .HasColumnName("platform_payload_sdr");
             entity.Property(e => e.MovementDate).HasColumnName("movement_date");
             entity.Property(e => e.MovementNumber)
                 .HasMaxLength(255)

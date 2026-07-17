@@ -23,6 +23,9 @@ public partial class StockMovementReadModel : BaseReadModel
     public Guid? AssignedUserId { get; set; }
     public string? IssuePurpose { get; set; }
     public Guid? CompanyId { get; set; }
+    public string? SubSystem { get; set; }
+    public string? Classification { get; set; }
+    public string? PlatformPayloadSdr { get; set; }
     public virtual ProjectRefModel? Project { get; set; }
     public virtual SubProjectRefModel? SubProject { get; set; }
     public virtual UserRefModel? AssignedUser { get; set; }

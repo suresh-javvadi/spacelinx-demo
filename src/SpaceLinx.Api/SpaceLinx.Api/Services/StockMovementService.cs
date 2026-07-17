@@ -56,6 +56,9 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             AssignedUserId = request.AssignedUserId,
             IssuePurpose = request.IssuePurpose,
             CompanyId = request.CompanyId,
+            SubSystem = request.SubSystem,
+            Classification = request.Classification,
+            PlatformPayloadSdr = request.PlatformPayloadSdr,
             PerformedById = request.PerformedById ?? user?.Id,
             WorkOrderId = request.WorkOrderId,
             ReferenceNumber = request.ReferenceNumber,
@@ -395,6 +398,9 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
         stockMovement.AssignedUserId = request.AssignedUserId;
         stockMovement.IssuePurpose = request.IssuePurpose;
         stockMovement.CompanyId = request.CompanyId;
+        stockMovement.SubSystem = request.SubSystem;
+        stockMovement.Classification = request.Classification;
+        stockMovement.PlatformPayloadSdr = request.PlatformPayloadSdr;
         stockMovement.PerformedById = request.PerformedById ?? user?.Id;
         stockMovement.WorkOrderId = request.WorkOrderId;
         stockMovement.ReferenceNumber = request.ReferenceNumber;

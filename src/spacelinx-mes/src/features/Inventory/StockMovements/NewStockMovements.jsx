@@ -20,7 +20,6 @@ import Popover from "@mui/material/Popover";
 import { fetchOptionSetByName } from "../../../services/optionSetService";
 import { fetchVendors } from "../../../services/companyService";
 import { fetchProjectsLookup } from "../../../services/projectService";
-import { fetchSubProjectsByProject } from "../../../services/subProjectService";
 import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
 
 const NewStockMovements = ({
@@ -38,6 +37,38 @@ const NewStockMovements = ({
     { id: 4, name: "Consumed" },
     { id: 5, name: "Adjustment" },
   ];
+  const subSystemOptions = [
+    "Payload",
+    "ADCS",
+    "Propulsion",
+    "Structures",
+    "Solar panels",
+    "SDR",
+    "RF COMMS",
+    "GNSS / GPS",
+    "Avionics Stack",
+    "EPS Stack",
+  ];
+  const classificationOptions = ["Payload", "SDR", "Platform"];
+  const platformPayloadSdrOptionsByClassification = {
+    Payload: [
+      "VISLINX-M",
+      "VISLINX-H",
+      "HyperLinx",
+      "ThermalLinx",
+      "ELINT",
+      "EBand",
+    ],
+    SDR: ["SDR Development"],
+    Platform: [
+      "XDSAT-NL",
+      "XDSAT-NS",
+      "VISLINX-M",
+      "XDSAT-M200",
+      "XDSAT-M400",
+      "XDSAT-M600",
+    ],
+  };
   const [formData, setFormData] = useState({
     movementType: null,
     fromLocation: null,
@@ -48,7 +79,9 @@ const NewStockMovements = ({
     reason: "",
     department: "",
     project: null,
-    subProject: null,
+    subSystem: null,
+    classification: null,
+    platformPayloadSdr: null,
     issuePurpose: null,
     company: null,
   });
@@ -95,8 +128,6 @@ const NewStockMovements = ({
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
-  const [subProjects, setSubProjects] = useState([]);
-  const [loadingSubProjects, setLoadingSubProjects] = useState(false);
   const [trackingOptionsMap, setTrackingOptionsMap] = useState({});
   const [issuePurposes, setIssuePurposes] = useState([]);
   const [loadingIssuePurposes, setLoadingIssuePurposes] = useState(true);
@@ -172,23 +203,6 @@ const NewStockMovements = ({
       Alert("Failed to fetch projects data. Please try again...!", "error");
     } finally {
       setLoadingProjects(false);
-    }
-  };
-
-  const fetchSubProjectsData = async (projectId) => {
-    if (!projectId) {
-      setSubProjects([]);
-      return;
-    }
-    setLoadingSubProjects(true);
-    try {
-      const data = await fetchSubProjectsByProject(projectId);
-      setSubProjects(data || []);
-    } catch (error) {
-      console.error("Failed to fetch sub-projects:", error);
-      Alert("Failed to fetch sub-projects. Please try again...!", "error");
-    } finally {
-      setLoadingSubProjects(false);
     }
   };
 
@@ -797,9 +811,8 @@ const NewStockMovements = ({
       reason: "Reason is required",
     };
 
-    if (key === "project") {
-      setFormData((prev) => ({ ...prev, subProject: null }));
-      fetchSubProjectsData(value?.id || null);
+    if (key === "classification") {
+      setFormData((prev) => ({ ...prev, platformPayloadSdr: null }));
     }
 
     setFormData((prev) => {
@@ -933,7 +946,9 @@ const NewStockMovements = ({
     notes: formData.description || "",
     department: formData?.department?.name,
     projectId: formData?.project?.id,
-    subProjectId: formData?.subProject?.id,
+    subSystem: formData?.subSystem || null,
+    classification: formData?.classification || null,
+    platformPayloadSdr: formData?.platformPayloadSdr || null,
     issuePurpose:
       formData?.movementType?.name === "Issued"
         ? formData?.issuePurpose?.name || null
@@ -1355,16 +1370,34 @@ const NewStockMovements = ({
                 )}
               />
               <Autocomplete
-                options={subProjects}
-                value={formData?.subProject}
-                loading={loadingSubProjects}
-                loadingText="Loading Sub-Projects..."
-                disabled={!formData?.project}
-                getOptionLabel={(o) => o.name || ""}
-                isOptionEqualToValue={(o, v) => o.id === v.id}
-                onChange={(_, v) => handleUpdateField("subProject", v)}
+                options={subSystemOptions}
+                value={formData?.subSystem}
+                onChange={(_, v) => handleUpdateField("subSystem", v)}
                 renderInput={(p) => (
-                  <TextField {...p} label="Sub Project" fullWidth />
+                  <TextField {...p} label="Sub System" fullWidth />
+                )}
+              />
+            </div>
+            <div className="GrnNewFlyoutContentTop">
+              <Autocomplete
+                options={classificationOptions}
+                value={formData?.classification}
+                onChange={(_, v) => handleUpdateField("classification", v)}
+                renderInput={(p) => (
+                  <TextField {...p} label="Classification" fullWidth />
+                )}
+              />
+              <Autocomplete
+                options={
+                  platformPayloadSdrOptionsByClassification[
+                    formData?.classification
+                  ] || []
+                }
+                value={formData?.platformPayloadSdr}
+                disabled={!formData?.classification}
+                onChange={(_, v) => handleUpdateField("platformPayloadSdr", v)}
+                renderInput={(p) => (
+                  <TextField {...p} label="Platform / Payload / SDR" fullWidth />
                 )}
               />
             </div>

@@ -21,4 +21,7 @@ public partial class StockMovementUpdateModel : BaseUpdateModel
     public Guid? AssignedUserId { get; set; }
     public string? IssuePurpose { get; set; }
     public Guid? CompanyId { get; set; }
+    public string? SubSystem { get; set; }
+    public string? Classification { get; set; }
+    public string? PlatformPayloadSdr { get; set; }
 }

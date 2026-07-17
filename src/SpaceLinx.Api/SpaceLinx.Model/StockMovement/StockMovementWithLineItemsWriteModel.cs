@@ -22,5 +22,8 @@ public class StockMovementWithLineItemsWriteModel
     public Guid? AssignedUserId { get; set; }
     public string? IssuePurpose { get; set; }
     public Guid? CompanyId { get; set; }
+    public string? SubSystem { get; set; }
+    public string? Classification { get; set; }
+    public string? PlatformPayloadSdr { get; set; }
     public List<StockMovementLineItemWriteModel> LineItems { get; set; } = new();
 }

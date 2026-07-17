@@ -28,7 +28,6 @@ import Popover from "@mui/material/Popover";
 import { fetchOptionSetByName } from "../../../services/optionSetService";
 import { fetchVendors } from "../../../services/companyService";
 import { fetchProjectsLookup } from "../../../services/projectService";
-import { fetchSubProjectsByProject } from "../../../services/subProjectService";
 import { useUserContext } from "../../userContext/UserContext";
 import { PERMISSIONS } from "../../../constants/PagePermissions";
 import dayjs from "dayjs";
@@ -49,6 +48,38 @@ const EditStockMovements = ({
     { id: 4, name: "Consumed" },
     { id: 5, name: "Adjustment" },
   ];
+  const subSystemOptions = [
+    "Payload",
+    "ADCS",
+    "Propulsion",
+    "Structures",
+    "Solar panels",
+    "SDR",
+    "RF COMMS",
+    "GNSS / GPS",
+    "Avionics Stack",
+    "EPS Stack",
+  ];
+  const classificationOptions = ["Payload", "SDR", "Platform"];
+  const platformPayloadSdrOptionsByClassification = {
+    Payload: [
+      "VISLINX-M",
+      "VISLINX-H",
+      "HyperLinx",
+      "ThermalLinx",
+      "ELINT",
+      "EBand",
+    ],
+    SDR: ["SDR Development"],
+    Platform: [
+      "XDSAT-NL",
+      "XDSAT-NS",
+      "VISLINX-M",
+      "XDSAT-M200",
+      "XDSAT-M400",
+      "XDSAT-M600",
+    ],
+  };
   const [formData, setFormData] = useState({
     movementType: null,
     fromLocation: null,
@@ -60,7 +91,9 @@ const EditStockMovements = ({
     reason: "",
     department: "",
     project: null,
-    subProject: null,
+    subSystem: null,
+    classification: null,
+    platformPayloadSdr: null,
     issuePurpose: null,
     company: null,
   });
@@ -105,8 +138,6 @@ const EditStockMovements = ({
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
-  const [subProjects, setSubProjects] = useState([]);
-  const [loadingSubProjects, setLoadingSubProjects] = useState(false);
   const [issuePurposes, setIssuePurposes] = useState([]);
   const [loadingIssuePurposes, setLoadingIssuePurposes] = useState(true);
   const [companies, setCompanies] = useState([]);
@@ -175,9 +206,9 @@ const EditStockMovements = ({
         department: data.department ? { name: data.department } : "",
         project:
           data.project || (data.projectId ? { id: data.projectId } : null),
-        subProject:
-          data.subProject ||
-          (data.subProjectId ? { id: data.subProjectId } : null),
+        subSystem: data.subSystem || null,
+        classification: data.classification || null,
+        platformPayloadSdr: data.platformPayloadSdr || null,
         issuePurpose: data.issuePurpose ? { name: data.issuePurpose } : null,
         company: data.companyId
           ? { id: data.companyId, name: data.company?.name || "" }
@@ -324,22 +355,6 @@ const EditStockMovements = ({
     }
   };
 
-  const fetchSubProjectsData = async (projectId) => {
-    if (!projectId) {
-      setSubProjects([]);
-      return;
-    }
-    setLoadingSubProjects(true);
-    try {
-      const data = await fetchSubProjectsByProject(projectId);
-      setSubProjects(data || []);
-    } catch {
-      Alert("Failed to fetch sub-projects", "error");
-    } finally {
-      setLoadingSubProjects(false);
-    }
-  };
-
   const fetchStockLocations = async (id) => {
     if (!id) return;
     setLoadingStockData(true);
@@ -375,21 +390,6 @@ const EditStockMovements = ({
       }
     }
   }, [projects, formData.project?.id]);
-
-  // Fetch sub-projects when project changes
-  useEffect(() => {
-    fetchSubProjectsData(formData.project?.id || null);
-  }, [formData.project?.id]);
-
-  // Resolve subProject once subProjects are loaded
-  useEffect(() => {
-    if (subProjects.length > 0 && formData.subProject?.id) {
-      const match = subProjects.find((s) => s.id === formData.subProject.id);
-      if (match && formData.subProject !== match) {
-        setFormData((prev) => ({ ...prev, subProject: match }));
-      }
-    }
-  }, [subProjects, formData.subProject?.id]);
 
   // Resolve department once departments are loaded
   useEffect(() => {
@@ -511,6 +511,10 @@ const EditStockMovements = ({
   const handleUpdateField = (key, value) => {
     setFormData((prev) => {
       const updatedData = { ...prev, [key]: value };
+
+      if (key === "classification") {
+        updatedData.platformPayloadSdr = null;
+      }
 
       setFormErrors((errors) => {
         const REQUIRED_FIELDS = {
@@ -854,7 +858,9 @@ const EditStockMovements = ({
       notes: formData.description || "",
       department: formData?.department?.name,
       projectId: formData?.project?.id,
-      subProjectId: formData?.subProject?.id,
+      subSystem: formData?.subSystem || null,
+      classification: formData?.classification || null,
+      platformPayloadSdr: formData?.platformPayloadSdr || null,
       issuePurpose:
         formData?.movementType?.name === "Issued"
           ? formData?.issuePurpose?.name || null
@@ -1276,8 +1282,16 @@ const EditStockMovements = ({
         : null,
     },
     {
-      label: "Sub Project",
-      value: formData.subProject?.name || null,
+      label: "Sub System",
+      value: formData.subSystem || null,
+    },
+    {
+      label: "Classification",
+      value: formData.classification || null,
+    },
+    {
+      label: "Platform / Payload / SDR",
+      value: formData.platformPayloadSdr || null,
     },
     {
       label: "Responsible Person",
@@ -1449,15 +1463,50 @@ const EditStockMovements = ({
                     : "---"}
                 </p>
               </div>
-              <div className="detailItem">
-                <p className="detailLabel">Sub Project</p>
-                <p className="detailValue">
-                  {formData.subProject?.name || "---"}
-                </p>
-              </div>
             </div>
 
             {/* <div className="stock-form-grid"> */}
+
+            <div className="GrnNewFlyoutContentTop">
+              <Autocomplete
+                options={subSystemOptions}
+                value={formData?.subSystem}
+                readOnly={readOnlyMode}
+                onChange={(_, v) => handleUpdateField("subSystem", v)}
+                renderInput={(p) => (
+                  <TextField {...p} label="Sub System" fullWidth />
+                )}
+              />
+              <Autocomplete
+                options={classificationOptions}
+                value={formData?.classification}
+                readOnly={readOnlyMode}
+                onChange={(_, v) => handleUpdateField("classification", v)}
+                renderInput={(p) => (
+                  <TextField {...p} label="Classification" fullWidth />
+                )}
+              />
+            </div>
+            <div className="GrnNewFlyoutContentTop">
+              <Autocomplete
+                options={
+                  platformPayloadSdrOptionsByClassification[
+                    formData?.classification
+                  ] || []
+                }
+                value={formData?.platformPayloadSdr}
+                disabled={!formData?.classification}
+                readOnly={readOnlyMode}
+                onChange={(_, v) => handleUpdateField("platformPayloadSdr", v)}
+                renderInput={(p) => (
+                  <TextField
+                    {...p}
+                    label="Platform / Payload / SDR"
+                    fullWidth
+                  />
+                )}
+              />
+            </div>
 
             <div className="GrnNewFlyoutContentTop">
               <TextField
