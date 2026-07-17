@@ -1,4 +1,4 @@
-﻿CREATE TABLE sc.po_line_item (
+CREATE TABLE sc.po_line_item (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     purchase_order_id UUID NOT NULL,
     part_id UUID NOT NULL,
@@ -15,6 +15,10 @@
     hsn VARCHAR(255),
     actual_delivery_date DATE,
     expected_delivery_date DATE,
+    conversion_rate DECIMAL(18,4) DEFAULT 1,
+    currency_id UUID,
+    unit_price_in_inr DECIMAL(18,4) GENERATED ALWAYS AS ((((unit_price * conversion_rate))::numeric(18,4))) STORED,
+    total_amount_in_inr DECIMAL(18,4) GENERATED ALWAYS AS ((((((ordered_quantity)::numeric * unit_price) * conversion_rate))::numeric(18,4))) STORED,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(255) NOT NULL,
@@ -23,5 +27,6 @@
     deleted_at TIMESTAMPTZ,
     deleted_by VARCHAR(255),
     FOREIGN KEY(purchase_order_id) REFERENCES sc.purchase_order(id) ON DELETE SET NULL,
-    FOREIGN KEY(part_id) REFERENCES mes.part(id) ON DELETE SET NULL
+    FOREIGN KEY(part_id) REFERENCES mes.part(id) ON DELETE SET NULL,
+    FOREIGN KEY(currency_id) REFERENCES common.currency(id) ON DELETE SET NULL
 );

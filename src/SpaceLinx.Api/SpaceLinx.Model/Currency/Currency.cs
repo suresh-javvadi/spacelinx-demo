@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model
+namespace SpaceLinx.Model
 {
     public partial class Currency : BaseModel
     {
@@ -10,5 +10,6 @@
         public virtual ICollection<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
         public virtual ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
         public virtual ICollection<Company> Companies { get; set; } = new List<Company>();
+        public virtual ICollection<PoLineItem> PoLineItems { get; set; } = new List<PoLineItem>();
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SpaceLinx.Model;
@@ -12,9 +13,11 @@ using SpaceLinx.Model;
 namespace SpaceLinx.Model.Migrations
 {
     [DbContext(typeof(SpaceLinxContext))]
-    partial class SpaceLinxContextModelSnapshot : ModelSnapshot
+    [Migration("20260716091003_AddPoLineItemInrColumns")]
+    partial class AddPoLineItemInrColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -8056,9 +8059,10 @@ namespace SpaceLinx.Model.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("created_by");
 
-                    b.Property<Guid?>("CurrencyId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("currency_id");
+                    b.Property<string>("Currency")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("currency");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
@@ -8163,8 +8167,6 @@ namespace SpaceLinx.Model.Migrations
 
                     b.HasKey("Id")
                         .HasName("po_line_item_pkey");
-
-                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("PartId");
 
@@ -14350,12 +14352,6 @@ namespace SpaceLinx.Model.Migrations
 
             modelBuilder.Entity("SpaceLinx.Model.PoLineItem", b =>
                 {
-                    b.HasOne("SpaceLinx.Model.Currency", "Currency")
-                        .WithMany("PoLineItems")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("po_line_item_currency_id_fkey");
-
                     b.HasOne("SpaceLinx.Model.Part", "Part")
                         .WithMany("PoLineItems")
                         .HasForeignKey("PartId")
@@ -14369,8 +14365,6 @@ namespace SpaceLinx.Model.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired()
                         .HasConstraintName("po_line_item_purchase_order_id_fkey");
-
-                    b.Navigation("Currency");
 
                     b.Navigation("Part");
 
@@ -15564,8 +15558,6 @@ namespace SpaceLinx.Model.Migrations
                     b.Navigation("BankAccounts");
 
                     b.Navigation("Companies");
-
-                    b.Navigation("PoLineItems");
 
                     b.Navigation("PurchaseOrders");
                 });

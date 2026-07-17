@@ -6703,7 +6703,9 @@ CREATE TABLE sc.po_line_item (
     actual_delivery_date date,
     expected_delivery_date date,
     conversion_rate numeric(18,4) DEFAULT 1,
-    currency character varying(255)
+    currency_id uuid,
+    unit_price_in_inr numeric(18,4) GENERATED ALWAYS AS ((((unit_price * conversion_rate))::numeric(18,4))) STORED,
+    total_amount_in_inr numeric(18,4) GENERATED ALWAYS AS ((((((ordered_quantity)::numeric * unit_price) * conversion_rate))::numeric(18,4))) STORED
 );
 
 
@@ -10698,6 +10700,14 @@ ALTER TABLE ONLY sc.po_line_item
 
 ALTER TABLE ONLY sc.po_line_item
     ADD CONSTRAINT po_line_item_purchase_order_id_fkey FOREIGN KEY (purchase_order_id) REFERENCES sc.purchase_order(id) ON DELETE SET NULL;
+
+
+--
+-- Name: po_line_item po_line_item_currency_id_fkey; Type: FK CONSTRAINT; Schema: sc; Owner: -
+--
+
+ALTER TABLE ONLY sc.po_line_item
+    ADD CONSTRAINT po_line_item_currency_id_fkey FOREIGN KEY (currency_id) REFERENCES common.currency(id) ON DELETE SET NULL;
 
 
 --

@@ -4499,9 +4499,7 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.CreatedBy)
                 .HasMaxLength(255)
                 .HasColumnName("created_by");
-            entity.Property(e => e.Currency)
-                .HasMaxLength(255)
-                .HasColumnName("currency");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(255)
@@ -4537,6 +4535,14 @@ public partial class SpaceLinxContext : DbContext
             entity.Property(e => e.UnitPrice)
                 .HasPrecision(18, 4)
                 .HasColumnName("unit_price");
+            entity.Property(e => e.UnitPriceInInr)
+                .HasPrecision(18, 4)
+                .HasColumnName("unit_price_in_inr")
+                .HasComputedColumnSql("((unit_price * conversion_rate))::numeric(18,4)", true);
+            entity.Property(e => e.TotalAmountInInr)
+                .HasPrecision(18, 4)
+                .HasColumnName("total_amount_in_inr")
+                .HasComputedColumnSql("((((ordered_quantity)::numeric * unit_price) * conversion_rate))::numeric(18,4)", true);
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(255)
@@ -4551,6 +4557,11 @@ public partial class SpaceLinxContext : DbContext
                 .HasForeignKey(d => d.PurchaseOrderId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("po_line_item_purchase_order_id_fkey");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.PoLineItems)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("po_line_item_currency_id_fkey");
         });
 
         modelBuilder.Entity<Product>(entity =>

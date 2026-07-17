@@ -256,7 +256,7 @@ public class PurchaseOrderController(
                             PendingQuantity = lineItem.PendingQuantity,
                             UnitPrice = lineItem.UnitPrice,
                             ConversionRate = lineItem.ConversionRate,
-                            Currency = lineItem.Currency,
+                            CurrencyId = lineItem.CurrencyId,
                             TotalPrice = lineItem.TotalPrice,
                             Tax = lineItem.Tax,
                             TaxType = lineItem.TaxType,
@@ -445,7 +445,7 @@ public class PurchaseOrderController(
                             PendingQuantity = item.PendingQuantity,
                             UnitPrice = item.UnitPrice,
                             ConversionRate = item.ConversionRate,
-                            Currency = item.Currency,
+                            CurrencyId = item.CurrencyId,
                             TotalPrice = item.TotalPrice,
                             Tax = item.Tax,
                             TaxType = item.TaxType,
@@ -470,7 +470,7 @@ public class PurchaseOrderController(
                         existingLineItem.PendingQuantity = item.PendingQuantity;
                         existingLineItem.UnitPrice = item.UnitPrice;
                         existingLineItem.ConversionRate = item.ConversionRate;
-                        existingLineItem.Currency = item.Currency;
+                        existingLineItem.CurrencyId = item.CurrencyId;
                         existingLineItem.TotalPrice = item.TotalPrice;
                         existingLineItem.Tax = item.Tax;
                         existingLineItem.TaxType = item.TaxType;

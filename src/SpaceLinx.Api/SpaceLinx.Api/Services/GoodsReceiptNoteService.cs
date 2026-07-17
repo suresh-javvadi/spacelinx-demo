@@ -20,7 +20,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
             if (request.PurchaseOrderId != null)
             {
                 purchaseOrder = await spaceLinxContext.PurchaseOrders
-                    .Include(po => po.PoLineItems)
+                    .Include(po => po.PoLineItems).ThenInclude(pli => pli.Currency)
                     .FirstOrDefaultAsync(po => po.Id == request.PurchaseOrderId && po.DeletedBy == null);
 
                 if (purchaseOrder == null)
@@ -162,7 +162,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                         HsnCode = item.HsnCode,
                         UnitPrice = poLineItem?.UnitPrice,
                         ConversionRate = poLineItem?.ConversionRate,
-                        Currency = poLineItem?.Currency,
+                        Currency = poLineItem?.Currency?.Code,
                         CreatedBy = UserEmail,
                         CreatedAt = DateTime.UtcNow,
                         IsActive = true
@@ -386,6 +386,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                 .Include(x => x.GrnLineItems)
                 .Include(x => x.PurchaseOrder)
                     .ThenInclude(po => po!.PoLineItems)
+                        .ThenInclude(pli => pli.Currency)
                 .FirstAsync(x => x.Id == grnId && x.DeletedBy == null);
 
             foreach (var lineItem in lineItems)
@@ -437,7 +438,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                         TrackingId = lineItem.TrackingId,
                         UnitPrice = poLineItem?.UnitPrice,
                         ConversionRate = poLineItem?.ConversionRate,
-                        Currency = poLineItem?.Currency,
+                        Currency = poLineItem?.Currency?.Code,
                         ProjectId = request.ProjectId,
                         Department = request.Department,
                         AssignedUserId = request.AssignedUserId,

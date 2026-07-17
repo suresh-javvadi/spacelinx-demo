@@ -8,9 +8,12 @@ public partial class PoLineItem : BaseModel
     public int? ReceivedQuantity { get; set; }
     public int? PendingQuantity { get; set; }
     public decimal? UnitPrice { get; set; }
+    public decimal? UnitPriceInInr { get; set; }
     public decimal? TotalPrice { get; set; }
+    public decimal? TotalAmountInInr { get; set; }
     public decimal? ConversionRate { get; set; }
-    public string? Currency { get; set; }
+    public Guid? CurrencyId { get; set; }
+    public virtual Currency? Currency { get; set; }
     public decimal? Tax { get; set; }
     public string? TaxType { get; set; }
     public string? Description { get; set; }

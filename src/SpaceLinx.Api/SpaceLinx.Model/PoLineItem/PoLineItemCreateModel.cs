@@ -1,4 +1,4 @@
-﻿namespace SpaceLinx.Model;
+namespace SpaceLinx.Model;
 
 public partial class PoLineItemCreateModel 
 {
@@ -9,7 +9,7 @@ public partial class PoLineItemCreateModel
     public decimal? UnitPrice { get; set; }
     public decimal? TotalPrice { get; set; }
     public decimal? ConversionRate { get; set; }
-    public string? Currency { get; set; }
+    public Guid? CurrencyId { get; set; }
     public decimal? Tax { get; set; }
     public string? TaxType { get; set; }
     public string? Description { get; set; }
