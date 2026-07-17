@@ -174,19 +174,28 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       headerName: "Received Qty",
       flex: 1,
       type: "number",
-      renderCell: ({ row }) =>
-        isEditing ? (
+      renderCell: ({ row }) => {
+        const isSerial = row.trackingMethod?.toLowerCase() === "serial";
+
+        if (!isEditing) {
+          return row.receivedQuantity;
+        }
+
+        return (
           <TextField
             size="small"
             type="number"
-            value={row.receivedQuantity}
-            onChange={(e) =>
-              handleLineItemChange(row.id || row.partId, e.target.value)
-            }
+            InputProps={{ readOnly: isSerial }}
+            inputProps={{ min: isSerial ? 1 : 0 }}
+            value={isSerial ? 1 : row.receivedQuantity}
+            onChange={(e) => {
+              if (!isSerial) {
+                handleLineItemChange(row.id || row.partId, e.target.value);
+              }
+            }}
           />
-        ) : (
-          row.receivedQuantity
-        ),
+        );
+      },
     },
     {
       field: "hsnCode",

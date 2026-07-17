@@ -74,7 +74,6 @@ const EditStockMovements = ({
     Platform: [
       "XDSAT-NL",
       "XDSAT-NS",
-      "VISLINX-M",
       "XDSAT-M200",
       "XDSAT-M400",
       "XDSAT-M600",

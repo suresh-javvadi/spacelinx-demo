@@ -63,7 +63,6 @@ const NewStockMovements = ({
     Platform: [
       "XDSAT-NL",
       "XDSAT-NS",
-      "VISLINX-M",
       "XDSAT-M200",
       "XDSAT-M400",
       "XDSAT-M600",
@@ -1397,7 +1396,11 @@ const NewStockMovements = ({
                 disabled={!formData?.classification}
                 onChange={(_, v) => handleUpdateField("platformPayloadSdr", v)}
                 renderInput={(p) => (
-                  <TextField {...p} label="Platform / Payload / SDR" fullWidth />
+                  <TextField
+                    {...p}
+                    label="Platform / Payload / SDR"
+                    fullWidth
+                  />
                 )}
               />
             </div>
