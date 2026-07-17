@@ -30,6 +30,7 @@ import { fetchVendors } from "../../../services/companyService";
 import { fetchProject } from "../../../services/projectService";
 import { fetchPaymentTerms } from "../../../services/paymentTermService";
 import { fetchCurrencies } from "../../../services/currencyService";
+import { resolveConversionRateToInr } from "../../../utils/currencyConversion";
 import LineItems from "./EditLineItems";
 import PODocuments from "./PODocuments";
 import { fetchCompanyAddressById } from "../../../services/companyAddressService";
@@ -491,6 +492,11 @@ const PurchaseOrderDetails = () => {
     formData.append("DeliveryTerms", editPoData.deliveryTerms || "");
     formData.append("TermsAndConditions", editPoData.termsAndConditions || "");
 
+    const poCurrencyCode = currencies.find(
+      (c) => c.id === editPoData.currencyId,
+    )?.code;
+    const conversionRate = await resolveConversionRateToInr(poCurrencyCode);
+
     latestLineItems.forEach((detail, index) => {
       if (detail.id && isValidUUID(detail.id)) {
         formData.append(`PoLineItems[${index}].id`, detail.id);
@@ -517,6 +523,11 @@ const PurchaseOrderDetails = () => {
         `PoLineItems[${index}].totalPrice`,
         detail.totalPrice || "",
       );
+      formData.append(
+        `PoLineItems[${index}].currencyId`,
+        editPoData.currencyId || "",
+      );
+      formData.append(`PoLineItems[${index}].conversionRate`, conversionRate);
       formData.append(`PoLineItems[${index}].HSN`, detail.hsn || "");
       formData.append(`PoLineItems[${index}].Tax`, detail.tax ?? 0);
       formData.append(

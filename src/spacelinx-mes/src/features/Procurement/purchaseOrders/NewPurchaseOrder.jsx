@@ -33,6 +33,8 @@ import { createPO } from "../../../services/purchaseOrders";
 import { fetchCompanyAddressById } from "../../../services/companyAddressService";
 import { fetchCompanyContactByVendorId } from "../../../services/companyContactService";
 import { fetchAllOrganizationWithAddresses } from "../../../services/organizationService";
+import { fetchCurrencyLookup } from "../../../services/currencyService";
+import { resolveConversionRateToInr } from "../../../utils/currencyConversion";
 import LineItems from "./LineItems";
 import PODocuments from "./PODocuments";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -64,6 +66,7 @@ const NewPurchaseOrder = () => {
   const [vendors, setVendors] = useState([]);
   const [requisitions, setRequisitions] = useState([]);
   const [organizations, setOrganizations] = useState([]);
+  const [currencies, setCurrencies] = useState([]);
   const [vendorAddresses, setVendorAddresses] = useState([]);
   const [vendorContacts, setVendorContacts] = useState([]);
   const [poData, setPoData] = useState({
@@ -147,14 +150,17 @@ const NewPurchaseOrder = () => {
         projectData,
         requisitionData,
         organizationsData,
+        currenciesData,
       ] = await Promise.all([
         fetchPaymentTerms(),
         fetchVendors(),
         fetchProject(),
         fetchRequisitionLookup(),
         fetchAllOrganizationWithAddresses(),
+        fetchCurrencyLookup(),
       ]);
 
+      setCurrencies(Array.isArray(currenciesData) ? currenciesData : []);
       setPaymentTerms(Array.isArray(paymentTermsData) ? paymentTermsData : []);
       setVendors(
         Array.isArray(vendorsData)
@@ -180,6 +186,7 @@ const NewPurchaseOrder = () => {
       setProjects([]);
       setRequisitions([]);
       setOrganizations([]);
+      setCurrencies([]);
     } finally {
       setLoadingData(false);
     }
@@ -328,6 +335,11 @@ const NewPurchaseOrder = () => {
     formData.append("DeliveryTerms", poData.deliveryTerms || "");
     formData.append("TermsAndConditions", poData.termsAndConditions || "");
 
+    const poCurrencyCode = currencies.find(
+      (c) => c.id === poData.currencyId,
+    )?.code;
+    const conversionRate = await resolveConversionRateToInr(poCurrencyCode);
+
     currentLineItems.forEach((detail, index) => {
       formData.append(`PoLineItems[${index}].partId`, detail.part.id || "");
       formData.append(
@@ -348,6 +360,11 @@ const NewPurchaseOrder = () => {
         `PoLineItems[${index}].totalPrice`,
         detail.totalPrice || 0,
       );
+      formData.append(
+        `PoLineItems[${index}].currencyId`,
+        poData.currencyId || "",
+      );
+      formData.append(`PoLineItems[${index}].conversionRate`, conversionRate);
       formData.append(`PoLineItems[${index}].Tax`, detail.tax || 0);
       formData.append(`PoLineItems[${index}].TaxType`, detail.taxType || 0);
       formData.append(`PoLineItems[${index}].Discount`, detail.discount || 0);
