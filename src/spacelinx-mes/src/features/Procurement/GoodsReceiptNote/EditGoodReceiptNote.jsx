@@ -32,6 +32,8 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [readOnlyMode, setReadOnlyMode] = useState(true);
   const [newDocuments, setNewDocuments] = useState([]);
+  const [poLineItemsData, setPoLineItemsData] = useState([]);
+  const [lineItemErrors, setLineItemErrors] = useState({});
   const [formData, setFormData] = useState({
     purchaseOrderNumber: "",
     receivedDate: "",
@@ -97,20 +99,31 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
             (a, b) => new Date(b.createdDate) - new Date(a.createdDate),
           ) || [];
 
-        setLineItems(sortedData);
+        setLineItems(
+          sortedData.map((item) => ({
+            ...item,
+            originalReceivedQuantity: item.receivedQuantity ?? 0,
+          })),
+        );
+        setLineItemErrors({});
 
         if (selectedGRN?.poId) {
           try {
             const poData = await fetchPurchaseOrderwithId(selectedGRN.poId);
             setPoApprovals(poData?.approvals || []);
+            setPoLineItemsData(
+              Array.isArray(poData?.poLineItems) ? poData.poLineItems : [],
+            );
             setVendorName(
               selectedGRN?.vendor?.name || poData?.company?.name || "",
             );
           } catch {
             setPoApprovals([]);
+            setPoLineItemsData([]);
             setVendorName(selectedGRN?.vendor?.name || "");
           }
         } else {
+          setPoLineItemsData([]);
           setVendorName(selectedGRN?.vendor?.name || "");
         }
       }
@@ -122,12 +135,63 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
     }
   };
 
-  const handleLineItemChange = (id, value) => {
-    setLineItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, receivedQuantity: value } : item,
-      ),
+  // Max qty this line can be edited up to: PO line's remaining pending
+  // quantity (which excludes this GRN's own contribution) plus whatever
+  // this line originally received, since that amount is being re-entered.
+  const getMaxReceivableQuantity = (item) => {
+    const poLineItem = item.poLineItemId
+      ? poLineItemsData.find((li) => li.id === item.poLineItemId)
+      : poLineItemsData.find(
+          (li) => li.partId === (item.partId || item.part?.id),
+        );
+
+    if (!poLineItem) {
+      return null;
+    }
+
+    return (
+      Number(poLineItem.pendingQuantity || 0) +
+      Number(item.originalReceivedQuantity || 0)
     );
+  };
+
+  const validateLineItemQuantity = (item, value) => {
+    const parsed = value === "" ? "" : Number(value);
+
+    if (parsed === "") {
+      return "Quantity is required";
+    }
+    if (parsed < 1) {
+      return "Quantity must be at least 1";
+    }
+
+    const maxReceivable = getMaxReceivableQuantity(item);
+
+    if (maxReceivable !== null && parsed > maxReceivable) {
+      return "Cannot exceed pending quantity";
+    }
+
+    return "";
+  };
+
+  const handleLineItemChange = (id, value) => {
+    let updatedItem;
+
+    setLineItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) {
+          return item;
+        }
+        updatedItem = { ...item, receivedQuantity: value };
+        return updatedItem;
+      }),
+    );
+
+    if (updatedItem) {
+      const error = validateLineItemQuantity(updatedItem, value);
+
+      setLineItemErrors((prev) => ({ ...prev, [id]: error }));
+    }
   };
   const lineItemColumns = [
     {
@@ -181,16 +245,24 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
           return row.receivedQuantity;
         }
 
+        const rowId = row.id || row.partId;
+        const maxReceivable = getMaxReceivableQuantity(row);
+
         return (
           <TextField
             size="small"
             type="number"
             InputProps={{ readOnly: isSerial }}
-            inputProps={{ min: isSerial ? 1 : 0 }}
+            inputProps={{
+              min: isSerial ? 1 : 0,
+              max: maxReceivable ?? undefined,
+            }}
             value={isSerial ? 1 : row.receivedQuantity}
+            error={Boolean(lineItemErrors[rowId])}
+            helperText={lineItemErrors[rowId] || ""}
             onChange={(e) => {
               if (!isSerial) {
-                handleLineItemChange(row.id || row.partId, e.target.value);
+                handleLineItemChange(rowId, e.target.value);
               }
             }}
           />
@@ -235,6 +307,31 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
   ];
 
   async function handleEditSubmit() {
+    const newErrors = {};
+
+    lineItems.forEach((item) => {
+      const isSerial = item.trackingMethod?.toLowerCase() === "serial";
+
+      if (isSerial) {
+        return;
+      }
+
+      const rowId = item.id || item.partId;
+      const error = validateLineItemQuantity(item, item.receivedQuantity);
+
+      if (error) {
+        newErrors[rowId] = error;
+      }
+    });
+
+    setLineItemErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      Alert("Please fix the quantity errors before updating", "error");
+      setEditFlyOutTabsValue("1");
+      return;
+    }
+
     const fd = new FormData();
 
     fd.append("PurchaseOrderId", selectedGRN?.purchaseOrderId || "");
