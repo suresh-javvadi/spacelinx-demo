@@ -585,7 +585,7 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
                 TransactedQuantity = item.Quantity,
                 ReferenceType = "StockMovement",
                 ReferenceId = stockMovement.Id,
-                TransactionDate = DateTime.UtcNow,
+                TransactionDate = stockMovement.MovementDate.ToDateTime(TimeOnly.MinValue),
                 Notes = $"{stockMovement.MovementType}: {item.Quantity} qty - {stockMovement.MovementReason ?? "No reason specified"} (Submitted)",
                 TrackingType = item.TrackingType,
                 TrackingId = item.TrackingId,
