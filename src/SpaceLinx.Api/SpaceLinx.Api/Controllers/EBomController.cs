@@ -588,7 +588,9 @@ public class EBomController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
                         newPartId,
                         UserEmail
                     );
-
+ 
+        await bomService.InvalidateBomCacheAsync(newPartId);
+ 
         return Ok(newPartId);
     }
 
