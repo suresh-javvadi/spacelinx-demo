@@ -16,6 +16,8 @@ import { PERMISSIONS } from "../../../constants/PagePermissions";
 import { useUserContext } from "../../userContext/UserContext";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import Popover from "@mui/material/Popover";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const GRN_DRAFT_STORAGE_KEY = "new-good-receipt-note-draft";
 const getInitialFormData = () => ({
@@ -991,195 +993,209 @@ const NewGoodReceiptNote = ({
           {loadingData && <Cliploader loading={loadingData} />}
           <TabPanel value="1" className="GrnNewFlyoutTabPanel">
             <div className="GrnNewFlyoutContent">
-              <div className="GrnNewFlyoutContentTop">
-                <Autocomplete
-                  options={locationsData}
-                  getOptionLabel={(option) => option.name || ""}
-                  value={
-                    locationsData.find(
-                      (loc) => loc.id === formData.locationId,
-                    ) || null
-                  }
-                  onChange={(event, newValue) => {
-                    const newLocationId = newValue?.id || "";
+              <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <h3 className="po-tracker-acc-header">GRN Details</h3>
+                </AccordionSummary>
 
-                    setFormData((prev) => ({
-                      ...prev,
-                      locationId: newLocationId,
-                    }));
+                <AccordionDetails
+                  sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                >
+                  <div className="GrnNewFlyoutContentTop">
+                    <Autocomplete
+                      options={locationsData}
+                      getOptionLabel={(option) => option.name || ""}
+                      value={
+                        locationsData.find(
+                          (loc) => loc.id === formData.locationId,
+                        ) || null
+                      }
+                      onChange={(event, newValue) => {
+                        const newLocationId = newValue?.id || "";
 
-                    setLocationError(newLocationId === "");
-                  }}
-                  renderInput={(params) => (
+                        setFormData((prev) => ({
+                          ...prev,
+                          locationId: newLocationId,
+                        }));
+
+                        setLocationError(newLocationId === "");
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Location"
+                          fullWidth
+                          required
+                          error={locationError}
+                          helperText={
+                            locationError ? "Please select a location" : ""
+                          }
+                        />
+                      )}
+                    />
+
                     <TextField
-                      {...params}
-                      label="Select Location"
+                      label="Received Date"
+                      type="date"
+                      name="receivedDate"
+                      value={formData.receivedDate}
+                      onChange={handleInputChange}
+                      InputLabelProps={{ shrink: true }}
                       fullWidth
                       required
-                      error={locationError}
+                      error={receivedDateError}
                       helperText={
-                        locationError ? "Please select a location" : ""
+                        receivedDateError ? "Received Date is required" : ""
                       }
                     />
-                  )}
-                />
+                  </div>
 
-                <TextField
-                  label="Received Date"
-                  type="date"
-                  name="receivedDate"
-                  value={formData.receivedDate}
-                  onChange={handleInputChange}
-                  InputLabelProps={{ shrink: true }}
-                  fullWidth
-                  required
-                  error={receivedDateError}
-                  helperText={
-                    receivedDateError ? "Received Date is required" : ""
-                  }
-                />
-              </div>
-
-              <div className="GrnNewFlyoutContentTop">
-                <TextField
-                  label="Invoice Number"
-                  name="invoiceNumber"
-                  className="AdminTextFeilds"
-                  value={formData.invoiceNumber}
-                  onChange={handleInputChange}
-                  required
-                  error={invoiceNumberError}
-                  helperText={
-                    invoiceNumberError ? "Invoice number is required" : ""
-                  }
-                />
-                <TextField
-                  label="Invoice Date"
-                  type="date"
-                  name="invoiceDate"
-                  value={formData.invoiceDate}
-                  onChange={handleInputChange}
-                  InputLabelProps={{ shrink: true }}
-                  fullWidth
-                  required
-                  error={invoiceDateError}
-                  helperText={
-                    invoiceDateError ? "Received Date is required" : ""
-                  }
-                />
-              </div>
-
-              <div className="GrnNewFlyoutContentTop">
-                <Autocomplete
-                  options={purchaseOrders}
-                  getOptionLabel={(option) => option.number || ""}
-                  loading={loadingPoData}
-                  loadingText="Loading POs..."
-                  value={selectedPO}
-                  onChange={(event, newValue) =>
-                    handlePurchaseOrderChange(newValue)
-                  }
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
-                  renderInput={(params) => (
+                  <div className="GrnNewFlyoutContentTop">
                     <TextField
-                      {...params}
-                      label="Select Purchase Order"
-                      fullWidth
+                      label="Invoice Number"
+                      name="invoiceNumber"
+                      className="AdminTextFeilds"
+                      value={formData.invoiceNumber}
+                      onChange={handleInputChange}
+                      required
+                      error={invoiceNumberError}
+                      helperText={
+                        invoiceNumberError ? "Invoice number is required" : ""
+                      }
                     />
-                  )}
-                />
+                    <TextField
+                      label="Invoice Date"
+                      type="date"
+                      name="invoiceDate"
+                      value={formData.invoiceDate}
+                      onChange={handleInputChange}
+                      InputLabelProps={{ shrink: true }}
+                      fullWidth
+                      required
+                      error={invoiceDateError}
+                      helperText={
+                        invoiceDateError ? "Received Date is required" : ""
+                      }
+                    />
+                  </div>
 
-                <Autocomplete
-                  value={formData.vendor || null}
-                  onChange={(event, newValue) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      vendor: newValue || null,
-                    }));
-                  }}
-                  options={vendorsData}
-                  getOptionLabel={(option) =>
-                    `${option.vendorCode} - ${option.name}` || ""
-                  }
-                  readOnly={Boolean(selectedPO)}
-                  loading={loadingVendorsData}
-                  loadingText="Loading Vendors..."
-                  renderInput={(params) => (
-                    <TextField {...params} label="Select Vendor" fullWidth />
-                  )}
-                />
-              </div>
+                  <div className="GrnNewFlyoutContentTop">
+                    <Autocomplete
+                      options={purchaseOrders}
+                      getOptionLabel={(option) => option.number || ""}
+                      loading={loadingPoData}
+                      loadingText="Loading POs..."
+                      value={selectedPO}
+                      onChange={(event, newValue) =>
+                        handlePurchaseOrderChange(newValue)
+                      }
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value.id
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Purchase Order"
+                          fullWidth
+                        />
+                      )}
+                    />
 
-              <TextField
-                label="Reference"
-                name="reference"
-                className="AdminTextFeilds"
-                value={formData.reference}
-                onChange={handleInputChange}
-                fullWidth
-              />
+                    <Autocomplete
+                      value={formData.vendor || null}
+                      onChange={(event, newValue) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          vendor: newValue || null,
+                        }));
+                      }}
+                      options={vendorsData}
+                      getOptionLabel={(option) =>
+                        `${option.vendorCode} - ${option.name}` || ""
+                      }
+                      readOnly={Boolean(selectedPO)}
+                      loading={loadingVendorsData}
+                      loadingText="Loading Vendors..."
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Vendor"
+                          fullWidth
+                        />
+                      )}
+                    />
+                  </div>
 
-              <Autocomplete
-                value={value}
-                onChange={(e, newValue) => {
-                  handleSelectPart(newValue);
-                  setValue(null);
-                  setInputValue("");
-                }}
-                inputValue={inputValue}
-                onInputChange={(e, newInputValue) =>
-                  setInputValue(newInputValue)
-                }
-                options={availableParts}
-                loading={loadingPartsData}
-                loadingText="Loading Parts..."
-                getOptionLabel={(option) =>
-                  option
-                    ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}${option.poLineItemId ? ` - PO Qty ${option.orderedQuantity || 0} - Pending ${option.pendingQuantity || 0}` : ""}`
-                    : ""
-                }
-                isOptionEqualToValue={(option, value) =>
-                  (option.poLineItemId || option.id) ===
-                  (value?.poLineItemId || value?.id)
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Select Part" fullWidth />
-                )}
-                renderOption={(props, option) => (
-                  <li {...props} key={option.poLineItemId || option.id}>
-                    <div>
-                      <strong>{option.name}</strong>
-                      <div style={{ fontSize: "0.85rem" }}>
-                        Part No: {option.partNumber}
-                      </div>
-                      <div style={{ fontSize: "0.85rem" }}>
-                        Manf. Part No: {option.manufacturingPartNumber}
-                      </div>
-                      {option.poLineItemId ? (
-                        <div style={{ fontSize: "0.85rem" }}>
-                          Ordered: {option.orderedQuantity || 0} | Pending:{" "}
-                          {option.pendingQuantity || 0}
+                  <TextField
+                    label="Reference"
+                    name="reference"
+                    className="AdminTextFeilds"
+                    value={formData.reference}
+                    onChange={handleInputChange}
+                    fullWidth
+                  />
+
+                  <Autocomplete
+                    value={value}
+                    onChange={(e, newValue) => {
+                      handleSelectPart(newValue);
+                      setValue(null);
+                      setInputValue("");
+                    }}
+                    inputValue={inputValue}
+                    onInputChange={(e, newInputValue) =>
+                      setInputValue(newInputValue)
+                    }
+                    options={availableParts}
+                    loading={loadingPartsData}
+                    loadingText="Loading Parts..."
+                    getOptionLabel={(option) =>
+                      option
+                        ? `${option.partNumber} - ${option.name} - ${option.manufacturingPartNumber}${option.poLineItemId ? ` - PO Qty ${option.orderedQuantity || 0} - Pending ${option.pendingQuantity || 0}` : ""}`
+                        : ""
+                    }
+                    isOptionEqualToValue={(option, value) =>
+                      (option.poLineItemId || option.id) ===
+                      (value?.poLineItemId || value?.id)
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Select Part" fullWidth />
+                    )}
+                    renderOption={(props, option) => (
+                      <li {...props} key={option.poLineItemId || option.id}>
+                        <div>
+                          <strong>{option.name}</strong>
+                          <div style={{ fontSize: "0.85rem" }}>
+                            Part No: {option.partNumber}
+                          </div>
+                          <div style={{ fontSize: "0.85rem" }}>
+                            Manf. Part No: {option.manufacturingPartNumber}
+                          </div>
+                          {option.poLineItemId ? (
+                            <div style={{ fontSize: "0.85rem" }}>
+                              Ordered: {option.orderedQuantity || 0} | Pending:{" "}
+                              {option.pendingQuantity || 0}
+                            </div>
+                          ) : null}
                         </div>
-                      ) : null}
-                    </div>
-                  </li>
-                )}
-              />
-              <Box sx={{ mt: 1, mb: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={handleAddAllLineItems}
-                  disabled={
-                    !selectedPO ||
-                    availableParts.length === 0 ||
-                    selectedParts.length > 0
-                  }
-                >
-                  Add All Line Items
-                </Button>
-              </Box>
+                      </li>
+                    )}
+                  />
+                  <Box sx={{ mt: 1, mb: 2 }}>
+                    <Button
+                      variant="outlined"
+                      onClick={handleAddAllLineItems}
+                      disabled={
+                        !selectedPO ||
+                        availableParts.length === 0 ||
+                        selectedParts.length > 0
+                      }
+                    >
+                      Add All Line Items
+                    </Button>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
               <div className="GrnDataGridDiv">
                 <StyledDataGrid
                   rows={selectedParts}

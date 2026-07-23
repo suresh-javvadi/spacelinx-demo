@@ -19,6 +19,8 @@ import Popover from "@mui/material/Popover";
 import { pdf } from "@react-pdf/renderer";
 import PrintGoodsReceiptNote from "./printGoodsReceiptNote";
 import { fetchPurchaseOrderwithId } from "../../../services/purchaseOrders";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
   const { Alert } = useContext(AlertsContext);
@@ -92,6 +94,7 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
           createdDate: selectedGRN?.createdAt
             ? dayjs(selectedGRN.createdAt).format("DD-MM-YYYY")
             : "",
+          vendorName: selectedGRN?.vendorName || "",
         });
 
         const sortedData =
@@ -382,6 +385,10 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       onClick: () =>
         navigateTo(`/procurement/purchaseorders/${formData.purchaseOrderId}`),
     },
+    {
+      label: "Vendor",
+      value: formData.vendorName,
+    },
     { label: "Invoice Date", value: formData.invoiceDate },
     { label: "Received Date", value: formData.receivedDate },
     { label: "Created On", value: formData.createdDate },
@@ -479,65 +486,74 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
           <TabPanel value="1" className="GrnNewFlyoutTabPanel">
             <div className="GrnNewFlyoutContent">
               {/* GRN DETAILS CARD */}
-              <div className="grnDetailsCard">
-                <h4 className="cardTitle">GRN Details</h4>
+              <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <h3 className="po-tracker-acc-header">GRN Details</h3>
+                </AccordionSummary>
 
-                <div className="grnDetailsGrid">
-                  {grnDetailsFields.map((item, index) => (
-                    <div className="detailItem" key={index}>
-                      <p className="detailLabel">{item.label}</p>
+                <AccordionDetails
+                  sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                >
+                  <div className="grnDetailsCard">
+                    {/* <h4 className="cardTitle">GRN Details</h4> */}
 
-                      <p
-                        className={`detailValue ${item.className || ""}`}
-                        onClick={item.onClick}
-                        style={{
-                          cursor: item.onClick ? "pointer" : "default",
-                        }}
-                      >
-                        {item.value || "---"}
-                      </p>
+                    <div className="grnDetailsGrid">
+                      {grnDetailsFields.map((item, index) => (
+                        <div className="detailItem" key={index}>
+                          <p className="detailLabel">{item.label}</p>
+
+                          <p
+                            className={`detailValue ${item.className || ""}`}
+                            onClick={item.onClick}
+                            style={{
+                              cursor: item.onClick ? "pointer" : "default",
+                            }}
+                          >
+                            {item.value || "---"}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Reference + Remarks */}
-              <div className="refDescGrid">
-                <div className="refDescCard">
-                  <h4 className="cardTitle">Reference</h4>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    placeholder="Reference"
-                    value={formData.reference}
-                    inputProps={{ readOnly: readOnlyMode }}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        reference: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
+                  {/* Reference + Remarks */}
+                  <div className="refDescGrid">
+                    <div className="refDescCard">
+                      <h4 className="cardTitle">Reference</h4>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        placeholder="Reference"
+                        value={formData.reference}
+                        inputProps={{ readOnly: readOnlyMode }}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            reference: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
 
-                <div className="refDescCard">
-                  <h4 className="cardTitle">Remarks</h4>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Remarks(Excess/Shortage/Damage)"
-                    value={formData.description}
-                    inputProps={{ readOnly: readOnlyMode }}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-
+                    <div className="refDescCard">
+                      <h4 className="cardTitle">Remarks</h4>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Remarks(Excess/Shortage/Damage)"
+                        value={formData.description}
+                        inputProps={{ readOnly: readOnlyMode }}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            description: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </AccordionDetails>
+              </Accordion>
               {/* DataGrid */}
               <div className="GrnEditDataGridDiv">
                 <StyledDataGrid

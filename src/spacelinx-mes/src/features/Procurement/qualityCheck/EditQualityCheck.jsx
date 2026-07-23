@@ -19,6 +19,8 @@ import { PERMISSIONS } from "../../../constants/PagePermissions";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import { Autocomplete } from "@mui/material";
 import Popover from "@mui/material/Popover";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const EditQualityCheck = ({ selectedGRN, handleClose, handleRefresh }) => {
   const { Alert } = useContext(AlertsContext);
@@ -150,6 +152,7 @@ const EditQualityCheck = ({ selectedGRN, handleClose, handleRefresh }) => {
           createdDate: selectedGRN?.createdAt
             ? dayjs(selectedGRN.createdAt).format("DD-MM-YYYY")
             : "",
+          vendorName: selectedGRN?.vendorName || "",
         });
 
         const sortedData =
@@ -372,70 +375,92 @@ const EditQualityCheck = ({ selectedGRN, handleClose, handleRefresh }) => {
           <TabPanel value="1" className="GrnNewFlyoutTabPanel">
             <div className="GrnNewFlyoutContent">
               {/* GRN DETAILS CARD */}
-              <div className="grnDetailsCard">
-                <h4 className="cardTitle">GRN Details</h4>
+              <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <h3 className="po-tracker-acc-header">GRN Details</h3>
+                </AccordionSummary>
 
-                <div className="grnDetailsGrid">
-                  <div className="detailItem">
-                    <p className="detailLabel">P.O Number</p>
-                    <p
-                      className="detailValue PO_Link"
-                      onClick={() =>
-                        navigateTo(
-                          `/procurement/purchaseorders/${formData.purchaseOrderId}`,
-                        )
-                      }
-                    >
-                      {formData.purchaseOrderNumber}
-                    </p>
-                  </div>
-                  <div className="detailItem">
-                    <p className="detailLabel">P.O Status</p>
-                    <p className="detailValue">{formData.poStatus}</p>
-                  </div>
-                  <div className="detailItem">
-                    <p className="detailLabel">Received Date</p>
-                    <p className="detailValue">{formData.receivedDate}</p>
-                  </div>
-                  <div className="detailItem">
-                    <p className="detailLabel">Received By</p>
-                    <p className="detailValue">{formData.receivedBy}</p>
-                  </div>
-                  <div className="detailItem">
-                    <p className="detailLabel">Invoice Number</p>
-                    <p className="detailValue">{formData.invoiceNumber}</p>
-                  </div>
-                  <div className="detailItem">
-                    <p className="detailLabel">Invoice Date</p>
-                    <p className="detailValue">{formData.invoiceDate}</p>
-                  </div>
-                  <div className="detailItem">
-                    <p className="detailLabel">Location</p>
-                    <p className="detailValue">{formData.locationName}</p>
-                  </div>
-                  <div className="detailItem">
-                    <p className="detailLabel">Created On</p>
-                    <p className="detailValue">{formData.createdDate}</p>
-                  </div>
-                </div>
-              </div>
+                <AccordionDetails
+                  sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                >
+                  <div className="grnDetailsCard">
+                    <h4 className="cardTitle">GRN Details</h4>
 
-              {/* Reference + Description */}
-              <div className="refDescGrid">
-                <div className="refDescCard">
-                  <h4 className="cardTitle">Reference</h4>
-                  <div className="detailItem">
-                    <p className="detailValue">{formData.reference || "-"}</p>
+                    <div className="grnDetailsGrid">
+                      <div className="detailItem">
+                        <p className="detailLabel">P.O Number</p>
+                        <p
+                          className="detailValue PO_Link"
+                          onClick={() =>
+                            navigateTo(
+                              `/procurement/purchaseorders/${formData.purchaseOrderId}`,
+                            )
+                          }
+                        >
+                          {formData.purchaseOrderNumber}
+                        </p>
+                      </div>
+                      <div className="detailItem">
+                        <p className="detailLabel">P.O Status</p>
+                        <p className="detailValue">{formData.poStatus}</p>
+                      </div>
+                      <div className="detailItem">
+                        <p className="detailLabel">Received Date</p>
+                        <p className="detailValue">{formData.receivedDate}</p>
+                      </div>
+                      <div className="detailItem">
+                        <p className="detailLabel">Received By</p>
+                        <p className="detailValue">{formData.receivedBy}</p>
+                      </div>
+                      <div className="detailItem">
+                        <p className="detailLabel">Invoice Number</p>
+                        <p className="detailValue">{formData.invoiceNumber}</p>
+                      </div>
+                      <div className="detailItem">
+                        <p className="detailLabel">Invoice Date</p>
+                        <p className="detailValue">{formData.invoiceDate}</p>
+                      </div>
+                      <div className="detailItem">
+                        <p className="detailLabel">Location</p>
+                        <p className="detailValue">{formData.locationName}</p>
+                      </div>
+                      <div className="detailItem">
+                        <p className="detailLabel">Vendor</p>
+                        <p className="detailValue">
+                          {formData.vendorName || "---"}
+                        </p>
+                      </div>
+                      <div className="detailItem">
+                        <p className="detailLabel">Created On</p>
+                        <p className="detailValue">{formData.createdDate}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="refDescCard">
-                  <h4 className="cardTitle">Remarks(Excess/Shortage/Damage)</h4>
-                  <div className="detailItem">
-                    <p className="detailValue">{formData.description || "-"}</p>
+                  {/* Reference + Description */}
+                  <div className="refDescGrid">
+                    <div className="refDescCard">
+                      <h4 className="cardTitle">Reference</h4>
+                      <div className="detailItem">
+                        <p className="detailValue">
+                          {formData.reference || "-"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="refDescCard">
+                      <h4 className="cardTitle">
+                        Remarks(Excess/Shortage/Damage)
+                      </h4>
+                      <div className="detailItem">
+                        <p className="detailValue">
+                          {formData.description || "-"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </AccordionDetails>
+              </Accordion>
 
               <div className="GrnEditDataGridDiv">
                 <StyledDataGrid
