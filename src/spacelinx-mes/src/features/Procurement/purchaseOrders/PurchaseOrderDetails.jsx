@@ -56,6 +56,8 @@ import "../../features.css";
 import "../../ContactHub/Staff/Staff.css";
 import "../../ContactHub/Company/Company.css";
 import { fetchOptionSetByName } from "../../../services/optionSetService";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const PurchaseOrderDetails = () => {
   const { po_id } = useParams();
@@ -1137,6 +1139,12 @@ const PurchaseOrderDetails = () => {
               </div>
             ) : (
               <div className="PurchaseOrdersDetailsTab">
+                <Accordion defaultExpanded>
+    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <h3> Purchase Order Details</h3>
+    </AccordionSummary>
+
+    <AccordionDetails>
                 <div className="CreateFlyoutBodyTwoColumns">
                   <Autocomplete
                     options={vendors}
@@ -1712,6 +1720,8 @@ const PurchaseOrderDetails = () => {
                     />
                   </div>
                 </div>
+                  </AccordionDetails>
+  </Accordion>
                 <Divider orientation="horizontal" />
                 <div className="PODetailsContentInner">
                   <LineItems

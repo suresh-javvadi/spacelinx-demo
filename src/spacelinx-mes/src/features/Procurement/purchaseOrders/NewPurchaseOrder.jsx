@@ -48,6 +48,8 @@ import "../procurement.css";
 import "../../features.css";
 import "../../ContactHub/Staff/Staff.css";
 import "../../ContactHub/Company/Company.css";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const NewPurchaseOrder = () => {
   const { Alert } = useContext(AlertsContext);
@@ -750,6 +752,12 @@ const NewPurchaseOrder = () => {
                 </div>
               ) : (
                 <div className="PurchaseOrdersDetailsTab">
+                  <Accordion defaultExpanded>
+  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+    <h3> Purchase Order Details</h3>
+  </AccordionSummary>
+
+  <AccordionDetails>
                   <div className="CreateFlyoutBodyTwoColumns">
                     <Autocomplete
                       options={vendors}
@@ -1280,6 +1288,8 @@ const NewPurchaseOrder = () => {
                       />
                     </div>
                   </div>
+                   </AccordionDetails>
+</Accordion>
                   <Divider orientation="horizontal" flexItem />
                   <LineItems
                     lineItems={poLineItems}
