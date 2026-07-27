@@ -51,15 +51,15 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
   const [tempRemarks, setTempRemarks] = useState("");
 
   const handleRemarksPopoverOpen = (row, event) => {
-    setActiveRowId(row.uniqueId);
-    setTempRemarks(row.remarks || "");
+    setActiveRowId(row.id || row.partId);
+    setTempRemarks(row.remark || "");
     setAnchorEl(event.currentTarget);
   };
 
   const handleRemarksChange = (id, value) => {
-    setSelectedParts((prev) =>
+    setLineItems((prev) =>
       prev.map((item) =>
-        item.uniqueId === id ? { ...item, remarks: value } : item,
+        (item.id || item.partId) === id ? { ...item, remark: value } : item,
       ),
     );
   };
@@ -301,11 +301,20 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
       field: "remark",
       headerName: "Remarks",
       flex: 1,
-      renderCell: ({ row, value }) => (
-        <div onClick={(e) => handleRemarksPopoverOpen(row, e)}>
-          <div>{value || "Click to edit"}</div>
-        </div>
-      ),
+      renderCell: ({ row, value }) => {
+        if (!isEditing) {
+          return <div>{value || "---"}</div>;
+        }
+
+        return (
+          <div
+            style={{ cursor: "pointer" }}
+            onClick={(e) => handleRemarksPopoverOpen(row, e)}
+          >
+            <div>{value || "Click to edit"}</div>
+          </div>
+        );
+      },
     },
   ];
 
@@ -356,6 +365,7 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
         `GrnLineItems[${idx}][receivedQuantity]`,
         item.receivedQuantity,
       );
+      fd.append(`GrnLineItems[${idx}][remark]`, item.remark || "");
     });
 
     newDocuments.forEach((doc) => {
