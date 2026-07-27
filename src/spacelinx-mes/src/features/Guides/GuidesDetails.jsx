@@ -284,7 +284,9 @@ const GuideDetails = () => {
     if (guideData?.checkOutBy) {
       if (guideData.checkOutBy === currentUser?.email) {
         setCheckOutStatus("checkIn");
-      } else if (currentUser?.roles.some((role) => role.roleName === "Admin")) {
+      } else if (
+        currentUser?.roles?.some((role) => role.roleName === "Admin")
+      ) {
         setCheckOutStatus("forceCheckOut");
       } else {
         setCheckOutStatus("checkedOutByOther");
@@ -308,15 +310,17 @@ const GuideDetails = () => {
     };
 
     fetchUsersData();
+  }, []);
 
-    if (accounts.length > 0) {
+  useEffect(() => {
+    if (accounts.length > 0 && users.length > 0) {
       const msalCurrentUser = accounts[0];
       const matchedUser = users.find(
         (user) => user.email === msalCurrentUser.username,
       );
       setCurrentUser(matchedUser);
     }
-  }, [accounts, presentGuideId, guideData]);
+  }, [accounts, users]);
 
   const handleImagePaste = (imageBlob) => {
     setSelectedImage(imageBlob);
