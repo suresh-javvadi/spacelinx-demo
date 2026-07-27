@@ -207,7 +207,8 @@ const ECOErrorDisplay = ({
       field: "status",
       headerName: "Status",
       flex: 0.3,
-      valueGetter: (_value, row) => row.status || "",
+      valueGetter: (_value, row) =>
+        row.status === "Draft" ? "" : row.status || "",
     },
     {
       field: "makeBuy",
@@ -330,7 +331,11 @@ const ECOErrorDisplay = ({
         ) : (
           <ion-icon
             name="trash-outline"
-            style={{ cursor: "pointer", fontSize: "18px", color: "var(--error-color)" }}
+            style={{
+              cursor: "pointer",
+              fontSize: "18px",
+              color: "var(--error-color)",
+            }}
             onClick={async (e) => {
               e.stopPropagation();
               await handleDeleteBomPart(row.ebomId);
@@ -371,14 +376,16 @@ const ECOErrorDisplay = ({
     {
       key: "archived",
       label: "Archived BOM Parts",
-      description: "(These parts are Archived — remove them from the BOM to proceed)",
+      description:
+        "(These parts are Archived — remove them from the BOM to proceed)",
       rows: archivedRows,
       columns: deleteBomColumns,
     },
     {
       key: "obsolete",
       label: "Obsolete BOM Parts",
-      description: "(These parts are Obsolete — remove them from the BOM to proceed)",
+      description:
+        "(These parts are Obsolete — remove them from the BOM to proceed)",
       rows: obsoleteRows,
       columns: deleteBomColumns,
     },
