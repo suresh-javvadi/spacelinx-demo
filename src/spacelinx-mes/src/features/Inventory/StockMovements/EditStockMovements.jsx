@@ -31,7 +31,12 @@ import { fetchProjectsLookup } from "../../../services/projectService";
 import { useUserContext } from "../../userContext/UserContext";
 import { PERMISSIONS } from "../../../constants/PagePermissions";
 import dayjs from "dayjs";
-
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 const EditStockMovements = ({
   selectedMovement,
   handleClose,
@@ -1368,9 +1373,20 @@ const EditStockMovements = ({
       ) : !isDraft ? (
         <div className="GrnNewFlyoutTabPanel">
           <div className="GrnNewFlyoutContent StockMovementContainer">
+              <Accordion defaultExpanded>
+                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <h3>Stock Movement Details</h3>
+                          </AccordionSummary>
+                          <AccordionDetails
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                         }}
+                          >
             {/* MOVEMENT DETAILS CARD */}
             <div className="grnDetailsCard">
-              <h4 className="cardTitle">Stock Movement Details</h4>
+              {/* <h4 className="cardTitle">Stock Movement Details</h4> */}
 
               <div className="grnDetailsGrid">
                 {stockMovementDetailsFields.map((item, index) => (
@@ -1383,7 +1399,8 @@ const EditStockMovements = ({
                 ))}
               </div>
             </div>
-
+</AccordionDetails>
+                      </Accordion>
             <div className="GrnEditDataGridDiv">
               <StyledDataGrid
                 rows={selectedStockItems}
@@ -1394,6 +1411,7 @@ const EditStockMovements = ({
                 rowsPerPageOptions={[5]}
               />
             </div>
+             
           </div>
 
           {isPendingApproval && (

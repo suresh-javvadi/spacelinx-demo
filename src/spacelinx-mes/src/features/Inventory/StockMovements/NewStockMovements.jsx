@@ -21,6 +21,12 @@ import { fetchOptionSetByName } from "../../../services/optionSetService";
 import { fetchVendors } from "../../../services/companyService";
 import { fetchProjectsLookup } from "../../../services/projectService";
 import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const NewStockMovements = ({
   handleCloseClick,
@@ -1300,7 +1306,17 @@ const NewStockMovements = ({
       ) : (
         <>
           <div className="CreateFlyoutBody">
-            <h3>Enter The Details</h3>
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <h3>Enter The Details</h3>
+              </AccordionSummary>
+              <AccordionDetails
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+             }}
+              >
 
             {initialParts.length > 0 && formData.movementType === null && (
               <div className="sm-preselect-callout">
@@ -1493,6 +1509,7 @@ const NewStockMovements = ({
                 Responsible Person / Department{" "}
                 <span className="required">*</span>
               </label>
+              </div>
               <div className="GrnNewFlyoutContentTop">
                 <Autocomplete
                   options={staffData}
@@ -1514,7 +1531,7 @@ const NewStockMovements = ({
                     />
                   )}
                 />
-
+ 
                 <Autocomplete
                   options={departments}
                   value={formData?.department}
@@ -1536,7 +1553,9 @@ const NewStockMovements = ({
                   Either Responsible Person or Department is required
                 </FormHelperText>
               )}
-            </div>
+              
+            </AccordionDetails>
+            </Accordion>
 
             <div className="LineItemsContainer">
               <Autocomplete
