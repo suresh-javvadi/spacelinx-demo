@@ -415,13 +415,15 @@ const EditGoodReceiptNote = ({ selectedGRN, handleClose, handleRefresh }) => {
         />
       );
       const blob = await pdf(doc).toBlob();
-      const url = URL.createObjectURL(blob);
+      const fileName = selectedGRN?.grnNumber
+        ? `GRN-${selectedGRN.grnNumber}.pdf`
+        : "GoodsReceiptNote.pdf";
+      const file = new File([blob], fileName, { type: "application/pdf" });
+      const url = URL.createObjectURL(file);
       const newWindow = window.open(url, "_blank");
-      if (newWindow) {
-        newWindow.addEventListener("load", () => URL.revokeObjectURL(url));
-      } else {
+      if (!newWindow) {
         Alert("Pop-ups are blocked. Please allow pop-ups to print.", "warning");
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        URL.revokeObjectURL(url);
       }
     } catch (error) {
       console.error("Failed to generate GRN PDF:", error);
