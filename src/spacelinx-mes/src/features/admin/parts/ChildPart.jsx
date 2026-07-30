@@ -34,7 +34,6 @@ import MyLocationIcon from "@mui/icons-material/MyLocation";
 import { LoadingOutlined } from "@ant-design/icons";
 import { StyledDataGrid } from "../../../Components/StyledDataGrid/StyledDataGrid";
 import ConsolidatedBOMView from "./ConsolidatedBOMView";
-import LocationBOMView from "./LocationBOMView";
 import TableViewIcon from "@mui/icons-material/TableView";
 import ChildPartAntTableView from "./ChildPartAntTableView";
 import { fetchAssemblyLocations } from "../../../services/assemblyLocationService";

@@ -661,10 +661,10 @@ const LocationViewAntDTable = ({
 
   useEffect(() => {
     if (!selectedId) return;
-    fetchSubsystemViewBOMTreeData(selectedId);
+    fetchLocationViewBOMTreeData(selectedId);
   }, [selectedId]);
 
-  const fetchSubsystemViewBOMTreeData = async (selectedId) => {
+  const fetchLocationViewBOMTreeData = async (selectedId) => {
     if (!selectedId) {
       setBomTreeData([]);
       setLoadingBomTreeData(false);
@@ -680,8 +680,8 @@ const LocationViewAntDTable = ({
         setBomTreeData(formattedData);
       }
     } catch (error) {
-      console.error("Error fetching Subsystem BOM Tree:", error);
-      Alert("Failed to fetch Subsystem BOM data.", "error");
+      console.error("Error fetching Location BOM Tree:", error);
+      Alert("Failed to fetch Location BOM data.", "error");
       setBomTreeData([]);
     } finally {
       setLoadingBomTreeData(false);

@@ -52,20 +52,14 @@ public class EBomController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
     public async Task<ActionResult<List<SubsystemBomHierarchyReadModel>>> GetFullBomHierarchyBySubsystem(Guid partId)
     {
         var bom = await bomService.GetBomHierarchyBySubsystemAsync(partId);
-        if (bom == null || !bom.Any())
-            return NotFound();
-
-        return Ok(bom);
+        return Ok(bom ?? new List<SubsystemBomHierarchyReadModel>());
     }
 
     [HttpGet("{partId}/bom/full/by-location")]
     public async Task<ActionResult<List<LocationBomHierarchyReadModel>>> GetFullBomHierarchyByLocation(Guid partId)
     {
         var bom = await bomService.GetBomHierarchyByLocationAsync(partId);
-        if (bom == null || !bom.Any())
-            return NotFound();
-
-        return Ok(bom);
+        return Ok(bom ?? new List<LocationBomHierarchyReadModel>());
     }
 
     [HttpGet("{partId}/bom/full/flat")]
