@@ -307,21 +307,30 @@ const NewRequisition = ({ handleCloseClick, handleRefresh, projectsData }) => {
                 part: parentPart,
                 quantity: parentQty,
                 description: lineItem.description || "",
-                isBom: false,
+                isBom: item.isBom,
               }
             : item,
         );
 
+        // Case 1: Child BOM part
         if (isBomChildItem(lineItems[editIndex])) {
           setLineItems(nextItems);
-          Alert("Line item updated successfully", "info");
+          Alert("Line item updated successfully", "success");
           resetLineItemState();
           return;
         }
 
+        // Check whether the selected part has a BOM
+        // Case 2: Parent part
         const rebuiltItems = await rebuildBomChildrenFromParents(nextItems);
         setLineItems(rebuiltItems);
-        Alert("Parent part and consolidated BOM items added", "info");
+
+        if (Array.isArray(fullBom) && fullBom.length > 0) {
+          Alert("Parent part and consolidated BOM items added", "success");
+        } else {
+          Alert("Line item updated successfully", "success");
+        }
+
         resetLineItemState();
         return;
       }
