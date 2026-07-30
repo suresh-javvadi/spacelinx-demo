@@ -141,28 +141,33 @@ function Header() {
                   "_blank"
                 )
               }
+              title="Help"
             >
               <ion-icon name="help-circle-outline"></ion-icon>
             </IconButton>
             <IconButton
               onClick={() => setIssuesDialogOpen(true)}
               className="header-icons HeaderIssuesIcon"
+              title="Create Issues"
             >
               <WarningAmberOutlinedIcon />
             </IconButton>
             <IconButton
               onClick={handleOpenCreateMenu}
               className="header-icon HeaderAddIcon"
+              title="Modules"
             >
               <ion-icon name="add-outline"></ion-icon>
             </IconButton>
             <IconButton
               onClick={handleOpenNotificationMenu}
               className="header-icon"
+              title="Notifications"
             >
               <NotificationsIcon />
             </IconButton>
-            <IconButton onClick={handleOpenMenu} className="header-icon">
+            <IconButton onClick={handleOpenMenu} className="header-icon"
+            title="Profile">
               <AccountCircleIcon />
             </IconButton>
           </div>
