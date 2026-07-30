@@ -844,6 +844,7 @@ public partial class SpaceLinxContext : DbContext
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
             entity.Property(e => e.IsCustomer).HasColumnName("is_customer");
+            entity.Property(e => e.IsMsmeCertified).HasColumnName("is_msme_certified");
             entity.Property(e => e.IsPartner).HasColumnName("is_partner");
             entity.Property(e => e.IsVendor).HasColumnName("is_vendor");
             entity.Property(e => e.LastActivityDate).HasColumnName("last_activity_date");

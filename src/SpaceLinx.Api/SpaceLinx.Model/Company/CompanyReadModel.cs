@@ -31,6 +31,7 @@
         public bool? IsCustomer { get; set; }
         public bool? IsPartner { get; set; }
         public string? PanNumber { get; set; }
+        public bool? IsMsmeCertified { get; set; }
         public virtual PaymentTermRefModel? PaymentTerm { get; set; }
         public virtual CurrencyRefModel? Currency { get; set; }
     }

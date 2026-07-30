@@ -376,6 +376,7 @@ public partial class SpaceLinxContext
         modelBuilder.Entity<Company>(e => e.ToTable(t =>
         {
             t.HasCheckConstraint("company_pan_check", "((is_vendor = true) OR (pan_number IS NULL))");
+            t.HasCheckConstraint("company_msme_check", "(is_vendor = true) OR (is_msme_certified IS NULL)");
         }));
         modelBuilder.Entity<GoodsReceiptNote>(e => e.ToTable(t =>
         {

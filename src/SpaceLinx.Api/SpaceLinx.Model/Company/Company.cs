@@ -31,6 +31,7 @@
         public bool? IsCustomer { get; set; }
         public bool? IsPartner { get; set; }
         public string? PanNumber { get; set; }
+        public bool? IsMsmeCertified { get; set; }
         public virtual PaymentTerm? PaymentTerm { get; set; }
         public virtual Currency? Currency { get; set; }
         public virtual ICollection<CompanyAddress> CompanyAddresses { get; set; } = new List<CompanyAddress>();

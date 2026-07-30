@@ -31,5 +31,6 @@
         public bool? IsCustomer { get; set; }
         public bool? IsPartner { get; set; }
         public string? PanNumber { get; set; }
+        public bool? IsMsmeCertified { get; set; }
     }
 }

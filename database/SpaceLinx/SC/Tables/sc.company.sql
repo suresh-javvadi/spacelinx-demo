@@ -14,6 +14,7 @@
     website TEXT,
     tax_id VARCHAR(50),
     pan_number VARCHAR(10),
+    is_msme_certified BOOLEAN,
     currency_code CHAR(3),
     quality_score INT DEFAULT 0,
     category VARCHAR(100),
@@ -41,5 +42,6 @@
     CHECK (
         (is_vendor = TRUE AND (is_customer = FALSE OR is_customer IS NULL) AND (is_partner = FALSE OR is_partner IS NULL))
         OR (pan_number IS NULL)
-    )
+    ),
+    CONSTRAINT company_msme_check CHECK ((is_vendor = TRUE) OR (is_msme_certified IS NULL))
 );

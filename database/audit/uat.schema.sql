@@ -5609,7 +5609,9 @@ CREATE TABLE sc.company (
     deleted_at timestamp with time zone,
     deleted_by character varying(255),
     pan_number character varying(10),
-    CONSTRAINT company_pan_check CHECK (((is_vendor = true) OR (pan_number IS NULL)))
+    is_msme_certified boolean,
+    CONSTRAINT company_pan_check CHECK (((is_vendor = true) OR (pan_number IS NULL))),
+    CONSTRAINT company_msme_check CHECK (((is_vendor = true) OR (is_msme_certified IS NULL)))
 );
 
 
