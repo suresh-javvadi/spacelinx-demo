@@ -308,15 +308,44 @@ const NewGoodReceiptNote = ({
     return acc;
   }, {});
 
-  const availableParts =
-    lineItems.length === 0
-      ? filteredParts
-      : filteredParts.filter((part) => {
-          const pending = Number(part.pendingQuantity || 0);
-          const used = receivedQtyMap[part.poLineItemId || part.id] || 0;
+  const selectedBatchPartKeys = new Set(
+    selectedParts
+      .filter((item) => {
+        const isPart = !item.itemType || item.itemType === "Part";
+        return isPart && item.isSerialNumberRequired !== true;
+      })
+      .map((item) => item.poLineItemId || item.id),
+  );
 
-          return used < pending;
-        });
+  const availableParts = filteredParts.filter((part) => {
+    const key = part.poLineItemId || part.id;
+    const isPart = !part.itemType || part.itemType === "Part";
+    const isSerial = isPart && part.isSerialNumberRequired === true;
+
+    // Batch-tracked parts can only be added once per GRN, and only while the
+    // PO line still has quantity outstanding — otherwise a fully-received
+    // batch line would reappear and could be over-received.
+    if (isPart && !isSerial) {
+      if (selectedBatchPartKeys.has(key)) {
+        return false;
+      }
+
+      if (lineItems.length === 0) {
+        return true;
+      }
+
+      return Number(part.pendingQuantity || 0) > 0;
+    }
+
+    if (lineItems.length === 0) {
+      return true;
+    }
+
+    const pending = Number(part.pendingQuantity || 0);
+    const used = receivedQtyMap[key] || 0;
+
+    return used < pending;
+  });
   const newFlyoutTabChange = (event, newValue) =>
     setEditFlyOutTabsValue(newValue);
 
