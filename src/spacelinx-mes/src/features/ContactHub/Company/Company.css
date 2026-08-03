@@ -233,7 +233,10 @@ div .AddButton {
   height: calc(100vh - 250px);
 }
 .VendorCheckBoxGroup {
+  grid-column: 1 / -1;
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 5px;
 }
 .VendorCheckBoxGroup.edit {
@@ -242,6 +245,96 @@ div .AddButton {
 
 .VendorCheckBoxGroup.create {
   margin-bottom: 40px;
+}
+.MsmeCertifiedRow {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 4px;
+}
+.MsmeCertifiedInline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.MsmeCertifiedLabel {
+  font-size: 14px !important;
+  white-space: nowrap;
+}
+.MsmeCertificateUpload {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.MsmeCertificateHint {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 13px;
+  opacity: 0.75;
+}
+.MsmeCertificateHintLink {
+  min-width: 0 !important;
+  padding: 0 4px !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+  margin: 0 2px;
+}
+.MsmeUploadButton {
+  text-transform: none !important;
+  white-space: nowrap;
+  border-radius: 6px !important;
+}
+.MsmeUploadButton.error {
+  border-color: #d32f2f !important;
+  color: #d32f2f !important;
+}
+.MsmeFileChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 2px 4px 2px 10px;
+  border: 1px solid rgba(128, 128, 128, 0.45);
+  border-radius: 16px;
+  background-color: rgba(128, 128, 128, 0.12);
+}
+.MsmeFileChipIcon {
+  font-size: 18px !important;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+.MsmeFileChipName {
+  font-size: 13px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.MsmeFileChipSize {
+  font-size: 12px;
+  opacity: 0.6;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.MsmeFileChipAction {
+  min-width: 0 !important;
+  padding: 0 6px !important;
+  font-size: 12px !important;
+  text-transform: none !important;
+  flex-shrink: 0;
+}
+.MsmeFileChipRemove {
+  padding: 2px !important;
+  flex-shrink: 0;
+}
+.MsmeCertificateError {
+  width: 100%;
+  color: #d32f2f;
+  font-size: 12px;
 }
 .TabButton.Selected {
   background-color: rgb(69, 69, 69);

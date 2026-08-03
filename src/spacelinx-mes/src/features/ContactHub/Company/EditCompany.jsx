@@ -7,6 +7,9 @@ import {
   Autocomplete,
   FormControlLabel,
   Checkbox,
+  RadioGroup,
+  Radio,
+  FormLabel,
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
@@ -43,6 +46,17 @@ const isEmail = (string) => {
 const isPhoneNumber = (string) => {
   const re = /^\+?[1-9]\d{1,14}$/;
   return re.test(String(string).replace(/\s/g, ""));
+};
+
+// Documents are stored against a company with an entityType. Derive it from the
+// company's own flags rather than the list tab it was opened from, so the same
+// company always resolves to the same value. A company can carry more than one
+// flag, so the order below is the precedence.
+const getCompanyEntityType = (company) => {
+  if (company?.isVendor) return "Vendors";
+  if (company?.isCustomer) return "Customers";
+  if (company?.isPartner) return "Partners";
+  return "Companies";
 };
 
 const EditCompany = ({
@@ -106,7 +120,7 @@ const EditCompany = ({
           null,
         paymentTermId:
           paymentTerms.find(
-            (p) => p.id === selectedCompanyData.paymentTermId
+            (p) => p.id === selectedCompanyData.paymentTermId,
           ) || null,
         category:
           categoryTypes.find((c) => c.name === selectedCompanyData.category) ||
@@ -120,6 +134,9 @@ const EditCompany = ({
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+      // MSME applies to vendors only — drop the flag rather than persisting a
+      // stale answer the form can no longer show.
+      ...(name === "isVendor" && !checked ? { isMsmeCertified: null } : {}),
     }));
   };
 
@@ -213,16 +230,16 @@ const EditCompany = ({
                     selectedCompanyData?.name || ""
                   }`
                 : pageTabValue === "Vendors"
-                ? `${selectedCompanyData?.vendorCode || ""} - ${
-                    selectedCompanyData?.name || ""
-                  }`
-                : pageTabValue === "Partners"
-                ? `${selectedCompanyData?.partnerCode || ""} - ${
-                    selectedCompanyData?.name || ""
-                  }`
-                : `${selectedCompanyData?.companyCode || ""} - ${
-                    selectedCompanyData?.name || ""
-                  }`}
+                  ? `${selectedCompanyData?.vendorCode || ""} - ${
+                      selectedCompanyData?.name || ""
+                    }`
+                  : pageTabValue === "Partners"
+                    ? `${selectedCompanyData?.partnerCode || ""} - ${
+                        selectedCompanyData?.name || ""
+                      }`
+                    : `${selectedCompanyData?.companyCode || ""} - ${
+                        selectedCompanyData?.name || ""
+                      }`}
             </h3>
             <div className="EditFlyoutHeaderIcons">
               {editFlyOutTabsValue === "1" && (
@@ -265,8 +282,12 @@ const EditCompany = ({
                 <Tab label="Documents" value="6" />
               </TabList>
             </Box>
-            <TabPanel value="1" className="EditFlyoutTabPanel"> 
-                <div className={readOnlyMode ? "EditFlyoutBody2" : "EditFlyoutBody2WithFooter"}>
+            <TabPanel value="1" className="EditFlyoutTabPanel">
+              <div
+                className={
+                  readOnlyMode ? "EditFlyoutBody2" : "EditFlyoutBody2WithFooter"
+                }
+              >
                 <TextField
                   label="Name"
                   className="AdminTextFeilds"
@@ -477,7 +498,7 @@ const EditCompany = ({
                   rows={3}
                   disabled={readOnlyMode}
                 />
-               <div className="VendorCheckBoxGroup edit">
+                <div className="VendorCheckBoxGroup edit">
                   <FormControlLabel
                     disabled={
                       !hasPermission(PERMISSIONS.VENDORS.MODIFY) || readOnlyMode
@@ -519,6 +540,72 @@ const EditCompany = ({
                     }
                     label="Partner"
                   />
+                  {formData.isVendor && (
+                    <div className="MsmeCertifiedRow">
+                      <div className="MsmeCertifiedInline">
+                        <FormLabel
+                          component="legend"
+                          className="MsmeCertifiedLabel"
+                        >
+                          Is it MSME certified?
+                        </FormLabel>
+                        <RadioGroup
+                          row
+                          name="isMsmeCertified"
+                          value={
+                            formData.isMsmeCertified === true
+                              ? "yes"
+                              : formData.isMsmeCertified === false
+                                ? "no"
+                                : ""
+                          }
+                          onChange={(e) =>
+                            onUpdateField(
+                              "isMsmeCertified",
+                              e.target.value === "yes",
+                            )
+                          }
+                        >
+                          <FormControlLabel
+                            value="yes"
+                            control={<Radio />}
+                            label="Yes"
+                            disabled={
+                              readOnlyMode ||
+                              !hasPermission(PERMISSIONS.VENDORS.MODIFY)
+                            }
+                          />
+                          <FormControlLabel
+                            value="no"
+                            control={<Radio />}
+                            label="No"
+                            disabled={
+                              readOnlyMode ||
+                              !hasPermission(PERMISSIONS.VENDORS.MODIFY)
+                            }
+                          />
+                        </RadioGroup>
+                      </div>
+                      {formData.isMsmeCertified === true &&
+                        !readOnlyMode &&
+                        hasPermission(
+                          PERMISSIONS.COMPANIES.DOCUMENTS.MODIFY
+                        ) && (
+                          <span className="MsmeCertificateHint">
+                            Attach the certificate in the
+                            <Button
+                              variant="text"
+                              size="small"
+                              className="MsmeCertificateHintLink"
+                              onClick={() => setEditFlyOutTabsValue("6")}
+                            >
+                              Documents
+                            </Button>
+                            tab.
+                          </span>
+                        )}
+                    </div>
+                  )}
                 </div>
               </div>
               {!readOnlyMode && (
@@ -550,7 +637,7 @@ const EditCompany = ({
             <TabPanel value="6">
               <Documents
                 entityId={selectedCompanyData?.id}
-                entityType={pageTabValue === "All" ? "Companies" : pageTabValue}
+                entityType={getCompanyEntityType(formData)}
                 canEdit={hasPermission(PERMISSIONS.COMPANIES.DOCUMENTS.VIEW)}
                 canUpload={
                   hasPermission(PERMISSIONS.COMPANIES.DOCUMENTS.MODIFY) &&

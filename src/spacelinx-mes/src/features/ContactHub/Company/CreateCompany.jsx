@@ -5,8 +5,17 @@ import {
   FormControlLabel,
   Checkbox,
   Autocomplete,
+  RadioGroup,
+  Radio,
+  FormLabel,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import CloseIcon from "@mui/icons-material/Close";
 import { createCompany } from "../../../services/companyService";
+import { createDocumentWithEntity } from "../../../services/documentsService";
 import { AlertsContext } from "../../AlertsContext/Context";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
 import { fetchCurrencies } from "../../../services/currencyService";
@@ -35,9 +44,19 @@ const isPhoneNumber = (string) => {
   return re.test(String(string).replace(/\s/g, ""));
 };
 
+const MSME_CERTIFICATE_ACCEPT = ".pdf,.jpg,.jpeg,.png";
+
+const formatFileSize = (bytes) => {
+  if (!bytes) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 const CreateCompany = ({ pageTabValue, setPageDrawer, fetchCompanyData }) => {
   const { Alert } = useContext(AlertsContext);
   const { hasPermission } = useUserContext();
+  const canModifyVendors = hasPermission(PERMISSIONS.VENDORS.MODIFY);
   const [loadingData, setLoadingData] = useState(true);
   const [currencies, setCurrencies] = useState([]);
   const [paymentTerms, setPaymentTerms] = useState([]);
@@ -59,6 +78,7 @@ const CreateCompany = ({ pageTabValue, setPageDrawer, fetchCompanyData }) => {
     isVendor: pageTabValue === "Vendors",
     isCustomer: pageTabValue === "Customers",
     isPartner: pageTabValue === "Partners",
+    isMsmeCertified: null,
     email: "",
     totalOrders: 0,
     totalSpent: 0,
@@ -67,6 +87,7 @@ const CreateCompany = ({ pageTabValue, setPageDrawer, fetchCompanyData }) => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [categoryTypes, setCategoryTypes] = useState([]);
+  const [msmeCertificateFile, setMsmeCertificateFile] = useState(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -109,7 +130,11 @@ const CreateCompany = ({ pageTabValue, setPageDrawer, fetchCompanyData }) => {
       isVendor: pageTabValue === "Vendors",
       isCustomer: pageTabValue === "Customers",
       isPartner: pageTabValue === "Partners",
+      isMsmeCertified: pageTabValue === "Vendors" ? prev.isMsmeCertified : null,
     }));
+    if (pageTabValue !== "Vendors") {
+      setMsmeCertificateFile(null);
+    }
   }, [pageTabValue]);
 
   const handleChange = (e) => {
@@ -117,7 +142,33 @@ const CreateCompany = ({ pageTabValue, setPageDrawer, fetchCompanyData }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+      ...(name === "isVendor" && !checked ? { isMsmeCertified: null } : {}),
     }));
+    if (name === "isVendor" && !checked) {
+      setMsmeCertificateFile(null);
+    }
+  };
+
+  const handleMsmeCertifiedChange = (e) => {
+    const isYes = e.target.value === "yes";
+    setFormData((prev) => ({ ...prev, isMsmeCertified: isYes }));
+    if (!isYes) {
+      setMsmeCertificateFile(null);
+      setFormErrors((prev) => ({ ...prev, msmeCertificate: undefined }));
+    }
+  };
+
+  const handleMsmeCertificateFileChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    // Reset the input value so picking the same file again still fires onChange.
+    e.target.value = "";
+    if (!file) return;
+    setMsmeCertificateFile(file);
+    setFormErrors((prev) => ({ ...prev, msmeCertificate: undefined }));
+  };
+
+  const handleMsmeCertificateRemove = () => {
+    setMsmeCertificateFile(null);
   };
 
   const validate = () => {
@@ -144,6 +195,14 @@ const CreateCompany = ({ pageTabValue, setPageDrawer, fetchCompanyData }) => {
       !isPhoneNumber(`+${formData.alternatePhone}`)
     ) {
       errors.alternatePhone = "Invalid alternate phone number.";
+    }
+    if (
+      formData.isVendor &&
+      formData.isMsmeCertified === true &&
+      !msmeCertificateFile
+    ) {
+      errors.msmeCertificate =
+        "MSME certificate is required when MSME certified is Yes.";
     }
     return errors;
   };
@@ -183,9 +242,46 @@ const CreateCompany = ({ pageTabValue, setPageDrawer, fetchCompanyData }) => {
         isVendor: formData.isVendor,
         isCustomer: formData.isCustomer,
         isPartner: formData.isPartner,
+        isMsmeCertified: formData.isVendor ? formData.isMsmeCertified : null,
       };
-      await createCompany(payload);
-      Alert("Company created successfully!", "success");
+      const created = await createCompany(payload);
+      // The alert context holds a single slot, so collect the outcome here and
+      // raise exactly one message below.
+      let certUploadFailed = false;
+      if (
+        formData.isVendor &&
+        formData.isMsmeCertified === true &&
+        msmeCertificateFile
+      ) {
+        if (!created?.id) {
+          certUploadFailed = true;
+        } else {
+          try {
+            const docFormData = new FormData();
+            docFormData.append("documentFiles[0].entityId", created.id);
+            // Guarded by formData.isVendor above, so this matches what the
+            // Documents tab derives for the same company.
+            docFormData.append("documentFiles[0].entityType", "Vendors");
+            docFormData.append(
+              "documentFiles[0].documentType",
+              "MSME Certificate"
+            );
+            docFormData.append(
+              "documentFiles[0].documentFile",
+              msmeCertificateFile
+            );
+            await createDocumentWithEntity(docFormData);
+          } catch (docError) {
+            certUploadFailed = true;
+          }
+        }
+      }
+      Alert(
+        certUploadFailed
+          ? "Company created, but the MSME certificate upload failed. Please attach it from the Documents tab."
+          : "Company created successfully!",
+        certUploadFailed ? "warning" : "success"
+      );
       fetchCompanyData();
       setPageDrawer(null);
     } catch (error) {
@@ -382,6 +478,106 @@ const CreateCompany = ({ pageTabValue, setPageDrawer, fetchCompanyData }) => {
             }
             label="Partner"
           />
+          {formData.isVendor && (
+            <div className="MsmeCertifiedRow">
+              <div className="MsmeCertifiedInline">
+                <FormLabel component="legend" className="MsmeCertifiedLabel">
+                  Is it MSME certified?
+                </FormLabel>
+                <RadioGroup
+                  row
+                  name="isMsmeCertified"
+                  value={
+                    formData.isMsmeCertified === true
+                      ? "yes"
+                      : formData.isMsmeCertified === false
+                      ? "no"
+                      : ""
+                  }
+                  onChange={handleMsmeCertifiedChange}
+                >
+                  <FormControlLabel
+                    value="yes"
+                    control={<Radio />}
+                    label="Yes"
+                    disabled={!canModifyVendors}
+                  />
+                  <FormControlLabel
+                    value="no"
+                    control={<Radio />}
+                    label="No"
+                    disabled={!canModifyVendors}
+                  />
+                </RadioGroup>
+              </div>
+              {formData.isMsmeCertified === true && (
+                <div className="MsmeCertificateUpload">
+                  {!msmeCertificateFile ? (
+                    <Button
+                      component="label"
+                      variant="outlined"
+                      size="small"
+                      startIcon={<AttachFileIcon />}
+                      disabled={!canModifyVendors}
+                      className={`MsmeUploadButton${
+                        formErrors.msmeCertificate ? " error" : ""
+                      }`}
+                    >
+                      Upload Certificate *
+                      <input
+                        type="file"
+                        hidden
+                        accept={MSME_CERTIFICATE_ACCEPT}
+                        onChange={handleMsmeCertificateFileChange}
+                      />
+                    </Button>
+                  ) : (
+                    <div className="MsmeFileChip">
+                      <InsertDriveFileIcon className="MsmeFileChipIcon" />
+                      <Tooltip title={msmeCertificateFile.name}>
+                        <span className="MsmeFileChipName">
+                          {msmeCertificateFile.name}
+                        </span>
+                      </Tooltip>
+                      <span className="MsmeFileChipSize">
+                        {formatFileSize(msmeCertificateFile.size)}
+                      </span>
+                      <Button
+                        component="label"
+                        size="small"
+                        className="MsmeFileChipAction"
+                        disabled={!canModifyVendors}
+                      >
+                        Replace
+                        <input
+                          type="file"
+                          hidden
+                          accept={MSME_CERTIFICATE_ACCEPT}
+                          onChange={handleMsmeCertificateFileChange}
+                        />
+                      </Button>
+                      <Tooltip title="Remove">
+                        <IconButton
+                          size="small"
+                          className="MsmeFileChipRemove"
+                          onClick={handleMsmeCertificateRemove}
+                          aria-label="Remove MSME certificate"
+                          disabled={!canModifyVendors}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  )}
+                  {formErrors.msmeCertificate && (
+                    <div className="MsmeCertificateError">
+                      {formErrors.msmeCertificate}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div className="CreateFlyoutFooter">
