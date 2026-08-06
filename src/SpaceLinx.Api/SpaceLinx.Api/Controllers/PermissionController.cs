@@ -50,7 +50,7 @@ public class PermissionController(SpaceLinxContext spaceLinxContext, IMapper map
     public async Task<IActionResult> DeletePermission(string permissionName)
     {
         var permission = await spaceLinxContext.Permissions
-            .FirstOrDefaultAsync(p => p.Name == permissionName);
+            .FirstOrDefaultAsync(p => p.Name == permissionName && p.DeletedAt == null);
 
         if (permission == null)
         {

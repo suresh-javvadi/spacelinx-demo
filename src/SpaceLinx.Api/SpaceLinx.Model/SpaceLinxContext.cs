@@ -4411,7 +4411,9 @@ public partial class SpaceLinxContext : DbContext
 
             entity.ToTable("permission", "application");
 
-            entity.HasIndex(e => e.Name, "permission_name_key").IsUnique();
+            entity.HasIndex(e => new { e.Name, e.DeletedAt }, "permission_name_deleted_at_key")
+                .IsUnique()
+                .AreNullsDistinct(false);
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")

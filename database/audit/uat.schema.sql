@@ -7618,11 +7618,11 @@ ALTER TABLE ONLY application.organization
 
 
 --
--- Name: permission permission_name_key; Type: CONSTRAINT; Schema: application; Owner: -
+-- Name: permission permission_name_deleted_at_key; Type: CONSTRAINT; Schema: application; Owner: -
 --
 
 ALTER TABLE ONLY application.permission
-    ADD CONSTRAINT permission_name_key UNIQUE (name);
+    ADD CONSTRAINT permission_name_deleted_at_key UNIQUE NULLS NOT DISTINCT (name, deleted_at);
 
 
 --
