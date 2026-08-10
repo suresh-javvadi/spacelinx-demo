@@ -38,6 +38,7 @@ public class InventoryStockController(SpaceLinxContext spaceLinxContext, IMapper
                 // cast to the int read model is lossless (no fractional component can occur).
                 QtyAvailable = (int)(x.QtyAvailable ?? 0),
                 QtyReserved = x.QtyReserved ?? 0,
+                QtyIssued = x.QtyIssued ?? 0,
                 QtyConsumed = x.QtyConsumed ?? 0,
                 QtyQcPending = x.QtyQcPending ?? 0,
                 QtyQcFailed = x.QtyQcFailed ?? 0,

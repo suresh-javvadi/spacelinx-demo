@@ -21,11 +21,7 @@ import { fetchOptionSetByName } from "../../../services/optionSetService";
 import { fetchVendors } from "../../../services/companyService";
 import { fetchProjectsLookup } from "../../../services/projectService";
 import { showConfirmation } from "../../../Components/ConfirmationDialog/ConfirmationDialog";
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from "@mui/material";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const NewStockMovements = ({
@@ -183,15 +179,46 @@ const NewStockMovements = ({
     }, 0);
   };
 
+  // The quantity a lot can actually be moved for under the given movement
+  // type — mirrors the write-path checks in StockMovementService, not just
+  // InventoryPartController.GetTrackingIdsAsync's (looser) read predicate.
+  // ProcessIssue rejects on QtyAvailable alone, so Issued stays available-only
+  // here even though the read endpoint also offers reserved-only lots for it
+  // — offering a lot the write path always rejects would be a dead end.
+  // Movement type unknown (not yet chosen) falls back to the strictest rule
+  // (qtyAvailable only) to stay conservative.
+  const getUsableQtyForMovement = (row, movementTypeName) => {
+    const available = row?.qtyAvailable ?? row?.qtyOnhand ?? 0;
+    const reserved = row?.qtyReserved ?? 0;
+    const issued = row?.qtyIssued ?? 0;
+    const qcFailed = row?.qtyQcFailed ?? 0;
+
+    switch (movementTypeName) {
+      case "Consumed":
+        return available + reserved + issued;
+      case "VendorReturn":
+      case "Scrap":
+        return available + reserved + issued + qcFailed;
+      case "Issued":
+      case "Reserved":
+      case "Adjustment":
+      default:
+        return available;
+    }
+  };
+
+  const isRowUsableForMovement = (row, movementTypeName) =>
+    getUsableQtyForMovement(row, movementTypeName) > 0;
+
   // Available quantity for a specific tracking ID = that inventory_stock row's
-  // own quantity (NOT the part's aggregate across all tracking IDs). Untracked
-  // (None) rows use their stock row's quantity.
+  // own usable quantity (NOT the part's aggregate across all tracking IDs).
+  // Untracked (None) rows use their stock row's quantity.
   const getTrackingAvailableQty = (partId, trackingId) => {
     const rows = stockData.filter((s) => s.partId === partId);
     const row = trackingId
       ? rows.find((s) => s.trackingId === trackingId)
       : rows.find((s) => !s.trackingId) || rows[0];
-    return row ? (row.qtyAvailable ?? row.qtyOnhand ?? 0) : 0;
+    return row ? getUsableQtyForMovement(row, formData.movementType?.name) : 0;
   };
 
   useEffect(() => {
@@ -482,8 +509,15 @@ const NewStockMovements = ({
     );
     const stockMatch =
       partStockRows.find(
-        (s) => s.trackingId && !usedTrackingIds.has(s.trackingId),
-      ) || partStockRows[0];
+        (s) =>
+          s.trackingId &&
+          !usedTrackingIds.has(s.trackingId) &&
+          isRowUsableForMovement(s, formData.movementType?.name),
+      ) ||
+      partStockRows.find((s) =>
+        isRowUsableForMovement(s, formData.movementType?.name),
+      ) ||
+      partStockRows[0];
 
     let trackingTypeStr = "None";
     const rawTrackingType =
@@ -536,8 +570,26 @@ const NewStockMovements = ({
         : null) ||
       (parentHistory && parentHistory.length > 0 ? parentHistory[0] : null);
 
-    const parentQtyAvailable = stockMatch
-      ? (stockMatch.qtyAvailable ?? stockMatch.qtyOnhand ?? 0)
+    // Identity comes from the stock row (trackingNo), not from purchase
+    // history — parentMatch is used below only for PO/GRN metadata. A lot
+    // created outside a GRN (adjustment, opening balance) legitimately has no
+    // purchase history match, and falling back to parentHistory[0]'s tracking
+    // ID here would attach stockMatch's bin/qty to a different, unrelated lot.
+    const matchedTrackingId = trackingNo || "";
+
+    // Only treat the matched lot as usable when it actually has movement-type
+    // appropriate stock, and (for Serial/Batch parts) isn't already claimed by
+    // another line item. Otherwise leave the row blank rather than auto-selecting
+    // — or leaking bin/qty from — an exhausted or already-used lot.
+    const isUsableStock = stockMatch
+      ? isRowUsableForMovement(stockMatch, formData.movementType?.name)
+      : false;
+    const isTrackingClaimedElsewhere =
+      !!matchedTrackingId && usedTrackingIds.has(matchedTrackingId);
+    const canUseStockMatch = isUsableStock && !isTrackingClaimedElsewhere;
+
+    const parentQtyAvailable = canUseStockMatch
+      ? getUsableQtyForMovement(stockMatch, formData.movementType?.name)
       : 0;
 
     const newEntry = {
@@ -545,17 +597,17 @@ const NewStockMovements = ({
       uniqueId: uniqueId,
       issueQuantity: isSerial && parentQtyAvailable > 0 ? 1 : "",
       trackingType: trackingTypeStr,
-      trackingNumber: usedTrackingIds.has(parentMatch?.trackingId || trackingNo)
-        ? ""
-        : parentMatch?.trackingId || trackingNo || "",
+      trackingNumber: canUseStockMatch ? matchedTrackingId : "",
       poNumber: parentMatch?.poNumber || "---",
       poQty: parentMatch?.receivedQuantity ?? null,
       grnNumber: parentMatch?.grnNumber || "---",
       remarks: "",
       qtyAvailable: parentQtyAvailable,
-      quantity: stockMatch ? (stockMatch.qtyOnhand ?? 0) : 0,
-      binId: stockMatch ? stockMatch.binId : formData?.bin?.binId || null,
-      binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
+      quantity: canUseStockMatch ? (stockMatch.qtyOnhand ?? 0) : 0,
+      binId: canUseStockMatch ? stockMatch.binId : formData?.bin?.binId || null,
+      binCode: canUseStockMatch
+        ? stockMatch.binCode
+        : formData?.bin?.binCode || "",
     };
 
     setSelectedStockItems((prev) => [...prev, newEntry]);
@@ -1105,9 +1157,28 @@ const NewStockMovements = ({
           .filter(Boolean);
 
         const filteredOptions = finalOptions.filter((opt) => {
+          // Keep the currently selected value
           if (opt.value === row.trackingNumber) return true;
 
-          return !selectedForPart.includes(opt.value);
+          // Already selected in another row
+          if (selectedForPart.includes(opt.value)) return false;
+
+          // This tracking ID's stock, aggregated across every bin in the
+          // current location's snapshot (a batch lot can span multiple bins).
+          const rows = stockData.filter(
+            (s) => s.partId === row.partId && s.trackingId === opt.value,
+          );
+
+          // Not present in this location's stock snapshot (e.g. the lot lives
+          // at a different location). The tracking-ids endpoint already
+          // scoped this option to the part + movement type server-side, so
+          // don't hide it based on a snapshot that was never location-aware.
+          if (rows.length === 0) return true;
+
+          // Hide only truly exhausted tracking IDs, per movement type rules
+          return rows.some((s) =>
+            isRowUsableForMovement(s, formData.movementType?.name),
+          );
         });
 
         const selectedOption =
@@ -1311,250 +1382,256 @@ const NewStockMovements = ({
                 <h3>Enter The Details</h3>
               </AccordionSummary>
               <AccordionDetails
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-             }}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
               >
+                {initialParts.length > 0 && formData.movementType === null && (
+                  <div className="sm-preselect-callout">
+                    <ion-icon name="layers-outline" class="sm-preselect-icon" />
+                    <div className="sm-preselect-text">
+                      <span className="sm-preselect-count">
+                        {initialParts.length} part
+                        {initialParts.length > 1 ? "s" : ""}
+                      </span>
+                      <span className="sm-preselect-hint">
+                        {" "}
+                        from inventory ready to add. Select a{" "}
+                        <strong>Movement Type</strong> to continue.
+                      </span>
+                    </div>
+                  </div>
+                )}
 
-            {initialParts.length > 0 && formData.movementType === null && (
-              <div className="sm-preselect-callout">
-                <ion-icon name="layers-outline" class="sm-preselect-icon" />
-                <div className="sm-preselect-text">
-                  <span className="sm-preselect-count">
-                    {initialParts.length} part
-                    {initialParts.length > 1 ? "s" : ""}
-                  </span>
-                  <span className="sm-preselect-hint">
-                    {" "}
-                    from inventory ready to add. Select a{" "}
-                    <strong>Movement Type</strong> to continue.
-                  </span>
+                {/* <div className="stock-form-grid"> */}
+                <div className="GrnNewFlyoutContentTop">
+                  <Autocomplete
+                    options={movementTypes}
+                    value={formData?.movementType}
+                    getOptionLabel={(o) => o.name || ""}
+                    onChange={(_, v) => handleUpdateField("movementType", v)}
+                    renderInput={(p) => (
+                      <TextField
+                        {...p}
+                        label="Movement Type"
+                        fullWidth
+                        required
+                        error={!!formErrors.movementType}
+                        helperText={formErrors.movementType}
+                      />
+                    )}
+                  />
+                  <Autocomplete
+                    options={locationsData}
+                    value={formData?.fromLocation}
+                    loading={loadingLocationData}
+                    loadingText="Loading Locations..."
+                    getOptionLabel={(o) => o.name || ""}
+                    onChange={(_, v) => handleUpdateField("fromLocation", v)}
+                    renderInput={(p) => (
+                      <TextField
+                        {...p}
+                        label="Location"
+                        fullWidth
+                        required
+                        error={!!formErrors.fromLocation}
+                        helperText={formErrors.fromLocation}
+                      />
+                    )}
+                  />
                 </div>
-              </div>
-            )}
-
-            {/* <div className="stock-form-grid"> */}
-            <div className="GrnNewFlyoutContentTop">
-              <Autocomplete
-                options={movementTypes}
-                value={formData?.movementType}
-                getOptionLabel={(o) => o.name || ""}
-                onChange={(_, v) => handleUpdateField("movementType", v)}
-                renderInput={(p) => (
-                  <TextField
-                    {...p}
-                    label="Movement Type"
-                    fullWidth
-                    required
-                    error={!!formErrors.movementType}
-                    helperText={formErrors.movementType}
+                <div className="GrnNewFlyoutContentTop">
+                  <Autocomplete
+                    options={projects}
+                    value={formData?.project}
+                    loading={loadingProjects}
+                    loadingText="Loading Projects..."
+                    getOptionLabel={(o) => `${o.projectCode} - ${o.name}` || ""}
+                    onChange={(_, v) => handleUpdateField("project", v)}
+                    renderInput={(p) => (
+                      <TextField {...p} label="Project" fullWidth />
+                    )}
                   />
-                )}
-              />
-              <Autocomplete
-                options={locationsData}
-                value={formData?.fromLocation}
-                loading={loadingLocationData}
-                loadingText="Loading Locations..."
-                getOptionLabel={(o) => o.name || ""}
-                onChange={(_, v) => handleUpdateField("fromLocation", v)}
-                renderInput={(p) => (
-                  <TextField
-                    {...p}
-                    label="Location"
-                    fullWidth
-                    required
-                    error={!!formErrors.fromLocation}
-                    helperText={formErrors.fromLocation}
+                  <Autocomplete
+                    options={subSystemOptions}
+                    value={formData?.subSystem}
+                    onChange={(_, v) => handleUpdateField("subSystem", v)}
+                    renderInput={(p) => (
+                      <TextField {...p} label="Sub System" fullWidth />
+                    )}
                   />
-                )}
-              />
-            </div>
-            <div className="GrnNewFlyoutContentTop">
-              <Autocomplete
-                options={projects}
-                value={formData?.project}
-                loading={loadingProjects}
-                loadingText="Loading Projects..."
-                getOptionLabel={(o) => `${o.projectCode} - ${o.name}` || ""}
-                onChange={(_, v) => handleUpdateField("project", v)}
-                renderInput={(p) => (
-                  <TextField {...p} label="Project" fullWidth />
-                )}
-              />
-              <Autocomplete
-                options={subSystemOptions}
-                value={formData?.subSystem}
-                onChange={(_, v) => handleUpdateField("subSystem", v)}
-                renderInput={(p) => (
-                  <TextField {...p} label="Sub System" fullWidth />
-                )}
-              />
-            </div>
-            <div className="GrnNewFlyoutContentTop">
-              <Autocomplete
-                options={classificationOptions}
-                value={formData?.classification}
-                onChange={(_, v) => handleUpdateField("classification", v)}
-                renderInput={(p) => (
-                  <TextField {...p} label="Classification" fullWidth />
-                )}
-              />
-              <Autocomplete
-                options={
-                  platformPayloadSdrOptionsByClassification[
-                    formData?.classification
-                  ] || []
-                }
-                value={formData?.platformPayloadSdr}
-                disabled={!formData?.classification}
-                onChange={(_, v) => handleUpdateField("platformPayloadSdr", v)}
-                renderInput={(p) => (
-                  <TextField
-                    {...p}
-                    label="Platform / Payload / SDR"
-                    fullWidth
+                </div>
+                <div className="GrnNewFlyoutContentTop">
+                  <Autocomplete
+                    options={classificationOptions}
+                    value={formData?.classification}
+                    onChange={(_, v) => handleUpdateField("classification", v)}
+                    renderInput={(p) => (
+                      <TextField {...p} label="Classification" fullWidth />
+                    )}
                   />
-                )}
-              />
-            </div>
-            {formData.movementType?.name === "Issued" && (
-              <div className="GrnNewFlyoutContentTop">
-                <Autocomplete
-                  options={issuePurposes}
-                  value={formData?.issuePurpose}
-                  loading={loadingIssuePurposes}
-                  loadingText="Loading Issue Purposes..."
-                  getOptionLabel={(o) => o.name || ""}
-                  isOptionEqualToValue={(o, v) => o.name === v?.name}
-                  onChange={(_, v) => handleUpdateField("issuePurpose", v)}
-                  renderInput={(p) => (
-                    <TextField {...p} label="Issue Purpose" fullWidth />
-                  )}
-                />
-                <Autocomplete
-                  options={companies}
-                  value={formData?.company}
-                  loading={loadingCompanies}
-                  loadingText="Loading Companies..."
-                  getOptionLabel={(o) => o.name || ""}
-                  isOptionEqualToValue={(o, v) => o.id === v?.id}
-                  onChange={(_, v) => handleUpdateField("company", v)}
-                  renderInput={(p) => (
-                    <TextField {...p} label="Company" fullWidth />
-                  )}
-                />
-              </div>
-            )}
-            <div className="GrnNewFlyoutContentTop">
-              <TextField
-                type="date"
-                label="Transaction Date"
-                value={formData?.movementDate}
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                onChange={(e) =>
-                  handleUpdateField("movementDate", e.target.value)
-                }
-                required
-                error={!!formErrors.movementDate}
-                helperText={formErrors.movementDate}
-              />
-              <TextField
-                type="date"
-                label="Expected Return Date"
-                value={formData?.expectedReturnDate}
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                onChange={(e) => handleExpectedReturnDateChange(e.target.value)}
-                error={!!formErrors.expectedReturnDate}
-                helperText={formErrors.expectedReturnDate}
-              />
-            </div>
-
-            <div className="GrnNewFlyoutContentTop">
-              <TextField
-                label="Reason"
-                value={formData?.reason}
-                fullWidth
-                multiline
-                rows={3}
-                onChange={(e) => handleUpdateField("reason", e.target.value)}
-                required
-                error={!!formErrors.reason}
-                helperText={formErrors.reason}
-              />
-
-              <TextField
-                label="Notes"
-                value={formData?.description}
-                multiline
-                rows={3}
-                fullWidth
-                onChange={(e) =>
-                  handleUpdateField("description", e.target.value)
-                }
-              />
-            </div>
-            <div className="stock-or-required-group">
-              <label
-                className={`stock-or-required-label ${
-                  formErrors.responsiblePerson || formErrors.department
-                    ? "error"
-                    : ""
-                }`}
-              >
-                Responsible Person / Department{" "}
-                <span className="required">*</span>
-              </label>
-              </div>
-              <div className="GrnNewFlyoutContentTop">
-                <Autocomplete
-                  options={staffData}
-                  value={formData?.responsiblePerson}
-                  loading={loadingStaffData}
-                  getOptionLabel={(o) => `${o.firstName} ${o.lastName}` || ""}
-                  isOptionEqualToValue={(o, v) => o.id === v.id}
-                  onChange={(_, v) => handleUpdateField("responsiblePerson", v)}
-                  renderOption={(props, option) => (
-                    <li {...props} key={option.id}>
-                      {`${option.firstName} ${option.lastName}`}
-                    </li>
-                  )}
-                  renderInput={(p) => (
-                    <TextField
-                      {...p}
-                      label="Responsible Person"
-                      error={!!formErrors.responsiblePerson}
+                  <Autocomplete
+                    options={
+                      platformPayloadSdrOptionsByClassification[
+                        formData?.classification
+                      ] || []
+                    }
+                    value={formData?.platformPayloadSdr}
+                    disabled={!formData?.classification}
+                    onChange={(_, v) =>
+                      handleUpdateField("platformPayloadSdr", v)
+                    }
+                    renderInput={(p) => (
+                      <TextField
+                        {...p}
+                        label="Platform / Payload / SDR"
+                        fullWidth
+                      />
+                    )}
+                  />
+                </div>
+                {formData.movementType?.name === "Issued" && (
+                  <div className="GrnNewFlyoutContentTop">
+                    <Autocomplete
+                      options={issuePurposes}
+                      value={formData?.issuePurpose}
+                      loading={loadingIssuePurposes}
+                      loadingText="Loading Issue Purposes..."
+                      getOptionLabel={(o) => o.name || ""}
+                      isOptionEqualToValue={(o, v) => o.name === v?.name}
+                      onChange={(_, v) => handleUpdateField("issuePurpose", v)}
+                      renderInput={(p) => (
+                        <TextField {...p} label="Issue Purpose" fullWidth />
+                      )}
                     />
-                  )}
-                />
- 
-                <Autocomplete
-                  options={departments}
-                  value={formData?.department}
-                  loading={loadingDepartments}
-                  getOptionLabel={(o) => o.name || ""}
-                  onChange={(_, v) => handleUpdateField("department", v)}
-                  renderInput={(p) => (
-                    <TextField
-                      {...p}
-                      label="Department"
-                      error={!!formErrors.department}
+                    <Autocomplete
+                      options={companies}
+                      value={formData?.company}
+                      loading={loadingCompanies}
+                      loadingText="Loading Companies..."
+                      getOptionLabel={(o) => o.name || ""}
+                      isOptionEqualToValue={(o, v) => o.id === v?.id}
+                      onChange={(_, v) => handleUpdateField("company", v)}
+                      renderInput={(p) => (
+                        <TextField {...p} label="Company" fullWidth />
+                      )}
                     />
-                  )}
-                />
-              </div>
+                  </div>
+                )}
+                <div className="GrnNewFlyoutContentTop">
+                  <TextField
+                    type="date"
+                    label="Transaction Date"
+                    value={formData?.movementDate}
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                    onChange={(e) =>
+                      handleUpdateField("movementDate", e.target.value)
+                    }
+                    required
+                    error={!!formErrors.movementDate}
+                    helperText={formErrors.movementDate}
+                  />
+                  <TextField
+                    type="date"
+                    label="Expected Return Date"
+                    value={formData?.expectedReturnDate}
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                    onChange={(e) =>
+                      handleExpectedReturnDateChange(e.target.value)
+                    }
+                    error={!!formErrors.expectedReturnDate}
+                    helperText={formErrors.expectedReturnDate}
+                  />
+                </div>
 
-              {(formErrors.responsiblePerson || formErrors.department) && (
-                <FormHelperText error>
-                  Either Responsible Person or Department is required
-                </FormHelperText>
-              )}
-              
-            </AccordionDetails>
+                <div className="GrnNewFlyoutContentTop">
+                  <TextField
+                    label="Reason"
+                    value={formData?.reason}
+                    fullWidth
+                    multiline
+                    rows={3}
+                    onChange={(e) =>
+                      handleUpdateField("reason", e.target.value)
+                    }
+                    required
+                    error={!!formErrors.reason}
+                    helperText={formErrors.reason}
+                  />
+
+                  <TextField
+                    label="Notes"
+                    value={formData?.description}
+                    multiline
+                    rows={3}
+                    fullWidth
+                    onChange={(e) =>
+                      handleUpdateField("description", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="stock-or-required-group">
+                  <label
+                    className={`stock-or-required-label ${
+                      formErrors.responsiblePerson || formErrors.department
+                        ? "error"
+                        : ""
+                    }`}
+                  >
+                    Responsible Person / Department{" "}
+                    <span className="required">*</span>
+                  </label>
+                </div>
+                <div className="GrnNewFlyoutContentTop">
+                  <Autocomplete
+                    options={staffData}
+                    value={formData?.responsiblePerson}
+                    loading={loadingStaffData}
+                    getOptionLabel={(o) => `${o.firstName} ${o.lastName}` || ""}
+                    isOptionEqualToValue={(o, v) => o.id === v.id}
+                    onChange={(_, v) =>
+                      handleUpdateField("responsiblePerson", v)
+                    }
+                    renderOption={(props, option) => (
+                      <li {...props} key={option.id}>
+                        {`${option.firstName} ${option.lastName}`}
+                      </li>
+                    )}
+                    renderInput={(p) => (
+                      <TextField
+                        {...p}
+                        label="Responsible Person"
+                        error={!!formErrors.responsiblePerson}
+                      />
+                    )}
+                  />
+
+                  <Autocomplete
+                    options={departments}
+                    value={formData?.department}
+                    loading={loadingDepartments}
+                    getOptionLabel={(o) => o.name || ""}
+                    onChange={(_, v) => handleUpdateField("department", v)}
+                    renderInput={(p) => (
+                      <TextField
+                        {...p}
+                        label="Department"
+                        error={!!formErrors.department}
+                      />
+                    )}
+                  />
+                </div>
+
+                {(formErrors.responsiblePerson || formErrors.department) && (
+                  <FormHelperText error>
+                    Either Responsible Person or Department is required
+                  </FormHelperText>
+                )}
+              </AccordionDetails>
             </Accordion>
 
             <div className="LineItemsContainer">
