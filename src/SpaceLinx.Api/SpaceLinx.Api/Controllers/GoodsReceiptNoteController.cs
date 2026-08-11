@@ -69,7 +69,9 @@ public class GoodsReceiptNoteController(SpaceLinxContext spaceLinxContext, IMapp
             return BadRequest("Failed to create GRN. Please check the purchase order and received quantities.");
         }
 
-        return CreatedAtAction(nameof(Get), new { id = createdGrn.Id }, createdGrn);
+        var result = mapper.Map<GoodsReceiptNoteReadModel>(createdGrn);
+
+        return CreatedAtAction(nameof(Get), new { id = createdGrn.Id }, result);
     }
 
     [HttpPut("grn-details-update/{id}")]

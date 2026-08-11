@@ -47,7 +47,6 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                     }
 
                     poLine.PendingQuantity = pendingQty;
-                    await spaceLinxContext.SaveChangesAsync();
                 }
             }
 
@@ -75,9 +74,17 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
             var grnLineEntities = new List<GrnLineItem>();
             var partCache = new Dictionary<(Guid, Guid?, Guid?), InventoryPart>();
 
+            // Batch-load parts referenced by the line items instead of querying per item
+            var requestPartIds = request.LineItems.Select(i => i.PartId).Distinct().ToList();
+            var partsById = (await spaceLinxContext.Parts
+                .Where(p => requestPartIds.Contains(p.Id!.Value))
+                .ToListAsync())
+                .ToDictionary(p => p.Id!.Value);
+
+            // Normalize tracking fields per item first (needs only the batch-loaded parts, no DB calls)
             foreach (var item in request.LineItems)
             {
-                var itemPart = await spaceLinxContext.Parts.FindAsync(item.PartId);
+                partsById.TryGetValue(item.PartId, out var itemPart);
                 var isGoodsOrService = itemPart != null && (itemPart.ItemType == "Goods" || itemPart.ItemType == "Services");
 
                 if (isGoodsOrService)
@@ -101,7 +108,23 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                 {
                     item.TrackingId = null;
                 }
+            }
 
+            // Batch-load inventory stock/part rows referenced by the (now normalized) line items
+            var stockLookup = (await spaceLinxContext.InventoryStocks
+                .Where(s => requestPartIds.Contains(s.PartId) && s.DeletedBy == null)
+                .ToListAsync())
+                .GroupBy(s => (s.PartId, s.TrackingId))
+                .ToDictionary(g => g.Key, g => g.First());
+
+            var inventoryPartLookup = (await spaceLinxContext.InventoryParts
+                .Where(p => requestPartIds.Contains(p.PartId) && p.LocationId == request.LocationId && p.BinId == null && p.DeletedBy == null)
+                .ToListAsync())
+                .GroupBy(p => p.PartId)
+                .ToDictionary(g => g.Key, g => g.First());
+
+            foreach (var item in request.LineItems)
+            {
                 var grnLineItem = new GrnLineItem
                 {
                     GrnId = grnEntity.Id.Value,
@@ -130,13 +153,14 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                     poLineToUpdate.UpdatedAt = DateTime.UtcNow;
                 }
 
-                var stock = await spaceLinxContext.InventoryStocks
-                    .FirstOrDefaultAsync(s => s.PartId == item.PartId && s.TrackingId == item.TrackingId && s.DeletedBy == null);
+                stockLookup.TryGetValue((item.PartId, item.TrackingId), out var stock);
 
                 var partKey = (item.PartId, request.LocationId, (Guid?)null);
                 partCache.TryGetValue(partKey, out var part);
-                part ??= await spaceLinxContext.InventoryParts
-                    .FirstOrDefaultAsync(p => p.PartId == item.PartId && p.LocationId == request.LocationId && p.BinId == null && p.DeletedBy == null);
+                if (part == null)
+                {
+                    inventoryPartLookup.TryGetValue(item.PartId, out part);
+                }
 
                 var qty = item.ReceivedQuantity ?? 0;
                 var poLineItem = purchaseOrder?.PoLineItems.FirstOrDefault(l => l.Id == item.PoLineItemId);
@@ -168,6 +192,7 @@ public class GoodsReceiptNoteService(SpaceLinxContext spaceLinxContext, IMapper 
                         IsActive = true
                     };
                     spaceLinxContext.InventoryStocks.Add(stock);
+                    stockLookup[(item.PartId, item.TrackingId)] = stock;
                 }
 
                 if (part != null)
