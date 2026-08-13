@@ -15,6 +15,34 @@ namespace SpaceLinx.Api.Controllers;
 public class PermissionController(SpaceLinxContext spaceLinxContext, IMapper mapper, IHttpContextAccessor httpContextAccessor, IUserService userService) :
     GenericRestController<Permission, PermissionWriteModel, PermissionUpdateModel, PermissionReadModel, PermissionRefModel>(spaceLinxContext, mapper, httpContextAccessor)
 {
+    [HttpPost]
+    public override async Task<IActionResult> Post(PermissionWriteModel newRecord)
+    {
+        var nameExists = await spaceLinxContext.Permissions
+            .AnyAsync(p => p.Name == newRecord.Name && p.DeletedAt == null);
+
+        if (nameExists)
+        {
+            return Conflict($"Permission with name '{newRecord.Name}' already exists.");
+        }
+
+        return await base.Post(newRecord);
+    }
+
+    [HttpPut("{id}")]
+    public override async Task<IActionResult> Update(Guid id, PermissionUpdateModel updatedRecord)
+    {
+        var nameExists = await spaceLinxContext.Permissions
+            .AnyAsync(p => p.Name == updatedRecord.Name && p.Id != id && p.DeletedAt == null);
+
+        if (nameExists)
+        {
+            return Conflict($"Permission with name '{updatedRecord.Name}' already exists.");
+        }
+
+        return await base.Update(id, updatedRecord);
+    }
+
     [HttpPut("permission-update/{id}")]
     public async Task<IActionResult> UpdatePermission(Guid id, string permissionName)
     {
@@ -24,6 +52,14 @@ public class PermissionController(SpaceLinxContext spaceLinxContext, IMapper map
         if (permission == null)
         {
             return NotFound($"Permission with ID {id} not found.");
+        }
+
+        var nameExists = await spaceLinxContext.Permissions
+            .AnyAsync(p => p.Name == permissionName && p.Id != id && p.DeletedAt == null);
+
+        if (nameExists)
+        {
+            return Conflict($"Permission with name '{permissionName}' already exists.");
         }
 
         var rolePermissions = await spaceLinxContext.RolePermissions

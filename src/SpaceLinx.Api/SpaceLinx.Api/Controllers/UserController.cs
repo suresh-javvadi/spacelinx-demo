@@ -20,7 +20,7 @@ public class UserController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
     public async Task<IActionResult> GetUser()
     {
         var user = await spaceLinxContext.Users.AsNoTracking()
-                    .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName))
+                    .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                     .ThenInclude(x => x.Role)
                     .ThenInclude(x => x.RolePermissions)
                     .FirstOrDefaultAsync(x => x.Email.ToLower() == UserEmail && x.DeletedBy == null);
@@ -37,7 +37,7 @@ public class UserController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
     public async Task<IActionResult> GetUsersByApp(Guid applicationId)
     {
         var users = await spaceLinxContext.Users.AsNoTracking()
-                           .Include(x => x.UserRoles.Where(ur => ur.Role.AppId == applicationId))
+                           .Include(x => x.UserRoles.Where(ur => ur.Role.AppId == applicationId && ur.DeletedBy == null))
                            .ThenInclude(x => x.Role)
                            .Where(x => x.DeletedBy == null && x.UserRoles.Any(ur => ur.Role.AppId == applicationId && ur.DeletedBy == null))
                            .ToListAsync();
@@ -50,7 +50,7 @@ public class UserController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
     {
         var users = await spaceLinxContext.Users.AsNoTracking()
                            .Include(x => x.DepartmentRef)
-                           .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName))
+                           .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                            .ThenInclude(x => x.Role)
                            .Where(x => x.DeletedBy == null && x.UserRoles.Any(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                            .ToListAsync();
@@ -62,7 +62,7 @@ public class UserController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
     public async Task<IActionResult> GetUserByEmail(string email)
     {
         var user = await spaceLinxContext.Users.AsNoTracking()
-                    .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName))
+                    .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                     .ThenInclude(x => x.Role)
                     .ThenInclude(x => x.RolePermissions)
                     .Where(x => x.DeletedBy == null && x.UserRoles.Any(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
@@ -82,7 +82,7 @@ public class UserController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
     public async Task<List<UserDetailWithUserRoleReadModel>> GetUsersWithRoles()
     {
         var users = await spaceLinxContext.Users.AsNoTracking()
-                        .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName))
+                        .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                         .ThenInclude(x => x.Role)
                         .Where(x => x.DeletedBy == null)
                         .ToListAsync();
@@ -196,7 +196,7 @@ public class UserController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
             var recordFromDatabase = await spaceLinxContext.Users
                             .Include(x => x.UserRoles)
                             .ThenInclude(ur => ur.Role)
-                            .SingleAsync(x => x.Id == id && x.DeletedBy == null);
+                            .SingleOrDefaultAsync(x => x.Id == id && x.DeletedBy == null);
 
             var app = await spaceLinxContext.Apps
             .Where(x => x.AppName == AppName && x.DeletedBy == null)
@@ -213,39 +213,83 @@ public class UserController(SpaceLinxContext spaceLinxContext, IMapper mapper, I
             recordFromDatabase.UpdatedBy = UserEmail;
             recordFromDatabase.UpdatedAt = DateTime.UtcNow;
 
-            var rolesToRemove = recordFromDatabase.UserRoles
+            var requestedIds = updatedRecord.Roles
+                                .Where(r => r?.Id is Guid roleId && roleId != Guid.Empty)
+                                .Select(r => r.Id!.Value)
+                                .Distinct()
+                                .ToList();
+
+            // Trust the database, not the client-supplied AppId: only roles that really
+            // belong to the app this request came from may be assigned here.
+            var requestedRoleIds = await spaceLinxContext.Roles
+                                .Where(r => requestedIds.Contains(r.Id.Value) && r.AppId == app.Id && r.DeletedBy == null)
+                                .Select(r => r.Id.Value)
+                                .ToListAsync();
+
+            // Scope every change to this app — a user's roles in other apps must survive
+            // an edit made from this one.
+            var currentAppRoles = recordFromDatabase.UserRoles
                                 .Where(ur => ur.Role.AppId == app.Id && ur.DeletedBy == null)
                                 .ToList();
-            foreach (var role in rolesToRemove)
+
+            foreach (var userRole in currentAppRoles.Where(ur => !requestedRoleIds.Contains(ur.RoleId)))
             {
-                recordFromDatabase.UserRoles.Remove(role);
+                userRole.IsDefault = false;
+                userRole.DeletedBy = UserEmail;
+                userRole.DeletedAt = DateTime.UtcNow;
+                userRole.UpdatedBy = UserEmail;
+                userRole.UpdatedAt = DateTime.UtcNow;
             }
 
-            recordFromDatabase.UserRoles.Clear();
-            foreach (var role in updatedRecord.Roles)
+            // Only add genuinely new assignments. Deleting and re-creating rows that are
+            // already there would discard IsDefault, which silently drops the user onto a
+            // different active role the next time they sign in.
+            foreach (var roleId in requestedRoleIds.Where(rid => currentAppRoles.All(ur => ur.RoleId != rid)))
             {
-                if (role?.Id != Guid.Empty && role.AppId == app.Id)
+                // Revive a previously soft-deleted row for this role instead of inserting a
+                // duplicate — there's no unique constraint on (user_id, role_id), so rows would
+                // otherwise pile up across repeated remove/re-add cycles.
+                var revivedRole = recordFromDatabase.UserRoles
+                    .FirstOrDefault(ur => ur.RoleId == roleId && ur.Role.AppId == app.Id && ur.DeletedBy != null);
+
+                if (revivedRole != null)
                 {
-                    var validRole = await spaceLinxContext.Roles
-                                        .Where(r => r.Id == role.Id && r.AppId == app.Id && r.DeletedBy == null)
-                                        .FirstOrDefaultAsync();
-
-                    if (validRole != null)
+                    revivedRole.IsActive = true;
+                    revivedRole.DeletedBy = null;
+                    revivedRole.DeletedAt = null;
+                    revivedRole.UpdatedBy = UserEmail;
+                    revivedRole.UpdatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    recordFromDatabase.UserRoles.Add(new UserRole
                     {
-                        var userRole = new UserRole
-                        {
-                            RoleId = role.Id.Value,
-                            UserId = id,
-                            IsActive = true,
-                            CreatedBy = UserEmail
-                        };
-
-                        recordFromDatabase.UserRoles.Add(userRole);
-                    }
+                        RoleId = roleId,
+                        UserId = id,
+                        IsActive = true,
+                        CreatedBy = UserEmail
+                    });
                 }
             }
 
             await spaceLinxContext.SaveChangesAsync();
+
+            // If the role that was flagged default has just been taken away, pin the
+            // lowest-numbered survivor rather than leaving the user with no default.
+            var survivingRoles = await spaceLinxContext.UserRoles
+                            .Include(ur => ur.Role)
+                            .Where(ur => ur.UserId == id && ur.DeletedBy == null && ur.Role.AppId == app.Id)
+                            .OrderBy(ur => ur.Role.RoleNumber)
+                            .ToListAsync();
+
+            if (survivingRoles.Count > 0 && survivingRoles.All(ur => !ur.IsDefault))
+            {
+                survivingRoles[0].IsDefault = true;
+                survivingRoles[0].UpdatedBy = UserEmail;
+                survivingRoles[0].UpdatedAt = DateTime.UtcNow;
+
+                await spaceLinxContext.SaveChangesAsync();
+            }
             await transaction.CommitAsync();
 
             var recordFromDb = await spaceLinxContext.Users

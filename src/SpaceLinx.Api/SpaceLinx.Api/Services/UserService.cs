@@ -11,10 +11,10 @@ public class UserService(SpaceLinxContext _spaceLinxContext, IHttpContextAccesso
     {
         var user = await _spaceLinxContext.Users
             .AsNoTracking()
-            .Include(u => u.UserRoles.Where(ur => ur.Role.Id == UserRoleId))
+            .Include(u => u.UserRoles.Where(ur => ur.Role.Id == UserRoleId && ur.DeletedBy == null))
             .ThenInclude(ur => ur.Role)
             .ThenInclude(r => r.RolePermissions)
-            .Include(u => u.UserRoles.Where(ur => ur.Role.Id == UserRoleId))
+            .Include(u => u.UserRoles.Where(ur => ur.Role.Id == UserRoleId && ur.DeletedBy == null))
             .ThenInclude(ur => ur.Role)
             .ThenInclude(r => r.RoleFilters)
             .FirstOrDefaultAsync(u => u.Email.ToLower() == UserEmail);
@@ -40,7 +40,7 @@ public class UserService(SpaceLinxContext _spaceLinxContext, IHttpContextAccesso
         var mappedUserDetail = mapper.Map<UserDetailReadModel>(user);
         userDetail = mappedUserDetail;
 
-        foreach (var userRole in user?.UserRoles ?? new List<UserRole>())
+        foreach (var userRole in (user?.UserRoles ?? new List<UserRole>()).Where(ur => ur.DeletedBy == null))
         {
             userDetail.Roles.Add(mapper.Map<RoleRefModel>(userRole.Role));
         }
@@ -53,10 +53,10 @@ public class UserService(SpaceLinxContext _spaceLinxContext, IHttpContextAccesso
         List<UserDetailReadModel> usersDetail = new List<UserDetailReadModel>(); 
         foreach (var user in users)
         {
-            var userDetail = mapper.Map<UserDetailReadModel>(user); 
-            foreach (var userRole in user?.UserRoles ?? new List<UserRole>()) 
+            var userDetail = mapper.Map<UserDetailReadModel>(user);
+            foreach (var userRole in (user?.UserRoles ?? new List<UserRole>()).Where(ur => ur.DeletedBy == null))
             {
-                userDetail.Roles.Add(mapper.Map<RoleRefModel>(userRole.Role)); 
+                userDetail.Roles.Add(mapper.Map<RoleRefModel>(userRole.Role));
             }
 
             usersDetail.Add(userDetail);
@@ -71,7 +71,7 @@ public class UserService(SpaceLinxContext _spaceLinxContext, IHttpContextAccesso
         foreach (var user in users)
         {
             var userDetail = mapper.Map<UserDetailWithUserRoleReadModel>(user);
-            foreach (var userRole in user?.UserRoles ?? new List<UserRole>())
+            foreach (var userRole in (user?.UserRoles ?? new List<UserRole>()).Where(ur => ur.DeletedBy == null))
             {
                 var roleModel = mapper.Map<RoleRefWithDefaultModel>(userRole.Role);
                 roleModel.IsDefault = userRole.IsDefault;
@@ -95,7 +95,7 @@ public class UserService(SpaceLinxContext _spaceLinxContext, IHttpContextAccesso
 
         foreach (var userRole in user?.UserRoles ?? new List<UserRole>())
         {
-            if (userRole.Role.AppId == app.Id)
+            if (userRole.Role.AppId == app.Id && userRole.DeletedBy == null)
             {
                 var roleRefModel = mapper.Map<RoleRefModel>(userRole.Role);
                 userDetail.Roles.Add(roleRefModel);

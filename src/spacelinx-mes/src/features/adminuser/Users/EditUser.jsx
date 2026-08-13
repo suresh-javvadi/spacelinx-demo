@@ -179,6 +179,9 @@ const EditUser = ({ handleCloseClick, selectedUserData, fetchUsersData }) => {
         firstName: formValues.firstName,
         lastName: formValues.lastName,
         email: formValues.email,
+        // There is no phone field on this form, but the update model carries one —
+        // omitting it maps null over the stored value and wipes it on every save.
+        phone: selectedUserData.phone ?? null,
         departmentId: formValues.departmentId || null,
         roles: updatedRoles,
         isActive: formValues.status === "Active",

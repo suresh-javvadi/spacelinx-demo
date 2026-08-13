@@ -19,7 +19,9 @@ public class BaseService(SpaceLinxContext _spaceLinxContext, IHttpContextAccesso
         }
 
         var userRoles = _spaceLinxContext.UserRoles
-                 .Where(x => x.User.Email.ToLower() == UserEmail)
+                 .Where(x => x.User.Email.ToLower() == UserEmail
+                          && x.DeletedBy == null
+                          && x.Role.DeletedBy == null)
                  .ToList();
 
         var defaultRole = userRoles.FirstOrDefault(x => x.IsDefault);

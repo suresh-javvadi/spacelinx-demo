@@ -19,7 +19,7 @@ public class AppController(SpaceLinxContext spaceLinxContext, IMapper mapper, IH
     public async Task<IActionResult> GetUsersByAppName()
     {
         var users = await spaceLinxContext.Users.AsNoTracking()
-                           .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName))
+                           .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                            .ThenInclude(x => x.Role)
                            .Where(x => x.UserRoles.Any(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                            .ToListAsync();

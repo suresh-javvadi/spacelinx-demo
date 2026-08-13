@@ -18,7 +18,7 @@ public class UserUaController(SpaceLinxContext spaceLinxContext, IMapper mapper,
     public async Task<IActionResult> CheckUserByEmail(string email)
     {
         var user = await spaceLinxContext.Users.AsNoTracking()
-                    .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName))
+                    .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                     .ThenInclude(x => x.Role)
                     .FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.DeletedBy == null);
 
@@ -35,7 +35,7 @@ public class UserUaController(SpaceLinxContext spaceLinxContext, IMapper mapper,
     public async Task<IActionResult> CheckUsersByEmailWithRoles(string email)
     {
         var user = await spaceLinxContext.Users.AsNoTracking()
-                        .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName))
+                        .Include(x => x.UserRoles.Where(ur => ur.Role.App.AppName == AppName && ur.DeletedBy == null))
                         .ThenInclude(x => x.Role)
                     .FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.DeletedBy == null);
 
