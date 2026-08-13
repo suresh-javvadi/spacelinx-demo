@@ -31,11 +31,7 @@ import { fetchProjectsLookup } from "../../../services/projectService";
 import { useUserContext } from "../../userContext/UserContext";
 import { PERMISSIONS } from "../../../constants/PagePermissions";
 import dayjs from "dayjs";
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from "@mui/material";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 const EditStockMovements = ({
   selectedMovement,
@@ -112,6 +108,13 @@ const EditStockMovements = ({
   const [purchaseHistoryCache, setPurchaseHistoryCache] = useState({});
   // In-flight request map to avoid redundant concurrent fetches for the same partId
   const purchaseHistoryInFlight = React.useRef({});
+  const selectionOrderRef = React.useRef(0);
+  const lineItemIdCounterRef = React.useRef(0);
+
+  const generateLineItemId = (partId) => {
+    lineItemIdCounterRef.current += 1;
+    return `${partId}-${Date.now()}-${lineItemIdCounterRef.current}`;
+  };
 
   const getPurchaseHistoryForPart = async (partId) => {
     if (purchaseHistoryCache[partId]) return purchaseHistoryCache[partId];
@@ -566,7 +569,8 @@ const EditStockMovements = ({
 
   const handleSelectItem = async (part) => {
     if (!part) return;
-
+    // Capture selection order immediately
+    const selectionOrder = selectionOrderRef.current++;
     // Fetch purchase history for parent part
     const parentHistory = await getPurchaseHistoryForPart(part.partId);
 
@@ -636,7 +640,7 @@ const EditStockMovements = ({
 
     const newEntry = {
       ...part,
-      uniqueId: `${part.partId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      uniqueId: generateLineItemId(part.partId),
       trackingType: trackingTypeObj,
       issueQuantity: isSerial && parentQtyAvailable > 0 ? 1 : "",
       trackingNumber: usedTrackingIds.has(parentMatch?.trackingId || trackingNo)
@@ -650,9 +654,12 @@ const EditStockMovements = ({
       quantity: parentQtyAvailable,
       binId: stockMatch ? stockMatch.binId : formData?.bin?.binId || null,
       binCode: stockMatch ? stockMatch.binCode : formData?.bin?.binCode || "",
+      selectionOrder: selectionOrder,
     };
 
-    setSelectedStockItems((prev) => [...prev, newEntry]);
+    setSelectedStockItems((prev) =>
+      [...prev, newEntry].sort((a, b) => a.selectionOrder - b.selectionOrder),
+    );
   };
 
   const handleIssueQuantityChange = (uniqueId, value) => {
@@ -1373,34 +1380,34 @@ const EditStockMovements = ({
       ) : !isDraft ? (
         <div className="GrnNewFlyoutTabPanel">
           <div className="GrnNewFlyoutContent StockMovementContainer">
-              <Accordion defaultExpanded>
-                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <h3>Stock Movement Details</h3>
-                          </AccordionSummary>
-                          <AccordionDetails
-                          sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 2,
-                         }}
-                          >
-            {/* MOVEMENT DETAILS CARD */}
-            <div className="grnDetailsCard">
-              {/* <h4 className="cardTitle">Stock Movement Details</h4> */}
+            <Accordion defaultExpanded>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <h3>Stock Movement Details</h3>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
+                {/* MOVEMENT DETAILS CARD */}
+                <div className="grnDetailsCard">
+                  {/* <h4 className="cardTitle">Stock Movement Details</h4> */}
 
-              <div className="grnDetailsGrid">
-                {stockMovementDetailsFields.map((item, index) => (
-                  <div className="detailItem" key={index}>
-                    <p className="detailLabel">{item.label}</p>
-                    <p className={`detailValue ${item.className || ""}`}>
-                      {item.value || "---"}
-                    </p>
+                  <div className="grnDetailsGrid">
+                    {stockMovementDetailsFields.map((item, index) => (
+                      <div className="detailItem" key={index}>
+                        <p className="detailLabel">{item.label}</p>
+                        <p className={`detailValue ${item.className || ""}`}>
+                          {item.value || "---"}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-</AccordionDetails>
-                      </Accordion>
+                </div>
+              </AccordionDetails>
+            </Accordion>
             <div className="GrnEditDataGridDiv">
               <StyledDataGrid
                 rows={selectedStockItems}
@@ -1411,7 +1418,6 @@ const EditStockMovements = ({
                 rowsPerPageOptions={[5]}
               />
             </div>
-             
           </div>
 
           {isPendingApproval && (
@@ -1656,12 +1662,18 @@ const EditStockMovements = ({
                 />
                 <Autocomplete
                   options={companies}
-                  value={formData?.company}
+                  value={formData?.company || null}
                   loading={loadingCompanies}
+                  loadingText="Loading Companies..."
                   getOptionLabel={(o) => o.name || ""}
                   isOptionEqualToValue={(o, v) => o.id === v?.id}
                   readOnly={readOnlyMode}
                   onChange={(_, v) => handleUpdateField("company", v)}
+                  renderOption={(props, option) => (
+                    <li {...props} key={option.id}>
+                      {option.name}
+                    </li>
+                  )}
                   renderInput={(p) => (
                     <TextField {...p} label="Company" fullWidth />
                   )}

@@ -98,6 +98,13 @@ const NewStockMovements = ({
   // In-flight request map to avoid redundant concurrent fetches for the same partId
   const purchaseHistoryInFlight = React.useRef({});
   const prePopulatedRef = React.useRef(false);
+  const lineItemIdCounterRef = React.useRef(0);
+  const selectionOrderRef = React.useRef(0);
+
+  const generateLineItemId = (partId) => {
+    lineItemIdCounterRef.current += 1;
+    return `${partId}-${Date.now()}-${lineItemIdCounterRef.current}`;
+  };
 
   const getPurchaseHistoryForPart = async (partId) => {
     if (purchaseHistoryCache[partId]) return purchaseHistoryCache[partId];
@@ -553,7 +560,8 @@ const NewStockMovements = ({
     }
 
     const isSerial = trackingTypeStr === "Serial";
-    const uniqueId = `${part.partId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const uniqueId = generateLineItemId(part.partId);
+    const selectionOrder = selectionOrderRef.current++;
 
     // Local lookup map of partId -> purchase history to resolve PO/GRN during auto-selection
     const localHistoryMap = {};
@@ -595,6 +603,7 @@ const NewStockMovements = ({
     const newEntry = {
       ...part,
       uniqueId: uniqueId,
+      selectionOrder: selectionOrder,
       issueQuantity: isSerial && parentQtyAvailable > 0 ? 1 : "",
       trackingType: trackingTypeStr,
       trackingNumber: canUseStockMatch ? matchedTrackingId : "",
@@ -610,7 +619,9 @@ const NewStockMovements = ({
         : formData?.bin?.binCode || "",
     };
 
-    setSelectedStockItems((prev) => [...prev, newEntry]);
+    setSelectedStockItems((prev) =>
+      [...prev, newEntry].sort((a, b) => a.selectionOrder - b.selectionOrder),
+    );
 
     // Fetch tracking options for all items (parent + children) that require tracking and were actually added, in parallel
     const itemsToFetch = [newEntry].filter(
@@ -1508,14 +1519,23 @@ const NewStockMovements = ({
                     />
                     <Autocomplete
                       options={companies}
-                      value={formData?.company}
+                      value={formData.company}
                       loading={loadingCompanies}
                       loadingText="Loading Companies..."
-                      getOptionLabel={(o) => o.name || ""}
-                      isOptionEqualToValue={(o, v) => o.id === v?.id}
-                      onChange={(_, v) => handleUpdateField("company", v)}
-                      renderInput={(p) => (
-                        <TextField {...p} label="Company" fullWidth />
+                      getOptionLabel={(option) => option.name ?? ""}
+                      isOptionEqualToValue={(option, value) =>
+                        option.id === value?.id
+                      }
+                      renderOption={(props, option) => (
+                        <li {...props} key={option.id}>
+                          {option.name}
+                        </li>
+                      )}
+                      onChange={(_, value) =>
+                        handleUpdateField("company", value)
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Company" fullWidth />
                       )}
                     />
                   </div>
