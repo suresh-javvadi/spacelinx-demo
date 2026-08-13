@@ -37,10 +37,7 @@ const StockMovements = () => {
   useEffect(() => {
     if (preSelectedParts.length > 0) {
       if (!hasPermission(PERMISSIONS.STOCKMOVEMENTS.MODIFY)) {
-        Alert(
-          "You don't have permission to create stock movements",
-          "warning",
-        );
+        Alert("You don't have permission to create stock movements", "warning");
         setPreSelectedParts([]);
         return;
       }
@@ -111,6 +108,12 @@ const StockMovements = () => {
         row.movementDate ? new Date(row.movementDate) : null,
       valueFormatter: (value) =>
         value ? dayjs(value).format("DD-MM-YYYY") : "-",
+    },
+    {
+      field: "movementReason",
+      headerName: "Reason",
+      flex: 1,
+      valueGetter: (_, row) => row.movementReason || "-",
     },
   ];
 
