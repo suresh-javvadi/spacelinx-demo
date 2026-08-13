@@ -37,6 +37,11 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             throw new InvalidOperationException("At least one line item is required.");
         }
 
+        if (request.LineItems.Count > 500)
+        {
+            throw new InvalidOperationException($"A stock movement cannot contain more than 500 line items (received {request.LineItems.Count}).");
+        }
+
             // Get user for performed by
             var user = await spaceLinxContext.Users.FirstOrDefaultAsync(x => x.Email == UserEmail && x.DeletedBy == null);
 
@@ -71,15 +76,20 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             IsActive = true
         };
 
-        spaceLinxContext.StockMovements.Add(stockMovement);
-        await spaceLinxContext.SaveChangesAsync();
+            // Validate all parts exist in a single round trip instead of one query per line item
+        var requestedPartIds = request.LineItems.Select(i => i.PartId).Distinct().ToList();
+        var existingPartIdSet = (await spaceLinxContext.Parts
+            .Where(p => requestedPartIds.Contains(p.Id!.Value) && p.DeletedBy == null)
+            .Select(p => p.Id!.Value)
+            .ToListAsync())
+            .ToHashSet();
 
-            // Create line items for the stock movement request
+            // Validate and build line items before persisting anything, so a rejected
+            // request never leaves an orphan StockMovement header behind
         foreach (var item in request.LineItems)
         {
                 // Validate part exists
-                var part = await spaceLinxContext.Parts.FirstOrDefaultAsync(p => p.Id == item.PartId && p.DeletedBy == null);
-            if (part == null)
+            if (!existingPartIdSet.Contains(item.PartId))
             {
                 throw new InvalidOperationException($"Part with ID {item.PartId} not found.");
             }
@@ -97,10 +107,9 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
                     throw new InvalidOperationException($"Issue quantity ({item.Quantity}) cannot exceed PO quantity ({item.PoQuantity.Value}) for Part ID {item.PartId}.");
             }
 
-                // Create line item
+                // Create line item; added via navigation so EF fixes up the FK once the header is saved
             var lineItem = new StockMovementLineItem
             {
-                StockMovementId = stockMovement.Id!.Value,
                 PartId = item.PartId,
                 Quantity = item.Quantity,
                 TrackingType = item.TrackingType,
@@ -112,9 +121,10 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true
             };
-            spaceLinxContext.StockMovementLineItems.Add(lineItem);
+            stockMovement.StockMovementLineItems.Add(lineItem);
         }
 
+        spaceLinxContext.StockMovements.Add(stockMovement);
         await spaceLinxContext.SaveChangesAsync();
         return stockMovement;
     }
@@ -381,6 +391,11 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             throw new InvalidOperationException("At least one line item is required.");
         }
 
+        if (request.LineItems.Count > 500)
+        {
+            throw new InvalidOperationException($"A stock movement cannot contain more than 500 line items (received {request.LineItems.Count}).");
+        }
+
             // Get user for performed by
             var user = await spaceLinxContext.Users.FirstOrDefaultAsync(x => x.Email == UserEmail && x.DeletedBy == null);
 
@@ -475,15 +490,19 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
 
             await spaceLinxContext.SaveChangesAsync();
 
+            var notifyPartIds = stockMovement.StockMovementLineItems.Select(l => l.PartId).Distinct().ToList();
+            var inventoryPartsForNotify = (await spaceLinxContext.InventoryParts
+                .AsNoTracking()
+                .Where(p => notifyPartIds.Contains(p.PartId) && p.DeletedBy == null)
+                .ToListAsync())
+                .GroupBy(p => p.PartId)
+                .ToDictionary(g => g.Key, g => g.First());
+
             foreach (var line in stockMovement.StockMovementLineItems)
             {
-                var inventoryPart = await spaceLinxContext.InventoryParts
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.PartId == line.PartId && p.DeletedBy == null);
-
-                if (inventoryPart != null)
+                if (inventoryPartsForNotify.TryGetValue(line.PartId, out var inventoryPart))
                 {
-                    await inventoryNotificationService.NotifyReorderLevelAsync(inventoryPart.Id.Value);
+                    await inventoryNotificationService.NotifyReorderLevelAsync(inventoryPart.Id!.Value);
                 }
             }
             await transaction.CommitAsync();
@@ -519,6 +538,27 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             AssignedUserId = stockMovement.AssignedUserId,
         };
 
+            // Batch-load lookups referenced by the line items instead of querying per item
+        var partIds = stockMovement.StockMovementLineItems.Select(li => li.PartId).Distinct().ToList();
+
+        var existingPartIdSet = (await spaceLinxContext.Parts
+            .Where(p => partIds.Contains(p.Id!.Value) && p.DeletedBy == null)
+            .Select(p => p.Id!.Value)
+            .ToListAsync())
+            .ToHashSet();
+
+        var sourceStockLookup = (await spaceLinxContext.InventoryStocks
+            .Where(s => partIds.Contains(s.PartId) && s.DeletedBy == null)
+            .ToListAsync())
+            .GroupBy(s => (s.PartId, s.TrackingId))
+            .ToDictionary(g => g.Key, g => g.First());
+
+        var inventoryPartLookup = (await spaceLinxContext.InventoryParts
+            .Where(p => partIds.Contains(p.PartId) && p.LocationId == request.FromLocationId && p.BinId == request.FromBinId && p.DeletedBy == null)
+            .ToListAsync())
+            .GroupBy(p => p.PartId)
+            .ToDictionary(g => g.Key, g => g.First());
+
         foreach (var lineItem in stockMovement.StockMovementLineItems)
         {
             var item = new StockMovementLineItemWriteModel
@@ -531,21 +571,16 @@ public class StockMovementService(SpaceLinxContext spaceLinxContext, IMapper map
             };
 
                 // Validate part exists
-                var part = await spaceLinxContext.Parts.FirstOrDefaultAsync(p => p.Id == item.PartId && p.DeletedBy == null);
-            if (part == null)
+            if (!existingPartIdSet.Contains(item.PartId))
             {
                 throw new InvalidOperationException($"Part with ID {item.PartId} not found.");
             }
 
                 // Get inventory stock at source location
-            var sourceStock = await spaceLinxContext.InventoryStocks
-                    .FirstOrDefaultAsync(s => s.PartId == item.PartId
-                        && s.TrackingId == item.TrackingId
-                        && s.DeletedBy == null);
+            sourceStockLookup.TryGetValue((item.PartId, item.TrackingId), out var sourceStock);
 
                 // Get inventory part
-            var inventoryPart = await spaceLinxContext.InventoryParts
-                    .FirstOrDefaultAsync(p => p.PartId == item.PartId && p.LocationId == request.FromLocationId && p.BinId == request.FromBinId && p.DeletedBy == null);
+            inventoryPartLookup.TryGetValue(item.PartId, out var inventoryPart);
 
             int previousQty = sourceStock?.QtyOnhand ?? 0;
 
