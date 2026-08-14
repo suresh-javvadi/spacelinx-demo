@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import { Autocomplete, Button, FormHelperText, TextField } from "@mui/material";
 import { AlertsContext } from "../../AlertsContext/Context";
 import { FlyoutAlerts } from "../../AlertsContext/Alerts";
@@ -216,6 +216,23 @@ const NewStockMovements = ({
 
   const isRowUsableForMovement = (row, movementTypeName) =>
     getUsableQtyForMovement(row, movementTypeName) > 0;
+
+  const selectableParts = useMemo(() => {
+    const movementTypeName = formData.movementType?.name;
+    // Adjustment can target parts with zero or missing stock at this
+    // location — the backend will create the inventory_stock row when
+    // processing an Increase adjustment. Only draw-down movement types
+    // need a usable lot to exist up-front.
+    if (!movementTypeName || movementTypeName === "Adjustment") return items;
+
+    return items.filter((part) =>
+      stockData.some(
+        (stock) =>
+          stock.partId === part.partId &&
+          isRowUsableForMovement(stock, movementTypeName),
+      ),
+    );
+  }, [items, stockData, formData.movementType]);
 
   // Available quantity for a specific tracking ID = that inventory_stock row's
   // own usable quantity (NOT the part's aggregate across all tracking IDs).
@@ -783,7 +800,10 @@ const NewStockMovements = ({
     ) {
       prePopulatedRef.current = true;
       const populate = async () => {
+        const allowedPartIds = new Set(selectableParts.map((p) => p.partId));
         for (const part of initialParts) {
+          // Ensure the same eligibility rules apply as the manual picker.
+          if (!allowedPartIds.has(part.partId)) continue;
           await handleSelectItem(part);
         }
       };
@@ -1668,7 +1688,12 @@ const NewStockMovements = ({
                   setInputValue(newInputValue)
                 }
                 readOnly={items.length === 0 || !formData?.movementType}
-                options={items}
+                options={selectableParts}
+                noOptionsText={
+                  items.length > 0 && selectableParts.length === 0
+                    ? `No parts with stock available for ${formData.movementType?.name} at this location`
+                    : "No parts found"
+                }
                 loading={loadingStockData}
                 loadingText="Loading Inventory Parts..."
                 getOptionLabel={(option) =>
