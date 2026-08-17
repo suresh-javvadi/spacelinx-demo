@@ -6739,6 +6739,24 @@ public partial class SpaceLinxContext : DbContext
                 .HasColumnName("user_number");
             entity.Property(e => e.DepartmentId).HasColumnName("department_id");
 
+            // Password-login columns (see User.Auth.cs). All nullable/defaulted so
+            // Azure-AD-only deployments are unaffected.
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(255)
+                .HasColumnName("password_hash");
+            entity.Property(e => e.PasswordUpdatedAt).HasColumnName("password_updated_at");
+            entity.Property(e => e.MustChangePassword)
+                .HasDefaultValue(false)
+                .HasColumnName("must_change_password");
+            entity.Property(e => e.FailedLoginAttempts)
+                .HasDefaultValue(0)
+                .HasColumnName("failed_login_attempts");
+            entity.Property(e => e.LockoutUntil).HasColumnName("lockout_until");
+            entity.Property(e => e.PasswordResetTokenHash)
+                .HasMaxLength(255)
+                .HasColumnName("password_reset_token_hash");
+            entity.Property(e => e.PasswordResetTokenExpiresAt).HasColumnName("password_reset_token_expires_at");
+
             entity.HasOne(d => d.DepartmentRef)
                 .WithMany(p => p.Users)
                 .HasForeignKey(d => d.DepartmentId)

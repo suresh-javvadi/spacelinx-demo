@@ -10,15 +10,40 @@ import Cliploader from "./Components/Loaders/Cliploader";
 import { useUserContext } from "./features/userContext/UserContext";
 import { retryPendingRequest } from "../src/services/api.js";
 import { EventType } from "@azure/msal-browser";
-import { useNavigate } from "react-router-dom";
+import { useMsal } from "@azure/msal-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import AppShell from "./AppShell.jsx";
+import LoginPage from "./Components/Auth/LoginPage.jsx";
+import ResetPasswordPage from "./Components/Auth/ResetPasswordPage.jsx";
+import ChangePasswordPage from "./Components/Auth/ChangePasswordPage.jsx";
+import { isLocalSession } from "./services/localAuth.js";
+import { getAuthConfig } from "./services/authConfigService.js";
 
 export const ThemeContext = createContext(null);
 
 function App({ msalInstance }) {
   const { isUserActive, userAuthenticated, loadingRoles } = useUserContext();
+  const { accounts } = useMsal();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const [authConfig, setAuthConfig] = useState(null);
+
+  // The explicit login screen only applies where password sign-in is enabled.
+  // Microsoft-only deployments keep their existing behaviour: no session simply
+  // means the API 401s and the interceptor bounces the user to Microsoft.
+  const hasSession = accounts.length > 0 || isLocalSession();
+  const showLogin = Boolean(authConfig?.passwordEnabled) && !hasSession;
+
+  useEffect(() => {
+    let active = true;
+    getAuthConfig().then((cfg) => {
+      if (active) setAuthConfig(cfg);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("MESAppTheme") || "dark";
   });
@@ -71,8 +96,16 @@ function App({ msalInstance }) {
         <ThemeProvider theme={muiTheme}>
           <CssBaseline />
           <div className="App" id={theme}>
-            {loading || loadingRoles ? (
+            {/* Reset-password links are followed while signed out, so this route is
+                checked before any session or role loading. */}
+            {location.pathname === "/reset-password" ? (
+              <ResetPasswordPage />
+            ) : loading || loadingRoles ? (
               <Cliploader loading={true} />
+            ) : showLogin ? (
+              <LoginPage />
+            ) : location.pathname === "/change-password" && hasSession ? (
+              <ChangePasswordPage />
             ) : !isUserActive || !userAuthenticated ? (
               <UnAuthorizedUser />
             ) : (

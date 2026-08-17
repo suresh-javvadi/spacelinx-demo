@@ -4,6 +4,7 @@ import { fetchUsersWithEmail } from "../../services/unAuthorizedUserService";
 import { useNavigate } from "react-router-dom";
 import { fetchRolePermissionByRoleId } from "../../services/rolePermissionService";
 import { fetchOptionSetByName } from "../../services/optionSetService";
+import { getLocalUserEmail } from "../../services/localAuth";
 
 const UserContext = createContext();
 
@@ -24,6 +25,12 @@ export const UserContextProvider = ({ children }) => {
   const [defaultRole, setDefaultRole] = useState(null);
   const [permissionSet, setPermissionSet] = useState(null);
 
+  // The signed-in user's email, whichever way they signed in: MSAL populates
+  // `accounts` for Azure AD, while password sign-in carries the email in the
+  // SpaceLinx token. Everything downstream keys off email, so the two are
+  // interchangeable from here on.
+  const signedInEmail = accounts[0]?.username || getLocalUserEmail();
+
   // Active-role selection is persisted in localStorage (not sessionStorage) so the
   // user's chosen role survives a browser/tab close — matching how MSAL persists the
   // login (cacheLocation: "localStorage"). Previously it lived in sessionStorage, so
@@ -39,7 +46,7 @@ export const UserContextProvider = ({ children }) => {
     );
     if (matchedRole) {
       setActiveRole(matchedRole);
-      const email = accounts[0]?.username;
+      const email = signedInEmail;
       localStorage.setItem(
         activeRoleStorageKey(email),
         matchedRole.role.roleName
@@ -60,8 +67,8 @@ export const UserContextProvider = ({ children }) => {
   const fetchUserRoles = async () => {
     setLoadingRoles(true);
     try {
-      if (accounts.length > 0) {
-        const email = accounts[0].username;
+      if (signedInEmail) {
+        const email = signedInEmail;
         const user = await fetchUsersWithEmail(email);
         const pathsData = await fetchOptionSetByName("Path_Permissions");
         setPermissionSet(pathsData);
@@ -150,7 +157,7 @@ export const UserContextProvider = ({ children }) => {
 
   useEffect(() => {
     fetchUserRoles();
-  }, [accounts]);
+  }, [accounts, signedInEmail]);
 
   useEffect(() => {
     setIsSuperAdmin(activeRole?.role?.roleName === "Super Admin");

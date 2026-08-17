@@ -1,5 +1,6 @@
 import axios from "axios";
 import msalInstance from "../msalConfig";
+import { getLocalToken, clearLocalToken } from "./localAuth";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -151,6 +152,15 @@ api.interceptors.request.use(
       return config;
     }
 
+    // Password sign-in: the SpaceLinx-issued token is already a valid bearer token,
+    // so use it directly and skip the MSAL acquisition flow entirely.
+    const localToken = getLocalToken();
+    if (localToken) {
+      config.headers["Authorization"] = `Bearer ${localToken}`;
+      config.headers["SPACELINX-TENANT-ID"] = tenantId;
+      return config;
+    }
+
     const token = await fetchMsalToken();
     if (token) {
       const { isExpired, timeLeft } = checkTokenExpiration(token);
@@ -192,6 +202,16 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       console.warn("Handling 401 error — token refresh needed");
+
+      // Password sessions have no silent refresh: the token simply expired or was
+      // revoked, so drop it and send the user back to the login screen. Falling
+      // through to the MSAL refresh below would bounce them to Microsoft instead.
+      if (getLocalToken() || localStorage.getItem("spacelinx.localAuth.token")) {
+        savePendingRequest(originalRequest);
+        clearLocalToken();
+        window.location.assign("/login");
+        return Promise.reject(error);
+      }
 
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

@@ -18,6 +18,7 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { Autocomplete, Divider, TextField, Tooltip } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import NewIssues from "../../features/issues/NewIssues";
+import { isLocalSession, clearLocalToken } from "../../services/localAuth";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import { useIssues } from "../../features/issues/IssuesContext";
 import { useUserContext } from "../../features/userContext/UserContext";
@@ -96,6 +97,16 @@ function Header() {
   const handleLogout = () => {
     sessionStorage.removeItem("activeRole");
     handleCloseMenu();
+
+    // Password sessions have nothing to sign out of at Microsoft — dropping the
+    // token and reloading is the whole logout. Calling logoutRedirect here would
+    // send the user to Microsoft for an account they never signed in with.
+    if (isLocalSession()) {
+      clearLocalToken();
+      window.location.assign("/");
+      return;
+    }
+
     instance.logoutRedirect({
       postLogoutRedirectUri: "/",
     });
