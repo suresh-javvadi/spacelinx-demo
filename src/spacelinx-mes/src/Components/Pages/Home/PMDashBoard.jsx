@@ -228,9 +228,9 @@ const PMDashBoard = () => {
           </div>
           <PieChart
             colors={[
-              "rgba(23, 203, 178, 1)",
-              "rgba(128, 205, 221, 1)",
-              "rgba(0, 181, 190, 1)",
+              "rgba(165, 180, 252, 1)",
+              "rgba(99, 102, 241, 1)",
+              "rgba(99, 102, 241, 1)",
             ]}
             series={[
               {
@@ -293,9 +293,9 @@ const PMDashBoard = () => {
           </div>
           <PieChart
             colors={[
-              "rgba(23, 203, 178, 1)",
-              "rgba(128, 205, 221, 1)",
-              "rgba(0, 181, 190, 1)",
+              "rgba(165, 180, 252, 1)",
+              "rgba(99, 102, 241, 1)",
+              "rgba(99, 102, 241, 1)",
             ]}
             series={[
               {
@@ -352,9 +352,9 @@ const PMDashBoard = () => {
           </div>{" "}
           <PieChart
             colors={[
-              "rgba(23, 203, 178, 1)",
-              "rgba(128, 205, 221, 1)",
-              "rgba(0, 181, 190, 1)",
+              "rgba(165, 180, 252, 1)",
+              "rgba(99, 102, 241, 1)",
+              "rgba(99, 102, 241, 1)",
             ]}
             series={[
               {

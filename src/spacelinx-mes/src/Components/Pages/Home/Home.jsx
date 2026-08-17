@@ -102,7 +102,7 @@ const Home = () => {
             <div className="DashBoardBody1Inner2Inner">
               <div className="DashBoardBody1Inner2Inner1">
                 <PieChart
-                  colors={["rgba(128, 205, 221, 1)", "rgba(96, 173, 212, 1)"]}
+                  colors={["rgba(99, 102, 241, 1)", "rgba(139, 92, 246, 1)"]}
                   series={[
                     {
                       data: [
@@ -188,7 +188,7 @@ const Home = () => {
                       ? "rgba(232, 232, 232, 1)"
                       : guide.status === "Draft"
                       ? " rgba(107, 223, 156, 1)"
-                      : "rgba(128, 205, 221, 1)",
+                      : "rgba(99, 102, 241, 1)",
                 }}
               >
                 <p>{guide.name}</p>

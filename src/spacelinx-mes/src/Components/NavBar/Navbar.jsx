@@ -28,8 +28,6 @@ import {
 } from "@mui/icons-material";
 import { useUserContext } from "../../features/userContext/UserContext";
 import "./Navbar.css";
-import poweredbyxdlinxDark from "../../Assest/Images/logos/poweredbyxdlinxDark.png";
-import poweredbyxdlinxLight from "../../Assest/Images/logos/poweredbyxdlinxLight.png";
 import { useTheme } from "@mui/material/styles";
 import { useFeatureBitContext } from "../../features/adminuser/FeatureBit/FeatureBitContext";
 import NavBarItems from "./NavBarItems";
@@ -432,15 +430,17 @@ const Navbar = () => {
         </div>
         {isDrawerOpen && (
           <div className="xdlinxLogoContainer">
-            <img
-              src={
-                theme.palette.mode === "dark"
-                  ? poweredbyxdlinxDark
-                  : poweredbyxdlinxLight
-              }
-              alt="powered by xdlinx"
-              className="xdlinxLogo"
-            />
+            <span
+              style={{
+                fontFamily: "var(--header-font-family)",
+                fontWeight: 700,
+                fontSize: "1.25rem",
+                letterSpacing: "0.14em",
+                color: theme.palette.mode === "dark" ? "#ffffff" : "#121212",
+              }}
+            >
+              SAR<span style={{ color: "var(--primary-color)" }}>SPACE</span>
+            </span>
           </div>
         )}
       </Drawer>

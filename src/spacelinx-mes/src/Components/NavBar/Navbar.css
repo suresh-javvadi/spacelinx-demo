@@ -58,7 +58,7 @@
   color: var(--link-color) !important;
 }
 .MuiBox-root.drawer-open .sub-buttons .MuiListItem-root:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(99, 102, 241, 0.12);
 }
 .navbar-icons svg {
   font-size: 24px;
@@ -78,15 +78,15 @@
 }
 .custom-popper .MuiListItem-root:hover .MuiListItemText-primary,
 .custom-popper .MuiListItem-root:hover {
-  color: #00ccff !important;
+  color: #6366F1 !important;
   background-color: var(--navbar-custom-popper) !important;
 }
 .navListItem:hover .MuiListItemText-primary {
-  color: #00ccff !important;
+  color: #6366F1 !important;
 }
 
 .navListItem:hover .navbar-icons svg {
-  color: #00ccff !important;
+  color: #6366F1 !important;
 }
 
 .navListItem {
@@ -117,7 +117,10 @@
 }
 .right-rail {
   position: relative;
-  background-color: #353e40;
+  background-color: #16161f;
+}
+#light .right-rail {
+  background-color: #f0f0f5;
 }
 .right-rail.active-menu::after,
 .right-rail.active-submenu::after,
@@ -129,7 +132,7 @@
   top: 0;
   width: 6px;
   height: 100%;
-  background-color: #00ccff;
+  background: var(--brand-gradient);
   border-radius: 4px 0 0 4px;
   transition: transform 150ms ease;
 }
@@ -141,13 +144,13 @@
 #dark .MuiListItem-root:hover,
 #dark .submenu-list-item-text:hover,
 #dark .custom-popper .MuiListItem-root:hover {
-  background-color: #353e40 !important;
+  background-color: rgba(99, 102, 241, 0.16) !important;
 }
 #light .navListItem:hover,
 #light .MuiListItem-root:hover,
 #light .submenu-list-item-text:hover,
 #light .custom-popper .MuiListItem-root:hover {
-  background-color: #e1faff !important;
+  background-color: rgba(99, 102, 241, 0.1) !important;
 }
 
 /* Keep text and icons highlighted on selected item */
@@ -160,12 +163,12 @@
 /* === Only submenu & child get background === */
 #dark .active-submenu,
 #dark .active-child {
-  background-color: #353e40 !important;
+  background-color: rgba(99, 102, 241, 0.16) !important;
 }
 
 #light .active-submenu,
 #light .active-child {
-  background-color: #e1faff !important;
+  background-color: rgba(99, 102, 241, 0.1) !important;
 }
 
 /* === Parent menu (active-menu) should NOT get background === */

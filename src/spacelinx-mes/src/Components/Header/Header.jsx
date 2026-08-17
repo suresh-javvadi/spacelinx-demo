@@ -11,7 +11,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useMsal } from "@azure/msal-react";
 import { useDrawer } from "../../useDrawerHook";
 import { ThemeContext } from "../../App";
-import spacelinxLogo from "../../Assest/Images/logos/spacelinxlogo.png";
 import "./Header.css";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
@@ -126,7 +125,7 @@ function Header() {
           zIndex: "(theme) => theme.zIndex.drawer + 1",
           height: "60px",
           boxShadow: "none",
-          backgroundColor: theme === "dark" ? "#2c2c2c" : "#ffffff",
+          backgroundColor: theme === "dark" ? "#0d0d18" : "#ffffff",
           color: theme === "dark" ? "#ffffff" : "#000000",
         }}
       >
@@ -141,7 +140,9 @@ function Header() {
             <MenuIcon />
           </IconButton>
           <div className="logo">
-            <img src={spacelinxLogo} alt="Logo" className="logo-img" />
+            <span className="brand-wordmark" aria-label="SARSPACE">
+              SAR<span className="brand-wordmark-accent">SPACE</span>
+            </span>
           </div>
           <div className="HeaderIconsContainer">
             <IconButton

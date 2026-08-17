@@ -222,7 +222,7 @@ const EngineerDashBoard = () => {
         <div className="EDashBoardBody2">
           <p className="EDashBoardBody2Header">Work Order Status</p>
           <PieChart
-            colors={["rgba(128, 205, 221, 1)", "rgba(96, 173, 212, 1)"]}
+            colors={["rgba(99, 102, 241, 1)", "rgba(139, 92, 246, 1)"]}
             series={[
               {
                 data: [

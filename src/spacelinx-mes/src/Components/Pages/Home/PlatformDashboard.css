@@ -1,358 +1,232 @@
-.PlatformMain {
+/* ============================================================
+   SARSPACE home page — modern hero + module launcher
+   ============================================================ */
+
+.home-wrap {
   position: relative;
+  min-height: calc(100vh - 70px);
   width: 100%;
-  height: 100vh;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 48px 32px 64px;
+  box-sizing: border-box;
 }
 
-.GlobeDiv {
+/* Animated gradient orbs in the background */
+.home-orbs {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
 }
-
-.globeImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
   opacity: 0.5;
 }
-
-/* .globeImageDark {
-  filter: brightness(0.9);
-} */
-
-.globeImageLight {
-  filter: brightness(1.1);
+.orb-1 {
+  width: 480px;
+  height: 480px;
+  background: #6366f1;
+  top: -120px;
+  left: -100px;
+  animation: orbFloat1 14s ease-in-out infinite;
 }
-
-/* Arc-shaped satellites at the top */
-.platformNamesDiv {
-  position: absolute;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 80%;
-  max-width: 1200px;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  transition: all 0.3s ease;
+.orb-2 {
+  width: 420px;
+  height: 420px;
+  background: #4f46e5;
+  bottom: -140px;
+  right: -80px;
+  animation: orbFloat2 16s ease-in-out infinite;
 }
-
-/* Arc shape for satellites */
-.platformNamesDiv .circle:nth-child(1) {
-  transform: translateY(20px) translateX(-40px);
+.orb-3 {
+  width: 320px;
+  height: 320px;
+  background: #8b5cf6;
+  top: 38%;
+  left: 55%;
+  opacity: 0.32;
+  animation: orbFloat1 19s ease-in-out infinite;
 }
-
-.platformNamesDiv .circle:nth-child(2) {
-  transform: translateY(0);
-}
-
-.platformNamesDiv .circle:nth-child(3) {
-  transform: translateY(-20px);
-}
-
-.platformNamesDiv .circle:nth-child(4) {
-  transform: translateY(0);
-}
-
-.platformNamesDiv .circle:nth-child(5) {
-  transform: translateY(20px) translateX(40px);
-}
-
-/* Bottom center info div */
-.platformNamesDiv2 {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 500px;
-  display: flex;
-  flex-direction: column;
-  z-index: 2;
-  gap: 40px;
-}
-.Heading-Container {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  justify-content: center;
-  align-items: center;
-}
-.Heading-Child1 {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.satellites-open {
-  position: absolute;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 80%;
-  max-width: 1200px;
-  top: 50px;
-  left: calc(50% + 120px);
-  transform: translateX(-50%);
-  transition: all 0.3s ease;
-}
-
-/* Arc shape for satellites when drawer open */
-.satellites-open .circle:nth-child(1) {
-  transform: translateY(100px) translateX(-250px);
-}
-
-.satellites-open .circle:nth-child(2) {
-  transform: translateY(40px) translateX(-200px);
-}
-
-.satellites-open .circle:nth-child(3) {
-  transform: translateY(10px) translateX(-100px);
-}
-
-.satellites-open .circle:nth-child(4) {
-  transform: translateY(20px) translateX(30px);
-}
-
-.satellites-open .circle:nth-child(5) {
-  transform: translateY(110px) translateX(80px);
-}
-.platformNamesDiv .circle:nth-child(1) {
-  transform: translateY(100px) translateX(-140px);
-}
-
-.platformNamesDiv .circle:nth-child(2) {
-  transform: translateY(40px) translateX(-80px);
-}
-
-.platformNamesDiv .circle:nth-child(3) {
-  transform: translateY(10px) translateX(0px);
-}
-
-.platformNamesDiv .circle:nth-child(4) {
-  transform: translateY(20px) translateX(80px);
-}
-
-.platformNamesDiv .circle:nth-child(5) {
-  transform: translateY(110px) translateX(120px);
-}
-
-.circle {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-  margin: 0 10px;
-}
-
-.circle img {
-  width: 110px;
-  height: 110px;
-  object-fit: contain;
-  margin-bottom: 10px;
-}
-
-.circle span {
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.circle p {
-  font-size: 14px;
-  margin: 5px 0 0 0;
-}
-
-.xdlinxspacelabs {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  justify-content: center;
-}
-
-.xdlinxspacelabs img {
-  height: 40px;
-}
-
-.platformNamesDiv2 h2 {
-  font-size: 24px;
-  margin: 0;
-  font-family: var(--header-font-family) !important;
-}
-
-.platformNamesDiv2 h3 {
-  font-size: 16px;
-  margin: 5px 0;
-  font-family: var(--header-font-family) !important;
-}
-
-.platformNamesDiv2 h6 {
-  font-size: 8px;
-  margin: 5px 0;
-}
-
-.PlatformDrawerStyles {
-  width: 400px;
-  max-width: 90%;
-  background-color: #f5f5f5;
-}
-@media (max-width: 768px) {
-  .circle img {
-    width: 70px; /* Reduced from 110px */
-    height: 70px; /* Reduced from 110px */
+@keyframes orbFloat1 {
+  0%,
+  100% {
+    transform: translate(0, 0);
   }
-
-  .platformNamesDiv {
-    position: absolute;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80%;
-    max-width: 1200px;
-    top: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    transition: all 0.3s ease;
-  }
-
-  /* Maintain arc shape */
-  .platformNamesDiv .circle:nth-child(1) {
-    transform: translateY(90px) translateX(-100px);
-  }
-
-  .platformNamesDiv .circle:nth-child(2) {
-    transform: translateY(-5px) translateX(-60px);
-  }
-
-  .platformNamesDiv .circle:nth-child(3) {
-    transform: translateY(-15px);
-  }
-
-  .platformNamesDiv .circle:nth-child(4) {
-    transform: translateY(-5px) translateX(60px);
-  }
-
-  .platformNamesDiv .circle:nth-child(5) {
-    transform: translateY(60px) translateX(90px);
-  }
-  .satellites-open .circle:nth-child(1) {
-    transform: translateY(90px) translateX(-100px);
-  }
-
-  .satellites-open .circle:nth-child(2) {
-    transform: translateY(-5px) translateX(-60px);
-  }
-
-  .satellites-open .circle:nth-child(3) {
-    transform: translateY(-15px);
-  }
-
-  .satellites-open .circle:nth-child(4) {
-    transform: translateY(-5px) translateX(60px);
-  }
-
-  .satellites-open .circle:nth-child(5) {
-    transform: translateY(60px) translateX(90px);
-  }
-
-  .platformNamesDiv2 {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 500px;
-    display: flex;
-    flex-direction: column;
-    z-index: 2;
+  50% {
+    transform: translate(40px, 30px);
   }
 }
-@media only screen and (min-width: 1351px) {
-  .circle img {
-    width: 200px;
-    height: 200px;
+@keyframes orbFloat2 {
+  0%,
+  100% {
+    transform: translate(0, 0);
   }
-  .xdlinxspacelabs img {
-    height: 50px;
-  }
-  .platformNamesDiv2 {
-    width: 1000px;
-  }
-  .platformNamesDiv2 h2 {
-    font-size: 40px;
+  50% {
+    transform: translate(-35px, -45px);
   }
 }
-.DataGridLinkCell {
-  color: var(--link-color);
-}
-.ProductsScrollingBox2 {
-  height: 180px;
-}
-.productDetail {
-  display: flex;
-  justify-content: center;
-  margin-left: 5px;
-}
-.productDetail h3 {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.productDetail p {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.Guides-Container {
-  margin-top: 40px;
-}
-.ProductsPlatformSection {
-  display: flex;
-  flex-direction: column;
-  width: 97%;
-  height: 200px;
-  margin-top: 80px;
-  margin-left: 20px;
-}
-.Guides {
-  margin-top: -10px;
-  margin-left: 20px;
-  font-size: 10px;
-}
-.Products {
-  margin-top: -15px;
-  font-size: 10px;
-  margin-bottom: 10px;
-}
-.divider {
-  margin: 20px;
-}
-.NotAvailableMessage {
-  font-size: 1.5rem;
+
+/* Hero */
+.home-hero {
+  position: relative;
+  z-index: 1;
   text-align: center;
-  margin: 20px auto;
-  padding: 10px;
-  width: fit-content;
+  padding: 36px 0 52px;
 }
-.PlatformDrawerStyles {
-  width: 70%;
+.home-eyebrow {
+  font-family: var(--header-font-family);
+  letter-spacing: 0.45em;
+  font-size: 0.8rem;
+  color: var(--link-color);
+  margin: 0 0 14px;
 }
-.xdlinxspacelabs {
-  margin-right: 10px;
+.home-wordmark {
+  font-family: var(--header-font-family);
+  font-weight: 700;
+  font-size: clamp(3rem, 9vw, 6.5rem);
+  letter-spacing: 0.12em;
+  margin: 0;
+  line-height: 1;
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
-.xdlinxspacelabs img {
-  width: 200px;
-  height: 50px;
+.home-tagline {
+  margin: 18px 0 0;
+  font-family: var(--body-font-family);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  opacity: 0.7;
+}
+
+/* Module launcher grid — 4 premium cards */
+.home-modules {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 24px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.home-card {
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 30px 26px;
+  min-height: 210px;
+  border-radius: 20px;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  color: inherit;
+  font-family: var(--body-font-family);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background 220ms ease;
+}
+/* gradient sheen that brightens on hover */
+.home-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 120% at 0% 0%,
+    rgba(99, 102, 241, 0.18),
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+.home-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(99, 102, 241, 0.75);
+  box-shadow: 0 22px 50px rgba(79, 70, 229, 0.35);
+  background: rgba(99, 102, 241, 0.08);
+}
+.home-card:hover::before {
+  opacity: 1;
+}
+.home-card-icon {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  color: #fff;
+  background: var(--brand-gradient);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.4);
+  transition: transform 220ms ease;
+}
+.home-card:hover .home-card-icon {
+  transform: scale(1.08) rotate(-4deg);
+}
+.home-card-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.home-card-title {
+  font-family: var(--header-font-family);
+  font-weight: 600;
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+}
+.home-card-desc {
+  font-size: 0.9rem;
+  opacity: 0.62;
+  line-height: 1.4;
+}
+.home-card-go {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--header-font-family);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--link-color);
+  opacity: 0.75;
+  transition:
+    gap 220ms ease,
+    opacity 220ms ease;
+}
+.home-card:hover .home-card-go {
+  opacity: 1;
+  gap: 12px;
+}
+
+/* Light theme */
+#light .home-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+#light .home-card:hover {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+@media (max-width: 600px) {
+  .home-wrap {
+    padding: 24px 16px 48px;
+  }
+  .home-hero {
+    padding: 16px 0 36px;
+  }
 }
