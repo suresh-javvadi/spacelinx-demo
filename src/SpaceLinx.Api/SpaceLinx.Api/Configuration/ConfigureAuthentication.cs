@@ -1,3 +1,4 @@
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SpaceLinx.Api.Security.LocalAuth;
@@ -35,10 +36,11 @@ public static class ConfigureAuthentication
 
         var authOptions = configuration.GetSection(AuthOptions.SectionName).Get<AuthOptions>() ?? new AuthOptions();
 
-        if (!authOptions.Microsoft.Enabled && !authOptions.Password.Enabled)
+        if (!authOptions.Microsoft.Enabled && !authOptions.Password.Enabled && !authOptions.Demo.Enabled)
         {
             throw new InvalidOperationException(
-                "No sign-in method is enabled. Set Auth:Microsoft:Enabled and/or Auth:Password:Enabled to true.");
+                "No sign-in method is enabled. Set Auth:Microsoft:Enabled, Auth:Password:Enabled "
+                + "and/or Auth:Demo:Enabled to true.");
         }
 
         if (authOptions.Password.Enabled)
@@ -52,6 +54,23 @@ public static class ConfigureAuthentication
 
             services.AddScoped<ILocalTokenService, LocalTokenService>();
             services.AddScoped<ILocalAuthService, LocalAuthService>();
+        }
+
+        // Demo mode replaces sign-in entirely: every request is authenticated as one
+        // fixed user. It deliberately takes precedence over the other two schemes so a
+        // demo deployment cannot accidentally end up requiring a real sign-in.
+        if (authOptions.Demo.Enabled)
+        {
+            Console.WriteLine(
+                "WARNING: Auth:Demo:Enabled is true. Every request is authenticated as "
+                + $"'{authOptions.Demo.Email}' with no sign-in. Never use this where real data lives.");
+
+            services
+                .AddAuthentication(DemoAuthenticationHandler.SchemeName)
+                .AddScheme<AuthenticationSchemeOptions, DemoAuthenticationHandler>(
+                    DemoAuthenticationHandler.SchemeName, null);
+
+            return services;
         }
 
         var builder = services.AddAuthentication(options =>

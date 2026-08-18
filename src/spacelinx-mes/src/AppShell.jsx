@@ -13,6 +13,8 @@ import { IssuesProvider } from "./features/issues/IssuesContext";
 import Header from "./Components/Header/Header";
 import Navbar from "./Components/NavBar/Navbar";
 import Content from "./Components/Content/Content";
+import { DEMO_MODE } from "./demoMode";
+import { isLocalSession } from "./services/localAuth";
 
 const DIRECT_DETAIL_BASE_PATHS = [
   "/procurement/purchaseorders",
@@ -64,6 +66,24 @@ const AuthenticatedApp = ({ location, navigate }) => {
 const AppShell = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  // MSAL's templates key off an MSAL account, which only exists for Microsoft
+  // sign-in. Demo mode and password sign-in both authenticate without one, so the
+  // unauthenticated view would render even though the user is signed in. Render the
+  // app directly in those cases.
+  if (DEMO_MODE || isLocalSession()) {
+    return (
+      <DeepLinkProvider>
+        <FeatureBitContextProvider>
+          <PartDetailsDrawerProvider>
+            <IssuesProvider>
+              <AuthenticatedApp location={location} navigate={navigate} />
+            </IssuesProvider>
+          </PartDetailsDrawerProvider>
+        </FeatureBitContextProvider>
+      </DeepLinkProvider>
+    );
+  }
 
   return (
     <React.Fragment>

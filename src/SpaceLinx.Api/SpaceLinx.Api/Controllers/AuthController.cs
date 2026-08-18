@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SpaceLinx.Api.Configuration;
@@ -41,6 +41,8 @@ public class AuthController(
 
         return Ok(new
         {
+            // Demo mode overrides the other two: the frontend skips sign-in entirely.
+            demoEnabled = _options.Demo.Enabled,
             microsoftEnabled = _options.Microsoft.Enabled,
             passwordEnabled = _options.Password.Enabled,
             // Only meaningful when Microsoft sign-in is on. These are public

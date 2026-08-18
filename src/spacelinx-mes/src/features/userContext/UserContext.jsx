@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchRolePermissionByRoleId } from "../../services/rolePermissionService";
 import { fetchOptionSetByName } from "../../services/optionSetService";
 import { getLocalUserEmail } from "../../services/localAuth";
+import { DEMO_MODE, DEMO_EMAIL } from "../../demoMode";
 
 const UserContext = createContext();
 
@@ -29,7 +30,11 @@ export const UserContextProvider = ({ children }) => {
   // `accounts` for Azure AD, while password sign-in carries the email in the
   // SpaceLinx token. Everything downstream keys off email, so the two are
   // interchangeable from here on.
-  const signedInEmail = accounts[0]?.username || getLocalUserEmail();
+  // Demo mode has no session of any kind — the API authenticates every request
+  // as the fixed demo user, so use that address here too.
+  const signedInEmail = DEMO_MODE
+    ? DEMO_EMAIL
+    : accounts[0]?.username || getLocalUserEmail();
 
   // Active-role selection is persisted in localStorage (not sessionStorage) so the
   // user's chosen role survives a browser/tab close — matching how MSAL persists the

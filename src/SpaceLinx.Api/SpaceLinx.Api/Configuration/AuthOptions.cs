@@ -1,4 +1,4 @@
-namespace SpaceLinx.Api.Configuration;
+﻿namespace SpaceLinx.Api.Configuration;
 
 /// <summary>
 /// Which sign-in methods this deployment offers, and how the password one behaves.
@@ -13,6 +13,21 @@ public class AuthOptions
     public MicrosoftAuthOptions Microsoft { get; set; } = new();
 
     public PasswordAuthOptions Password { get; set; } = new();
+
+    public DemoAuthOptions Demo { get; set; } = new();
+}
+
+public class DemoAuthOptions
+{
+    /// <summary>
+    /// DEMO ONLY. Authenticates every request as <see cref="Email"/> with no sign-in,
+    /// overriding the other two methods. Anyone who can reach the URL gets that user's
+    /// access, so never enable this where real data lives.
+    /// </summary>
+    public bool Enabled { get; set; }
+
+    /// <summary>Must match a seeded Super Admin user.</summary>
+    public string Email { get; set; } = "demo@spacelinx.dev";
 }
 
 public class MicrosoftAuthOptions

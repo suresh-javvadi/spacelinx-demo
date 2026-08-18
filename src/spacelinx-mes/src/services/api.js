@@ -1,6 +1,7 @@
 import axios from "axios";
 import msalInstance from "../msalConfig";
 import { getLocalToken, clearLocalToken } from "./localAuth";
+import { DEMO_MODE } from "../demoMode";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -152,6 +153,13 @@ api.interceptors.request.use(
       return config;
     }
 
+    // Demo mode: there is no token at all. The API authenticates every request as
+    // the fixed demo user, so just forward the tenant header.
+    if (DEMO_MODE) {
+      config.headers["SPACELINX-TENANT-ID"] = tenantId;
+      return config;
+    }
+
     // Password sign-in: the SpaceLinx-issued token is already a valid bearer token,
     // so use it directly and skip the MSAL acquisition flow entirely.
     const localToken = getLocalToken();
@@ -202,6 +210,12 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       console.warn("Handling 401 error — token refresh needed");
+
+      // Demo mode has no sign-in to return to, so surface the error as-is rather
+      // than bouncing to Microsoft.
+      if (DEMO_MODE) {
+        return Promise.reject(error);
+      }
 
       // Password sessions have no silent refresh: the token simply expired or was
       // revoked, so drop it and send the user back to the login screen. Falling

@@ -17,6 +17,7 @@ import LoginPage from "./Components/Auth/LoginPage.jsx";
 import ResetPasswordPage from "./Components/Auth/ResetPasswordPage.jsx";
 import ChangePasswordPage from "./Components/Auth/ChangePasswordPage.jsx";
 import { isLocalSession } from "./services/localAuth.js";
+import { DEMO_MODE } from "./demoMode.js";
 import { getAuthConfig } from "./services/authConfigService.js";
 
 export const ThemeContext = createContext(null);
@@ -33,7 +34,9 @@ function App({ msalInstance }) {
   // Microsoft-only deployments keep their existing behaviour: no session simply
   // means the API 401s and the interceptor bounces the user to Microsoft.
   const hasSession = accounts.length > 0 || isLocalSession();
-  const showLogin = Boolean(authConfig?.passwordEnabled) && !hasSession;
+  // Demo mode never shows a sign-in screen, even if password sign-in is also on.
+  const showLogin =
+    !DEMO_MODE && Boolean(authConfig?.passwordEnabled) && !hasSession;
 
   useEffect(() => {
     let active = true;
