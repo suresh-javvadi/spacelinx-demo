@@ -51,10 +51,15 @@ public static class ConfigureAuthentication
                 throw new InvalidOperationException(
                     "Auth:Password:SigningKey must be at least 32 bytes when password sign-in is enabled.");
             }
-
-            services.AddScoped<ILocalTokenService, LocalTokenService>();
-            services.AddScoped<ILocalAuthService, LocalAuthService>();
         }
+
+        // Registered unconditionally: AuthController depends on these, and its
+        // /api/auth/config endpoint has to answer even where password sign-in is off —
+        // that is how the frontend discovers which sign-in methods exist. The endpoints
+        // that actually use the service return 404 when it is disabled, so nothing here
+        // is reachable without Auth:Password:Enabled.
+        services.AddScoped<ILocalTokenService, LocalTokenService>();
+        services.AddScoped<ILocalAuthService, LocalAuthService>();
 
         // Demo mode replaces sign-in entirely: every request is authenticated as one
         // fixed user. It deliberately takes precedence over the other two schemes so a
